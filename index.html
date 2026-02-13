@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DSA | Leetcode Visualizer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="global-nav">
+        <div class="nav-left">
+            <div class="logo">
+                <span class="logo-text">DSA</span><span class="logo-highlight">Visualizer</span>
+            </div>
+            <!-- Search bar -->
+            <div class="search-bar-wrapper">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-bar" 
+                    placeholder="Search problems..." 
+                    autocomplete="off"
+                >
+                <i class="fas fa-search"></i>
+                <div id="searchDropdown" class="search-dropdown" style="display:none;"></div>
+            </div>
+            <!-- All Problems button -->
+            <button id="problemListBtn" class="modern-select" style="background: var(--bg-card); border: 1px solid var(--border); cursor: pointer; padding: 10px 16px; gap: 8px; display: flex; align-items: center;">
+                <i class="fas fa-list"></i> All Problems
+            </button>
+        </div>
+        <div class="nav-right">
+            <div class="control-info">
+                <span class="control-hint">Use ← → arrow keys or buttons to navigate</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Problem List Modal - Full Screen -->
+    <div id="problemModal" class="problem-modal">
+        <div class="problem-modal-content">
+            <div class="problem-modal-header">
+                <h2>All Problems</h2>
+                <button id="problemModalClose" class="problem-modal-close" type="button">✕</button>
+            </div>
+            
+            <div class="problem-modal-filters">
+                <div class="filter-group">
+                    <label>Topic:</label>
+                    <div class="filter-options">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="recursion">Recursion</button>
+                        <button class="filter-btn" data-filter="tree">Tree</button>
+                        <button class="filter-btn" data-filter="graph">Graph</button>
+                        <button class="filter-btn" data-filter="stack">Stack</button>
+                        <button class="filter-btn" data-filter="queue">Queue</button>
+                        <button class="filter-btn" data-filter="blind75">Blind 75</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="problemList" class="problem-list">
+            </div>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <div class="control-group">
+            <button onclick="changeStep(-1)" id="prevBtn" class="control-btn">
+                ← Previous
+            </button>
+            <button onclick="changeStep(1)" id="nextBtn" class="control-btn primary">
+                Next →
+            </button>
+            <button onclick="resetVisualization()" class="control-btn secondary">
+                Reset
+            </button>
+            <button id="youtubeBtn" class="control-btn youtube-btn" type="button">
+                <i class="fab fa-youtube"></i> Videos
+            </button>
+            <!-- Algorithm Selector inline with controls -->
+            <div class="algorithm-selector">
+                <label for="algorithmSelect" class="algorithm-label">Algorithm:</label>
+                <select id="algorithmSelect" class="modern-select">
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+        </div>
+
+        <div class="step-info">
+            <div class="step-progress">
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                </div>
+            </div>
+            <div id="stepCounter" class="step-counter">
+            </div>
+        </div>
+    </div>
+
+    <main class="app-layout">
+        <section class="module code-module">
+            <div class="module-header">
+                <div class="module-label">
+                    <span>SOURCE CODE</span>
+                </div>
+                <div class="language-badge">Python</div>
+            </div>
+            <div id="codeEditor" class="code-viewport"></div>
+            <div class="code-info">
+                <div class="complexity-info">
+                    <div class="complexity-item">
+                        <span class="complexity-label">Time Complexity</span>
+                        <span id="timeComplexity" class="complexity-value">O(n)</span>
+                    </div>
+                    <div class="complexity-item">
+                        <span class="complexity-label">Space Complexity</span>
+                        <span id="spaceComplexity" class="complexity-value">O(h)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module viz-module">
+            <div class="module-header">
+            </div>
+            <div id="canvas" class="render-engine">
+                <!-- SVG layer for edges / arrows -->
+                <svg id="svgLines" class="svg-lines" xmlns="http://www.w3.org/2000/svg"></svg>
+                <!-- Nodes will be injected here -->
+                <div id="nodesContainer" class="nodes-container"></div>
+                <!-- Queue visualization (hidden when empty) -->
+                <div id="queueContainer" class="queue-container" style="display:none"></div>
+            </div>
+            <div class="console-panel">
+                <div id="console" class="console-text"></div>
+            </div>
+        </section>
+
+        <section class="module stack-module">
+            <div class="module-header">
+            </div>
+            <div class="stack-controls">
+                <div id="stackLabel" class="stack-header">CALL STACK</div>
+                <div class="stack-stats">
+                    <span id="activeCallsLabel">Active Calls:</span>
+                    <span id="activeCalls">0</span>
+                    <span id="stackDepth" style="margin-left:12px">Depth: 0</span>
+                    <span id="maxDepth" style="margin-left:12px">Max: 0</span>
+                </div>
+            </div>
+            <div id="stackList" class="stack-viewport">
+            </div>
+            <div id="stackLegend" class="stack-legend">
+            </div>
+        </section>
+    </main>
+
+    <div id="youtubeModal" class="youtube-modal">
+        <div class="youtube-modal-content">
+            <div class="youtube-modal-header">
+                <h3><i class="fab fa-youtube"></i> Recommended Videos</h3>
+                <button id="youtubeModalClose" class="youtube-modal-close" type="button">✕</button>
+            </div>
+            <div id="youtubeContent" class="youtube-modal-body"></div>
+        </div>
+    </div>
+
+    <footer class="keyboard-hint">
+        <div class="hint-content">
+            
+            <div class="hints-grid">
+                <div class="hint-item">
+                    <kbd>Space</kbd>
+                    <span>Play/Pause</span>
+                </div>
+                <div class="hint-item">
+                    <kbd>←</kbd>
+                    <span>Previous Step</span>
+                </div>
+                <div class="hint-item">
+                    <kbd>→</kbd>
+                    <span>Next Step</span>
+                </div>
+                <div class="hint-item">
+                    <kbd>Y</kbd>
+                    <span>Videos</span>
+                </div>
+                <div class="hint-item">
+                    <kbd>Esc</kbd>
+                    <span>Close Modal</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="annotation-tooltip" class="annotation-tooltip" style="display:none;"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
