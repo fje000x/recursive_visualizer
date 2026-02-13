@@ -1,6 +1,10 @@
 const problemDB = {
     "111": {
         name: "Minimum Depth of Binary Tree",
+        leetcodeUrl: "https://leetcode.com/problems/minimum-depth-of-binary-tree/",
+        difficulty: "easy",
+        topics: ["tree", "recursion", "bfs", "dfs"],
+        leetcode150: true,
         tree: {
             v: 3, id: 'n3', x: 0, y: -160,
             left: { v: 9, id: 'n9', x: -180, y: -20, left: null, right: null },
@@ -83,6 +87,10 @@ const problemDB = {
     },
     "104": {
         name: "Maximum Depth of Binary Tree",
+        leetcodeUrl: "https://leetcode.com/problems/maximum-depth-of-binary-tree/",
+        difficulty: "easy",
+        topics: ["tree", "recursion", "bfs", "dfs"],
+        leetcode150: true,
         tree: {
             v: 3, id: 'n3', x: 0, y: -160,
             left: { v: 9, id: 'n9', x: -180, y: -20, left: null, right: null },
@@ -162,8 +170,10 @@ const problemDB = {
     },
     "88": {
         name: "Merge Sorted Array",
+        leetcodeUrl: "https://leetcode.com/problems/merge-sorted-array/",
         difficulty: "easy",
         topics: ["array", "two-pointers"],
+        leetcode150: true,
         tree: null,
         algorithms: {
             twoPointers: {
@@ -204,7 +214,7 @@ let currentAlgorithm = "recursive";
 let history = [];
 let currentStep = 0;
 let autoPlayInterval = null;
-let autoPlaySpeed = 250;
+let autoPlaySpeed = 1000;
 let baseCasesCount = 0;
 
 
@@ -296,13 +306,29 @@ function closeProblemModal() {
     modal.classList.remove('show');
 }
 
-function renderProblemList() {
+let currentFilter = 'all';
+
+function renderProblemList(filter) {
+    if (filter !== undefined) currentFilter = filter;
     const problemList = document.getElementById('problemList');
-    problemList.innerHTML = Object.entries(problemDB).map(([id, prob]) => `
+    
+    const filtered = Object.entries(problemDB).filter(([id, prob]) => {
+        if (currentFilter === 'all') return true;
+        if (currentFilter === 'leetcode150') return prob.leetcode150 === true;
+        return prob.topics && prob.topics.includes(currentFilter);
+    });
+
+    if (filtered.length === 0) {
+        problemList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">No problems found for this filter.</div>`;
+        return;
+    }
+
+    problemList.innerHTML = filtered.map(([id, prob]) => `
         <div class="problem-item" onclick="selectProblem('${id}'); closeProblemModal();">
             <div class="problem-item-left">
                 <div class="problem-item-id">#${id}</div>
                 <div class="problem-item-name">${prob.name}</div>
+                <div class="problem-item-tags">${prob.difficulty ? `<span class="difficulty-badge difficulty-${prob.difficulty}">${prob.difficulty}</span>` : ''}${prob.topics ? prob.topics.map(t => `<span class="problem-tag">${t}</span>`).join('') : ''}${prob.leetcode150 ? '<span class="problem-tag leetcode150">LC 150</span>' : ''}</div>
             </div>
             <div class="problem-item-right">
                 <i class="fas fa-arrow-right"></i>
@@ -443,7 +469,7 @@ function generateMaxDepthBFSHistory(tree) {
         h.push({
             nodeId: node?.id || null,
             line,
-            queue: JSON.parse(JSON.stringify(queue.map(q => q.v))),
+            queue: JSON.parse(JSON.stringify(queue.map(q => ({v: q.v, id: q.id})))),
             visited: [...visited],
             currentDepth: depth,
             msg,
@@ -451,48 +477,61 @@ function generateMaxDepthBFSHistory(tree) {
         });
     }
     
-    record(null, 1, `Initializing BFS for maximum depth calculation...`);
+    // line 0: def maxDepth(root):
+    // line 1: if not root: return 0
+    // line 2: queue = [root]
+    // line 3: depth = 0
+    // line 4: while queue:
+    // line 5:     depth += 1
+    // line 6:     level_size = len(queue)
+    // line 7:     for _ in range(level_size):
+    // line 8:         node = queue.pop(0)
+    // line 9:         if node.left:
+    // line 10:            queue.append(node.left)
+    // line 11:        if node.right:
+    // line 12:            queue.append(node.right)
+    // line 13: return depth (index 13 in array, but array only has 14 items, index 0-13)
+
+    record(null, 2, `Initializing BFS — queue = [root=${tree.v}]`);
     
     if (!tree) {
-        record(null, 2, `Tree is empty, returning 0`);
+        record(null, 1, `Tree is empty, returning 0`);
         return h;
     }
-    
-    record(null, 3, `Queue initialized with root node ${tree.v}`);
     
     while (queue.length > 0 && step < 50) {
         step++;
         depth++;
         
-        record(null, 5, `Processing level ${depth} with ${queue.length} node(s)`);
+        record(null, 5, `Level ${depth}: processing ${queue.length} node(s)`);
         
         const levelSize = queue.length;
         for (let i = 0; i < levelSize; i++) {
             const node = queue.shift();
             
-            record(node, 8, `Processing node ${node.v} at level ${depth}`, {
-                currentQueueItem: node.id,
-                levelIndex: i + 1,
-                levelTotal: levelSize
+            record(node, 8, `Dequeue node ${node.v} (level ${depth}, ${i + 1}/${levelSize})`, {
+                currentQueueItem: node.v
             });
             
             visited.add(node.id);
             
             if (node.left) {
                 queue.push(node.left);
-                record(node, 11, `→ Adding left child ${node.left.v} to queue for next level`);
+                record(node, 10, `→ Enqueue left child ${node.left.v}`, {
+                    currentQueueItem: node.v
+                });
             }
             
             if (node.right) {
                 queue.push(node.right);
-                record(node, 13, `→ Adding right child ${node.right.v} to queue for next level`);
+                record(node, 12, `→ Enqueue right child ${node.right.v}`, {
+                    currentQueueItem: node.v
+                });
             }
         }
-        
-        record(null, 6, `Completed level ${depth}. Queue size for next level: ${queue.length}`);
     }
     
-    record(null, 15, `✓ All levels processed. Maximum depth is ${depth}`);
+    record(null, 13, `✓ All levels processed. Maximum depth is ${depth}`);
     
     h.push({
         nodeId: null,
@@ -518,18 +557,32 @@ function generateMaxDepthIterativeHistory(tree) {
         h.push({
             nodeId: node?.id || null,
             line,
-            stack: JSON.parse(JSON.stringify(stack.map(s => ({v: s.node.v, depth: s.depth})))),
+            stack: JSON.parse(JSON.stringify(stack.map(s => ({v: s.node.v, depth: s.depth, id: s.node.id})))),
             visited: [...visited],
             maxDepth: maxDepth,
+            bestDepth: maxDepth,
             msg,
             ...extra
         });
     }
     
-    record(null, 1, `Initializing iterative DFS for maximum depth...`);
+    // line 0: def maxDepth(root):
+    // line 1: if not root: return 0
+    // line 2: stack = [(root, 1)]
+    // line 3: max_depth = 0
+    // line 4: while stack:
+    // line 5:     node, depth = stack.pop()
+    // line 6:     max_depth = max(max_depth, depth)
+    // line 7:     if node.left:
+    // line 8:         stack.append((node.left, depth + 1))
+    // line 9:     if node.right:
+    // line 10:        stack.append((node.right, depth + 1))
+    // line 11: return max_depth
+
+    record(null, 2, `Initializing iterative DFS — stack = [(root=${tree.v}, depth=1)]`);
     
     if (!tree) {
-        record(null, 2, `Tree is empty, returning 0`);
+        record(null, 1, `Tree is empty, returning 0`);
         return h;
     }
     
@@ -537,27 +590,33 @@ function generateMaxDepthIterativeHistory(tree) {
         step++;
         const {node, depth} = stack.pop();
         
-        record(node, 6, `Processing node ${node.v} at depth ${depth}`, {
-            currentStackItem: node.id
+        record(node, 5, `Pop node ${node.v} at depth ${depth}`, {
+            currentStackItem: node.v
         });
         
         visited.add(node.id);
         
         maxDepth = Math.max(maxDepth, depth);
-        record(node, 7, `Updated maximum depth to ${maxDepth}`);
-        
-        if (node.right) {
-            stack.push({node: node.right, depth: depth + 1});
-            record(node, 10, `→ Adding right child ${node.right.v} to stack (depth: ${depth + 1})`);
-        }
+        record(node, 6, `max_depth = max(${maxDepth}, ${depth}) = ${maxDepth}`, {
+            currentStackItem: node.v
+        });
         
         if (node.left) {
             stack.push({node: node.left, depth: depth + 1});
-            record(node, 12, `→ Adding left child ${node.left.v} to stack (depth: ${depth + 1})`);
+            record(node, 8, `→ Push left child ${node.left.v} (depth: ${depth + 1})`, {
+                currentStackItem: node.v
+            });
+        }
+        
+        if (node.right) {
+            stack.push({node: node.right, depth: depth + 1});
+            record(node, 10, `→ Push right child ${node.right.v} (depth: ${depth + 1})`, {
+                currentStackItem: node.v
+            });
         }
     }
     
-    record(null, 14, `✓ DFS complete! Maximum depth is ${maxDepth}`);
+    record(null, 11, `✓ DFS complete! Maximum depth is ${maxDepth}`);
     
     h.push({
         nodeId: null,
@@ -565,6 +624,7 @@ function generateMaxDepthIterativeHistory(tree) {
         stack: [],
         visited: [...visited],
         maxDepth: maxDepth,
+        bestDepth: maxDepth,
         msg: `✓ Iterative DFS complete! Maximum depth is ${maxDepth}.`,
         isComplete: true
     });
@@ -686,27 +746,42 @@ function generateBFSHistory(tree, isMin = true) {
         h.push({
             nodeId: node?.id || null,
             line,
-            queue: JSON.parse(JSON.stringify(queue.map(q => ({v: q.node.v, depth: q.depth})))),
+            queue: JSON.parse(JSON.stringify(queue.map(q => ({v: q.node.v, depth: q.depth, id: q.node.id})))),
             visited: [...visited],
             msg,
             ...extra
         });
     }
     
-    record(null, 1, `Initializing BFS for minimum depth...`);
+    // line 0: def minDepth(root):
+    // line 1: if not root: return 0
+    // line 2: queue = [(root, 1)]
+    // line 3: while queue:
+    // line 4: node, depth = queue.pop(0)
+    // line 5: if not node.left and not node.right:
+    // line 6:     return depth
+    // line 7: if node.left:
+    // line 8:     queue.append((node.left, depth + 1))
+    // line 9: if node.right:
+    // line 10:    queue.append((node.right, depth + 1))
+
+    record(null, 2, `Initializing BFS — queue = [(root=${tree.v}, depth=1)]`);
     
     while (queue.length > 0 && step < 50) {
         step++;
         const current = queue[0];
         
-        record(current.node, 5, `Processing node ${current.node.v} at depth ${current.depth}...`, {
-            currentQueueItem: current.node.id
+        // Highlight "node, depth = queue.pop(0)" — line index 4
+        record(current.node, 4, `Dequeue node ${current.node.v} at depth ${current.depth}`, {
+            currentQueueItem: current.node.v
         });
         
+        // Check leaf — line index 5
         if (!current.node.left && !current.node.right) {
-            record(current.node, 7, `✓ Leaf node found! Minimum depth is ${current.depth}`, {
+            record(current.node, 6, `✓ Leaf node found! Minimum depth is ${current.depth}`, {
                 isBase: true,
-                baseCaseValue: current.depth
+                baseCaseValue: current.depth,
+                currentQueueItem: current.node.v
             });
             break;
         }
@@ -716,12 +791,18 @@ function generateBFSHistory(tree, isMin = true) {
         
         if (current.node.left) {
             queue.push({node: current.node.left, depth: current.depth + 1});
-            record(current.node, 9, `→ Adding left child ${current.node.left.v} to queue (depth: ${current.depth + 1})`);
+            // Highlight "queue.append((node.left, ...))" — line index 8
+            record(current.node, 8, `→ Enqueue left child ${current.node.left.v} (depth: ${current.depth + 1})`, {
+                currentQueueItem: current.node.v
+            });
         }
         
         if (current.node.right) {
             queue.push({node: current.node.right, depth: current.depth + 1});
-            record(current.node, 11, `→ Adding right child ${current.node.right.v} to queue (depth: ${current.depth + 1})`);
+            // Highlight "queue.append((node.right, ...))" — line index 10
+            record(current.node, 10, `→ Enqueue right child ${current.node.right.v} (depth: ${current.depth + 1})`, {
+                currentQueueItem: current.node.v
+            });
         }
     }
     
@@ -748,7 +829,7 @@ function generateIterativeHistory(tree, isMin = true) {
         h.push({
             nodeId: node?.id || null,
             line,
-            stack: JSON.parse(JSON.stringify(stack.map(s => ({v: s.node.v, depth: s.depth})))),
+            stack: JSON.parse(JSON.stringify(stack.map(s => ({v: s.node.v, depth: s.depth, id: s.node.id})))),
             visited: [...visited],
             bestDepth: bestDepth,
             msg,
@@ -756,38 +837,57 @@ function generateIterativeHistory(tree, isMin = true) {
         });
     }
     
-    record(null, 1, `Initializing iterative DFS for minimum depth...`);
+    // line 0: def minDepth(root):
+    // line 1: if not root: return 0
+    // line 2: stack = [(root, 1)]
+    // line 3: min_depth = float('inf')
+    // line 4: while stack:
+    // line 5: node, depth = stack.pop()
+    // line 6: if not node.left and not node.right:
+    // line 7:     min_depth = min(min_depth, depth)
+    // line 8: if node.right:
+    // line 9:     stack.append((node.right, depth+1))
+    // line 10: if node.left:
+    // line 11:     stack.append((node.left, depth+1))
+    // line 12: return min_depth
+
+    record(null, 2, `Initializing iterative DFS — stack = [(root=${tree.v}, depth=1)]`);
     
     while (stack.length > 0 && step < 50) {
         step++;
         const {node, depth} = stack.pop();
         
-        record(node, 6, `Processing node ${node.v} at depth ${depth}...`, {
-            currentStackItem: node.id
+        record(node, 5, `Pop node ${node.v} at depth ${depth}`, {
+            currentStackItem: node.v
         });
         
         visited.add(node.id);
         
         if (!node.left && !node.right) {
             bestDepth = Math.min(bestDepth, depth);
-            record(node, 9, `✓ Leaf node! Current best depth: ${bestDepth}`, {
+            record(node, 7, `✓ Leaf node! min_depth = min(${bestDepth === depth ? depth : bestDepth + ', ' + depth}) = ${bestDepth}`, {
                 isBase: true,
-                baseCaseValue: depth
+                baseCaseValue: depth,
+                currentStackItem: node.v
             });
         }
         
         if (node.right) {
             stack.push({node: node.right, depth: depth + 1});
-            record(node, 12, `→ Adding right child ${node.right.v} to stack (depth: ${depth + 1})`);
+            record(node, 9, `→ Push right child ${node.right.v} (depth: ${depth + 1})`, {
+                currentStackItem: node.v
+            });
         }
         
         if (node.left) {
             stack.push({node: node.left, depth: depth + 1});
-            record(node, 14, `→ Adding left child ${node.left.v} to stack (depth: ${depth + 1})`);
+            record(node, 11, `→ Push left child ${node.left.v} (depth: ${depth + 1})`, {
+                currentStackItem: node.v
+            });
         }
     }
     
-    record(null, 17, `✓ DFS complete! Minimum depth is ${bestDepth}`);
+    record(null, 12, `✓ DFS complete! Minimum depth is ${bestDepth}`);
     
     h.push({
         nodeId: null,
@@ -1124,10 +1224,11 @@ function render() {
         const toEl = document.getElementById(state.arrowTo.id);
         
         if (fromEl && toEl) {
-            const fx = parseFloat(fromEl.style.left) + 30;
-            const fy = parseFloat(fromEl.style.top) + 30;
-            const tx = parseFloat(toEl.style.left) + 30;
-            const ty = parseFloat(toEl.style.top) + 30;
+            const halfNode = 24; // half of --node-size (48px)
+            const fx = parseFloat(fromEl.style.left) + halfNode;
+            const fy = parseFloat(fromEl.style.top) + halfNode;
+            const tx = parseFloat(toEl.style.left) + halfNode;
+            const ty = parseFloat(toEl.style.top) + halfNode;
             
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             const midX = (fx + tx) / 2;
@@ -1169,21 +1270,44 @@ function render() {
     
     // Update queue visualization for BFS
     const queueContainer = document.getElementById('queueContainer');
-    if (state.queue && state.queue.length > 0) {
+    if (currentAlgorithm === 'bfs' && state.queue && state.queue.length > 0) {
         queueContainer.style.display = 'flex';
-        queueContainer.innerHTML = `<span class="queue-label">Queue:</span>`;
-        
+        queueContainer.innerHTML = '';
+
+        // "Front" label
+        const frontLabel = document.createElement('span');
+        frontLabel.className = 'queue-label';
+        frontLabel.textContent = 'Front →';
+        queueContainer.appendChild(frontLabel);
+
         state.queue.forEach((item, index) => {
             const queueItem = document.createElement('div');
             queueItem.className = 'queue-item';
-            queueItem.textContent = typeof item === 'object' ? `${item.v || item}${item.depth ? ` (d:${item.depth})` : ''}` : item;
-            
+
+            // Show value + depth if available
+            const val = typeof item === 'object' ? item.v : item;
+            const depth = typeof item === 'object' && item.depth ? item.depth : null;
+            queueItem.innerHTML = depth
+                ? `<span class="qi-val">${val}</span><span class="qi-depth">d:${depth}</span>`
+                : `${val}`;
+
+            // Highlight the front item being processed
+            if (index === 0) {
+                queueItem.classList.add('queue-front');
+            }
+
             if (item.v === state.currentQueueItem || item === state.currentQueueItem) {
                 queueItem.classList.add('current');
             }
-            
+
             queueContainer.appendChild(queueItem);
         });
+
+        // "Back" label
+        const backLabel = document.createElement('span');
+        backLabel.className = 'queue-label queue-back-label';
+        backLabel.textContent = '← Back';
+        queueContainer.appendChild(backLabel);
     } else {
         queueContainer.style.display = 'none';
         queueContainer.innerHTML = '';
@@ -1207,6 +1331,12 @@ function render() {
     document.getElementById('prevBtn').disabled = currentStep === 0;
     document.getElementById('nextBtn').disabled = currentStep === history.length - 1;
     
+    // Sync mobile nav buttons
+    const mobilePrev = document.getElementById('mobilePrevBtn');
+    const mobileNext = document.getElementById('mobileNextBtn');
+    if (mobilePrev) mobilePrev.disabled = currentStep === 0;
+    if (mobileNext) mobileNext.disabled = currentStep === history.length - 1;
+    
     // Array visualization for merge sorted arrays
     if (currentProbId === '88') {
         const engine = document.querySelector('.render-engine');
@@ -1224,7 +1354,8 @@ function render() {
             const p2 = state.pointers?.p2 ?? -1;
             const pMerge = state.pointers?.p ?? -1;
             
-            let html = `
+            let html = `<div class="array-inner">`; 
+            html += `
                 <div class="array-section">
                     <div class="array-label">nums1 (merged array)</div>
                     <div class="array-visualization">
@@ -1299,6 +1430,7 @@ function render() {
                     </div>
                 </div>
             `;
+            html += `</div>`; // close array-inner
             
             arrayContainer.innerHTML = html;
         }
@@ -1312,8 +1444,10 @@ function updateStackVisualization(state) {
     
     if (currentAlgorithm === 'recursive') {
         if (state.stack && state.stack.length > 0) {
-            document.getElementById('stackLabel').textContent = 'CALL STACK & STATE';
-            document.getElementById('activeCallsLabel').textContent = 'Active Calls:';
+            document.getElementById('stackLabel').textContent = 'CALL STACK';
+            document.getElementById('activeCallsLabel').textContent = 'Active';
+            document.getElementById('depthLabel').textContent = 'Depth';
+            document.getElementById('maxLabel').textContent = 'Max';
             document.getElementById('stackLegend').style.display = 'flex';
             
             stackList.innerHTML = '';
@@ -1363,7 +1497,9 @@ function updateStackVisualization(state) {
         }
     } else if (currentAlgorithm === 'bfs') {
         document.getElementById('stackLabel').textContent = 'BFS QUEUE';
-        document.getElementById('activeCallsLabel').textContent = 'Queue Size:';
+        document.getElementById('activeCallsLabel').textContent = 'Queue';
+        document.getElementById('depthLabel').textContent = 'Visited';
+        document.getElementById('maxLabel').textContent = 'Total';
         document.getElementById('stackLegend').style.display = 'none';
         
         if (state.queue && state.queue.length > 0) {
@@ -1412,7 +1548,9 @@ function updateStackVisualization(state) {
         }
     } else if (currentAlgorithm === 'iterative') {
         document.getElementById('stackLabel').textContent = 'DFS STACK';
-        document.getElementById('activeCallsLabel').textContent = 'Stack Size:';
+        document.getElementById('activeCallsLabel').textContent = 'Stack';
+        document.getElementById('depthLabel').textContent = 'Visited';
+        document.getElementById('maxLabel').textContent = 'Total';
         document.getElementById('stackLegend').style.display = 'none';
         
         if (state.stack && state.stack.length > 0) {
@@ -1422,13 +1560,13 @@ function updateStackVisualization(state) {
                 const div = document.createElement('div');
                 div.className = 'stack-item';
                 
-                if (item.node?.v === state.currentStackItem) {
+                if (item.v === state.currentStackItem) {
                     div.classList.add('active');
                 }
                 
                 div.innerHTML = `
                     <div class="stack-header-row">
-                        <div class="stack-function-name">Node ${item.node?.v || 'N/A'}</div>
+                        <div class="stack-function-name">Node ${item.v || 'N/A'}</div>
                         <div class="stack-node-value">Depth: ${item.depth || 'N/A'}</div>
                     </div>
                     <div class="stack-details">
@@ -1469,11 +1607,11 @@ function updateStats(state) {
     document.getElementById('activeCalls').textContent = activeCalls;
     
     if (currentAlgorithm === 'recursive') {
-        document.getElementById('stackDepth').textContent = `Depth: ${state.stack?.length || 0}`;
+        document.getElementById('stackDepth').textContent = state.stack?.length || 0;
         const maxDepth = Math.max(...history.map(h => h.stack?.length || 0));
         document.getElementById('maxDepth').textContent = maxDepth;
     } else {
-        document.getElementById('stackDepth').textContent = `Nodes Visited: ${state.visited?.length || 0}`;
+        document.getElementById('stackDepth').textContent = state.visited?.length || 0;
         const maxVisited = Math.max(...history.map(h => h.visited?.length || 0));
         document.getElementById('maxDepth').textContent = maxVisited;
     }
@@ -1511,30 +1649,58 @@ function init() {
     // RESET LAYOUT - Remove inline styles and use CSS classes
     const appLayout = document.querySelector('.app-layout');
     const stackModule = document.querySelector('.stack-module');
+    const stackToggleBtn = document.getElementById('stackToggleBtn');
     
     if (appLayout) {
         appLayout.style.gridTemplateColumns = ''; // Clear inline style
     }
     
-    if (currentProbId === '88') {
-        if (appLayout) {
-            appLayout.classList.add('hide-right-panel');
-        }
+    const isArrayProblem = currentProbId === '88';
+    const isBFS = currentAlgorithm === 'bfs';
+
+    if (isArrayProblem || isBFS) {
+        // Array problems & BFS: hide right panel
+        // BFS shows the queue inline at bottom of canvas
+        if (appLayout) appLayout.classList.add('hide-right-panel');
         if (stackModule) {
             stackModule.style.display = 'none';
+            stackModule.classList.remove('mobile-visible');
+        }
+        if (stackToggleBtn) {
+            stackToggleBtn.style.display = 'none';
         }
     } else {
+        // Recursive & Iterative DFS: show the right panel (call stack / DFS stack)
         if (appLayout) {
             appLayout.classList.remove('hide-right-panel');
         }
         if (stackModule) {
             stackModule.style.display = '';
         }
+        if (stackToggleBtn) {
+            stackToggleBtn.style.display = '';
+        }
     }
     
-    // Update algorithm selector
+    // Update "All Problems" button to show current problem
+    const problemListBtn = document.getElementById('problemListBtn');
+    if (problemListBtn) {
+        const diffClass = prob.difficulty ? `difficulty-${prob.difficulty}` : '';
+        const diffLabel = prob.difficulty ? prob.difficulty.charAt(0).toUpperCase() + prob.difficulty.slice(1) : '';
+        problemListBtn.innerHTML = `<i class="fas fa-list"></i> #${currentProbId} ${prob.name} ${prob.difficulty ? `<span class="difficulty-badge ${diffClass}">${diffLabel}</span>` : ''}`;
+    }
+
+    // Update LeetCode link
+    const leetcodeLink = document.getElementById('leetcodeLink');
+    if (leetcodeLink && prob.leetcodeUrl) {
+        leetcodeLink.href = prob.leetcodeUrl;
+    }
+
+    // Update algorithm selector (desktop + mobile)
     const algorithmSelect = document.getElementById('algorithmSelect');
+    const mobileAlgorithmSelect = document.getElementById('mobileAlgorithmSelect');
     algorithmSelect.innerHTML = '';
+    if (mobileAlgorithmSelect) mobileAlgorithmSelect.innerHTML = '';
     
     Object.keys(prob.algorithms).forEach(algoKey => {
         const option = document.createElement('option');
@@ -1544,7 +1710,16 @@ function init() {
             option.selected = true;
         }
         algorithmSelect.appendChild(option);
+
+        // Clone for mobile
+        if (mobileAlgorithmSelect) {
+            mobileAlgorithmSelect.appendChild(option.cloneNode(true));
+        }
     });
+
+    // Explicitly set the value on both selects
+    algorithmSelect.value = currentAlgorithm;
+    if (mobileAlgorithmSelect) mobileAlgorithmSelect.value = currentAlgorithm;
     
     // Update code editor with proper indentation
     const codeEditor = document.getElementById('codeEditor');
@@ -1591,14 +1766,44 @@ function init() {
     const nodesContainer = document.getElementById('nodesContainer');
     nodesContainer.innerHTML = '';
     const svg = document.getElementById('svgLines');
+    const treeCanvas = document.getElementById('treeCanvas');
+
+    // The canvas is a fixed 800×600 coordinate space.
+    // We scale the whole .tree-canvas div via CSS transform to fit the container.
+    const canvasW = 800;
+    const canvasH = 600;
+
+    // Compute bounding box of all tree nodes to auto-center
+    function getBounds(node) {
+        if (!node) return { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity };
+        const left = getBounds(node.left);
+        const right = getBounds(node.right);
+        return {
+            minX: Math.min(node.x, left.minX, right.minX),
+            maxX: Math.max(node.x, left.maxX, right.maxX),
+            minY: Math.min(node.y, left.minY, right.minY),
+            maxY: Math.max(node.y, left.maxY, right.maxY)
+        };
+    }
+    const bounds = getBounds(prob.tree);
+    // Offset to shift tree center to canvas center
+    const treeCenterX = (bounds.minX + bounds.maxX) / 2;
+    const treeCenterY = (bounds.minY + bounds.maxY) / 2;
+    const centerX = canvasW / 2 - treeCenterX;
+    const centerY = canvasH / 2 - treeCenterY;
+
+    // Compute uniform scale to fit the canvas inside the render-engine
+    // Use a 1.15x boost so the tree fills the space better
+    const containerW = engine.clientWidth || canvasW;
+    const containerH = engine.clientHeight || canvasH;
+    const fitScale = Math.min(containerW / canvasW, containerH / canvasH) * 1.15;
+    treeCanvas.style.transform = `translate(-50%, -50%) scale(${fitScale})`;
 
     // ensure svg has the correct drawing surface size and coordinate system
     if (svg) {
-        const w = engine.clientWidth || 800;
-        const h = engine.clientHeight || 600;
-        svg.setAttribute('width', w);
-        svg.setAttribute('height', h);
-        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+        svg.setAttribute('width', canvasW);
+        svg.setAttribute('height', canvasH);
+        svg.setAttribute('viewBox', `0 0 ${canvasW} ${canvasH}`);
         svg.innerHTML = `
             <defs>
                 <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
@@ -1608,13 +1813,10 @@ function init() {
         `;
     }
     
+    const halfNode = 24; // half of --node-size (48px)
+
     function drawTree(node) {
         if (!node) return;
-        
-        // Calculate proper center point FRESH each time
-        const engine = document.querySelector('.render-engine');
-        const centerX = engine.clientWidth / 2;
-        const centerY = engine.clientHeight / 2;
         
         const nx = centerX + node.x;
         const ny = centerY + node.y;
@@ -1623,15 +1825,15 @@ function init() {
         nodeEl.className = 'node';
         nodeEl.id = node.id;
         nodeEl.textContent = node.v;
-        nodeEl.style.left = (nx - 20) + 'px';  // offset by half node width
-        nodeEl.style.top = (ny - 20) + 'px';   // offset by half node height
+        nodeEl.style.left = (nx - halfNode) + 'px';
+        nodeEl.style.top = (ny - halfNode) + 'px';
         nodesContainer.appendChild(nodeEl);
         
         if (currentAlgorithm === 'recursive') {
             const labelEl = document.createElement('div');
             labelEl.className = 'task-label';
-            labelEl.style.left = (nx + 40) + 'px';
-            labelEl.style.top = (ny - 30) + 'px';
+            labelEl.style.left = (nx + halfNode + 10) + 'px';
+            labelEl.style.top = (ny - halfNode - 10) + 'px';
             labelEl.innerHTML = `
                 <span id="L-${node.id}">L ↓</span>
                 <span id="R-${node.id}">R ↓</span>
@@ -1677,23 +1879,114 @@ function init() {
     setupEventListeners();
 }
 
+// Code panel toggle
+function toggleCodePanel() {
+    const appLayout = document.querySelector('.app-layout');
+    const toggleBtn = document.getElementById('codeToggleBtn');
+    const codeModule = document.querySelector('.code-module');
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+        // Mobile: toggle split visibility (code takes top half, viz shrinks)
+        const nowVisible = codeModule.classList.toggle('mobile-visible');
+        toggleBtn.classList.toggle('collapsed', nowVisible);
+    } else {
+        // Desktop: toggle grid column collapse
+        const isCollapsed = appLayout.classList.toggle('hide-code-panel');
+        toggleBtn.classList.toggle('collapsed', isCollapsed);
+    }
+
+    // Re-scale tree canvas after layout transition completes
+    setTimeout(() => {
+        const engine = document.querySelector('.render-engine');
+        const treeCanvas = document.getElementById('treeCanvas');
+        if (engine && treeCanvas) {
+            const containerW = engine.clientWidth || 800;
+            const containerH = engine.clientHeight || 600;
+            const fitScale = Math.min(containerW / 800, containerH / 600) * 1.15;
+            treeCanvas.style.transform = `translate(-50%, -50%) scale(${fitScale})`;
+        }
+    }, 350);
+}
+
+// Stack panel toggle (mobile only)
+function toggleStackPanel() {
+    const toggleBtn = document.getElementById('stackToggleBtn');
+    const stackModule = document.querySelector('.stack-module');
+    const isMobile = window.innerWidth <= 768;
+
+    if (!isMobile) return; // only works on mobile
+
+    const nowVisible = stackModule.classList.toggle('mobile-visible');
+    toggleBtn.classList.toggle('collapsed', nowVisible);
+
+    // Re-scale tree canvas after layout transition completes
+    setTimeout(() => {
+        const engine = document.querySelector('.render-engine');
+        const treeCanvas = document.getElementById('treeCanvas');
+        if (engine && treeCanvas) {
+            const containerW = engine.clientWidth || 800;
+            const containerH = engine.clientHeight || 600;
+            const fitScale = Math.min(containerW / 800, containerH / 600) * 1.15;
+            treeCanvas.style.transform = `translate(-50%, -50%) scale(${fitScale})`;
+        }
+    }, 350);
+}
+
 function setupEventListeners() {
     // Add search and problem list listeners
     initSearch();
+
+    // Code toggle button
+    const codeToggleBtn = document.getElementById('codeToggleBtn');
+    if (codeToggleBtn) {
+        codeToggleBtn.removeEventListener('click', toggleCodePanel);
+        codeToggleBtn.addEventListener('click', toggleCodePanel);
+    }
+
+    // Stack toggle button
+    const stackToggleBtn = document.getElementById('stackToggleBtn');
+    if (stackToggleBtn) {
+        stackToggleBtn.removeEventListener('click', toggleStackPanel);
+        stackToggleBtn.addEventListener('click', toggleStackPanel);
+    }
     
     const problemListBtn = document.getElementById('problemListBtn');
     if (problemListBtn) problemListBtn.addEventListener('click', openProblemModal);
     
     const problemModalClose = document.getElementById('problemModalClose');
     if (problemModalClose) problemModalClose.addEventListener('click', closeProblemModal);
+
+    // Filter buttons in problem modal
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderProblemList(btn.dataset.filter);
+        });
+    });
     
     document.getElementById('algorithmSelect').addEventListener('change', (e) => {
         currentAlgorithm = e.target.value;
+        // Sync mobile selector
+        const mobileSelect = document.getElementById('mobileAlgorithmSelect');
+        if (mobileSelect) mobileSelect.value = currentAlgorithm;
         init();
     });
+
+    const mobileAlgoSelect = document.getElementById('mobileAlgorithmSelect');
+    if (mobileAlgoSelect) {
+        mobileAlgoSelect.addEventListener('change', (e) => {
+            currentAlgorithm = e.target.value;
+            // Sync desktop selector
+            document.getElementById('algorithmSelect').value = currentAlgorithm;
+            init();
+        });
+    }
     
     document.getElementById('youtubeBtn').addEventListener('click', openYouTubeModal);
     document.getElementById('youtubeModalClose').addEventListener('click', closeYouTubeModal);
+    
     
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') changeStep(-1);
@@ -1726,6 +2019,11 @@ function setupEventListeners() {
 }
 
 function changeStep(delta) {
+    const ytModal = document.getElementById('youtubeModal');
+    if (ytModal && ytModal.classList.contains('show')) {
+        closeYouTubeModal();
+        return;
+    }
     const newStep = currentStep + delta;
     if (newStep >= 0 && newStep < history.length) {
         currentStep = newStep;
@@ -1734,10 +2032,20 @@ function changeStep(delta) {
 }
 
 function toggleAutoPlay() {
+    const ytModal = document.getElementById('youtubeModal');
+    if (ytModal && ytModal.classList.contains('show')) {
+        closeYouTubeModal();
+        return;
+    }
     if (autoPlayInterval) {
         clearInterval(autoPlayInterval);
         autoPlayInterval = null;
     } else {
+        // If we're at the end, restart from the beginning
+        if (currentStep >= history.length - 1) {
+            currentStep = 0;
+            render();
+        }
         autoPlayInterval = setInterval(() => {
             if (currentStep < history.length - 1) {
                 changeStep(1);
@@ -1750,6 +2058,11 @@ function toggleAutoPlay() {
 }
 
 function resetVisualization() {
+    const ytModal = document.getElementById('youtubeModal');
+    if (ytModal && ytModal.classList.contains('show')) {
+        closeYouTubeModal();
+        return;
+    }
     currentStep = 0;
     baseCasesCount = 0;
     if (autoPlayInterval) {
@@ -1761,4 +2074,20 @@ function resetVisualization() {
 
 // Initialize on load
 window.addEventListener('DOMContentLoaded', init);
-window.addEventListener('resize', init);
+
+// Debounced resize: only re-layout the tree canvas scale, not full init
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        // Just re-scale the tree canvas to fit the new container size
+        const engine = document.querySelector('.render-engine');
+        const treeCanvas = document.getElementById('treeCanvas');
+        if (engine && treeCanvas) {
+            const containerW = engine.clientWidth || 800;
+            const containerH = engine.clientHeight || 600;
+            const fitScale = Math.min(containerW / 800, containerH / 600) * 1.15;
+            treeCanvas.style.transform = `translate(-50%, -50%) scale(${fitScale})`;
+        }
+    }, 150);
+});
