@@ -159,6 +159,43 @@ const problemDB = {
                 }
             }
         }
+    },
+    "88": {
+        name: "Merge Sorted Array",
+        difficulty: "easy",
+        topics: ["array", "two-pointers"],
+        tree: null,
+        algorithms: {
+            twoPointers: {
+                name: "Two Pointers (Optimal)",
+                code: [
+                    "def merge(nums1, m, nums2, n):",
+                    "    p1 = m - 1",
+                    "    p2 = n - 1", 
+                    "    p = m + n - 1",
+                    "    ",
+                    "    while p1 >= 0 and p2 >= 0:",
+                    "        if nums1[p1] > nums2[p2]:",
+                    "            nums1[p] = nums1[p1]",
+                    "            p1 -= 1",
+                    "        else:",
+                    "            nums1[p] = nums2[p2]",
+                    "            p2 -= 1",
+                    "        p -= 1",
+                    "    ",
+                    "    while p2 >= 0:",
+                    "        nums1[p] = nums2[p2]",
+                    "        p2 -= 1",
+                    "        p -= 1"
+                ],
+                indentation: [0, 1, 1, 1, 0, 1, 2, 3, 3, 2, 3, 3, 2, 0, 1, 2, 2, 2],
+                timeComplexity: "O(m + n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateMergeSortedArrayHistory();
+                }
+            }
+        }
     }
 };
 
@@ -241,7 +278,8 @@ function initSearch() {
 
 function selectProblem(probId) {
     currentProbId = probId;
-    currentAlgorithm = 'recursive';
+    const prob = problemDB[probId];
+    currentAlgorithm = Object.keys(prob.algorithms)[0]; // Get first algorithm
     document.getElementById('searchInput').value = '';
     document.getElementById('searchDropdown').style.display = 'none';
     init();
@@ -279,80 +317,99 @@ function generateMaxDepthRecursiveHistory(tree) {
     let stack = [];
     let doneMap = {};
     let callId = 0;
-    
+
     function record(node, line, msg, currentTask = null, extra = {}) {
-        h.push({ 
-            nodeId: node?.id || null, 
-            line, 
-            stack: JSON.parse(JSON.stringify(stack)), 
-            done: JSON.parse(JSON.stringify(doneMap)), 
-            msg, 
-            currentTask, 
-            ...extra 
+        h.push({
+            nodeId: node?.id || null,
+            line,
+            stack: JSON.parse(JSON.stringify(stack)),
+            done: JSON.parse(JSON.stringify(doneMap)),
+            msg,
+            currentTask,
+            ...extra
         });
     }
 
     function dfs(node, parent) {
         if (!node) {
             record(null, 2, `Node is None, returning 0`, null, { frameId: ++callId });
+            if (parent) {
+                record(null, 2, `↑ Returning depth 0 to parent node ${parent.v}`, null, {
+                    arrowTo: parent,
+                    val: 0,
+                    returnValue: 0,
+                    frameId: callId
+                });
+            }
             return 0;
         }
-        
+
         const frameId = ++callId;
         doneMap[node.id] = { L: false, R: false };
-        const frame = { 
+        const frame = {
             id: frameId,
-            v: node.v, 
-            l: "PENDING", 
-            r: "PENDING", 
+            v: node.v,
+            l: "PENDING",
+            r: "PENDING",
             nodeId: node.id,
             status: "ACTIVE",
             parentId: parent?.id || null
         };
         stack.push(frame);
-        
+
         record(node, 1, `Entering maxDepth(${node.v})`, null, { frameId });
 
         // Base case: leaf node
         if (!node.left && !node.right) {
-            doneMap[node.id].L = true; 
+            doneMap[node.id].L = true;
             doneMap[node.id].R = true;
             frame.l = "LEAF";
             frame.r = "LEAF";
             frame.status = "COMPLETED";
-            record(node, 2, `✓ Leaf node ${node.v} found, returning 1`, null, { 
+            record(node, 2, `✓ Leaf node ${node.v} found, returning 1`, null, {
                 isBase: true,
                 baseCaseValue: 1,
                 frameId
             });
             stack.pop();
+
+            // Add return arrow for the parent
+            if (parent) {
+                record(node, 2, `↑ Returning depth 1 to parent node ${parent.v}`, null, {
+                    arrowTo: parent,
+                    val: 1,
+                    returnValue: 1,
+                    frameId
+                });
+            }
             return 1;
         }
-        
+
         // Process left subtree
         record(node, 3, `Calculating left subtree depth...`, 'L', { frameId });
         doneMap[node.id].L = true;
         frame.l = "PROCESSING";
         const leftDepth = dfs(node.left, node);
         frame.l = leftDepth;
-        
+
         // Process right subtree
         record(node, 4, `Calculating right subtree depth...`, 'R', { frameId });
         doneMap[node.id].R = true;
         frame.r = "PROCESSING";
         const rightDepth = dfs(node.right, node);
         frame.r = rightDepth;
-        
+
         const result = Math.max(leftDepth, rightDepth) + 1;
-        
+
         record(node, 5, `max(${leftDepth}, ${rightDepth}) + 1 = ${result}`, null, { frameId });
-        
+
         frame.status = "COMPLETED";
         stack.pop();
-        
+
+        // Add return arrow for the parent
         if (parent) {
-            record(node, 5, `↑ Returning depth ${result} to parent node ${parent.v}`, null, { 
-                arrowTo: parent, 
+            record(node, 5, `↑ Returning depth ${result} to parent node ${parent.v}`, null, {
+                arrowTo: parent,
                 val: result,
                 returnValue: result,
                 frameId
@@ -360,9 +417,9 @@ function generateMaxDepthRecursiveHistory(tree) {
         }
         return result;
     }
-    
+
     const result = dfs(tree, null);
-    
+
     h.push({
         nodeId: null,
         line: -1,
@@ -371,7 +428,7 @@ function generateMaxDepthRecursiveHistory(tree) {
         msg: `✓ Algorithm complete! Maximum depth is ${result}`,
         isComplete: true
     });
-    
+
     return h;
 }
 
@@ -745,6 +802,120 @@ function generateIterativeHistory(tree, isMin = true) {
     return h;
 }
 
+// Add this function before init()
+
+function generateMergeSortedArrayHistory() {
+    // More complex test case that exercises both loops
+    const nums1 = [4, 5, 6, 0, 0, 0, 0, 0, 0];
+    const m = 3;
+    const nums2 = [1, 2, 3, 7, 8, 9];
+    const n = 6;
+    
+    const h = [];
+    let p1 = m - 1;
+    let p2 = n - 1;
+    let p = m + n - 1;
+    let step = 0;
+    const merged = [...nums1];
+    
+    function record(msg, pointers = {}, isComparison = false, isComplete = false) {
+        h.push({
+            msg,
+            line: step,
+            pointers: { ...pointers, p1, p2, p },
+            nums1: [...merged],
+            nums2: [...nums2],
+            isComparison,
+            isComplete,
+            step: h.length
+        });
+    }
+    
+    record(`Initializing merge. nums1=[${nums1}], nums2=[${nums2}]`, {}, false);
+    step = 1;
+    
+    record(`Setting pointers: p1=${p1}, p2=${p2}, p=${p}`, {}, false);
+    step = 5;
+    
+    let comparisonCount = 0;
+    
+    // First loop: comparing both arrays
+    while (p1 >= 0 && p2 >= 0) {
+        step = 6;
+        record(`Comparing nums1[${p1}]=${nums1[p1]} vs nums2[${p2}]=${nums2[p2]}`, { comparing: true }, true);
+        comparisonCount++;
+        
+        if (nums1[p1] > nums2[p2]) {
+            step = 7;
+            record(`✓ nums1[${p1}]=${nums1[p1]} > nums2[${p2}]=${nums2[p2]}, placing ${nums1[p1]} at position ${p}`, {}, false);
+            
+            merged[p] = nums1[p1];
+            step = 8;
+            record(`Placed ${nums1[p1]} at merged[${p}]`, {}, false);
+            
+            p1--;
+            step = 9;
+            record(`Moved p1 to ${p1}`, {}, false);
+        } else {
+            step = 10;
+            record(`✓ nums2[${p2}]=${nums2[p2]} >= nums1[${p1}]=${nums1[p1]}, placing ${nums2[p2]} at position ${p}`, {}, false);
+            
+            merged[p] = nums2[p2];
+            step = 11;
+            record(`Placed ${nums2[p2]} at merged[${p}]`, {}, false);
+            
+            p2--;
+            step = 12;
+            record(`Moved p2 to ${p2}`, {}, false);
+        }
+        
+        p--;
+        step = 13;
+        record(`Moved p to ${p}`, {}, false);
+    }
+    
+    step = 14;
+    record(`First loop complete. p1=${p1}, p2=${p2}. Checking remaining elements...`, {}, false);
+    
+    // Second loop: handle remaining elements from nums2
+    if (p2 >= 0) {
+        record(`⚠️ nums1 exhausted! Remaining elements in nums2 (from index 0 to ${p2})`, {}, false);
+    }
+    
+    while (p2 >= 0) {
+        step = 15;
+        record(`Remaining elements in nums2. Placing nums2[${p2}]=${nums2[p2]} at position ${p}`, {}, false);
+        
+        merged[p] = nums2[p2];
+        step = 16;
+        record(`Placed ${nums2[p2]} at merged[${p}]`, {}, false);
+        
+        p2--;
+        step = 17;
+        record(`Moved p2 to ${p2}`, {}, false);
+        
+        p--;
+        step = 13;
+        record(`Moved p to ${p}`, {}, false);
+    }
+    
+    if (p1 >= 0) {
+        record(`✓ All nums2 elements placed. nums1 elements already in correct position!`, {}, false);
+    }
+    
+    h.push({
+        msg: `✓ Merge complete! Result: [${merged}]`,
+        line: -1,
+        pointers: { p1, p2, p },
+        nums1: merged,
+        nums2: nums2,
+        isComplete: true,
+        step: h.length
+    });
+    
+    return h;
+}
+
 // YouTube Recommendation Functions (simplified)
 async function getYouTubeRecommendations() {
     const youtubeContent = document.getElementById('youtubeContent');
@@ -759,49 +930,113 @@ async function getYouTubeRecommendations() {
     setTimeout(() => {
         const problem = problemDB[currentProbId];
         const algorithm = problem.algorithms[currentAlgorithm];
-        const isMinDepth = problem.name.includes('Minimum');
         
-        const videos = [
-            {
-                title: "Binary Tree Algorithms for Technical Interviews - freeCodeCamp",
-                url: "https://www.youtube.com/watch?v=fAAZixBzIAI",
-                reason: "Comprehensive guide to binary tree algorithms and traversal methods"
-            },
-            {
-                title: "Tree Data Structure | Illustrated Data Structures - Gaurav Sen",
-                url: "https://www.youtube.com/watch?v=qH6yxkw0u78",
-                reason: "Builds fundamental understanding of tree properties and operations"
-            }
-        ];
+        let videos = [];
         
-        if (algorithm.name.includes('DFS')) {
-            videos.push({
-                title: "Recursion for Beginners - CS Dojo",
-                url: "https://www.youtube.com/watch?v=B0NtAFf4bvU",
-                reason: "Essential for understanding DFS tree traversal and recursion"
-            });
+        // Problem 88 - Merge Sorted Array
+        if (currentProbId === '88') {
+            videos = [
+                {
+                    title: "Merge Sorted Array - Two Pointer Technique - LeetCode 88",
+                    url: "https://www.youtube.com/watch?v=P1Ic41zsoldQ",
+                    reason: "Step-by-step walkthrough of the two-pointer approach for merging sorted arrays"
+                },
+                {
+                    title: "Two Pointer Technique Explained - GeeksforGeeks",
+                    url: "https://www.youtube.com/watch?v=pWLlJPg0Sx0",
+                    reason: "Comprehensive guide to the two-pointer technique and when to use it"
+                },
+                {
+                    title: "Array Interview Questions - Two Pointers - Coding Interview",
+                    url: "https://www.youtube.com/watch?v=9oZIKdLm1I8",
+                    reason: "Multiple array problems solved using two-pointer approach"
+                },
+                {
+                    title: "Merge Sorted Array - Optimal Solution - NeetCode",
+                    url: "https://www.youtube.com/watch?v=P1Ic41zsoldQ",
+                    reason: "Optimal O(m+n) time and O(1) space solution with detailed explanation"
+                },
+                {
+                    title: "Two Pointers - Easy to Hard - Abdul Bari",
+                    url: "https://www.youtube.com/watch?v=ypu9QXI-8S8",
+                    reason: "Progressive learning from basic to advanced two-pointer problems"
+                }
+            ];
         }
-        
-        if (algorithm.name.includes('BFS')) {
-            videos.push({
-                title: "Breadth First Search - Computerphile",
-                url: "https://www.youtube.com/watch?v=uOlJDhRPfpa",
-                reason: "Excellent explanation of BFS algorithm with visual examples"
-            });
+        // Problem 111 - Minimum Depth
+        else if (currentProbId === '111') {
+            videos = [
+                {
+                    title: "Minimum Depth of Binary Tree - LeetCode 111 - NeetCode",
+                    url: "https://www.youtube.com/watch?v=hWQjewDsO1c",
+                    reason: "Direct solution explanation for minimum depth problem with multiple approaches"
+                },
+                {
+                    title: "Binary Tree DFS Traversal - Complete Tutorial",
+                    url: "https://www.youtube.com/watch?v=wcIRwqJ6KDo",
+                    reason: "Master depth-first search in binary trees with visual examples"
+                },
+                {
+                    title: "Tree Recursion - In Depth Tutorial - CS Dojo",
+                    url: "https://www.youtube.com/watch?v=B0NtAFf4bvU",
+                    reason: "Essential fundamentals of recursion on binary trees"
+                },
+                {
+                    title: "BFS vs DFS - Binary Tree Level Order Traversal",
+                    url: "https://www.youtube.com/watch?v=60OdZHN12DE",
+                    reason: "Compare BFS and DFS approaches for solving minimum depth"
+                },
+                {
+                    title: "Leetcode 111 - Minimum Depth of Binary Tree - Kevin Naughton Jr",
+                    url: "https://www.youtube.com/watch?v=hWQjewDsO1c",
+                    reason: "Full code walkthrough and explanation of edge cases"
+                }
+            ];
         }
-        
-        if (isMinDepth) {
-            videos.push({
-                title: "Minimum Depth of Binary Tree - NeetCode",
-                url: "https://www.youtube.com/watch?v=QaaclTlZqAY",
-                reason: "Direct solution explanation and walkthrough for minimum depth problem"
-            });
-        } else {
-            videos.push({
-                title: "Maximum Depth of Binary Tree - take U forward",
-                url: "https://www.youtube.com/watch?v=eD3tmO66aBA",
-                reason: "Step-by-step explanation of maximum depth problem with code walkthrough"
-            });
+        // Problem 104 - Maximum Depth
+        else if (currentProbId === '104') {
+            videos = [
+                {
+                    title: "Maximum Depth of Binary Tree - LeetCode 104 - NeetCode",
+                    url: "https://www.youtube.com/watch?v=BhuvNBP4cjU",
+                    reason: "Complete walkthrough of maximum depth with recursive and iterative solutions"
+                },
+                {
+                    title: "Binary Tree Traversal Algorithms - Full Tutorial",
+                    url: "https://www.youtube.com/watch?v=9RHaS00qXs8",
+                    reason: "Learn all major tree traversal techniques including DFS and BFS"
+                },
+                {
+                    title: "Tree Height and Depth - Visual Explanation - Abdul Bari",
+                    url: "https://www.youtube.com/watch?v=_pPXW84kC8Q",
+                    reason: "Clear visual explanation of height, depth, and how to calculate them"
+                },
+                {
+                    title: "Recursive Problem Solving on Trees - Coding Interview",
+                    url: "https://www.youtube.com/watch?v=gm8DW8rg97w",
+                    reason: "Master recursive approaches to tree problems with examples"
+                },
+                {
+                    title: "LeetCode 104 Maximum Depth - Multiple Solutions",
+                    url: "https://www.youtube.com/watch?v=BhuvNBP4cjU",
+                    reason: "Compare recursive DFS, iterative DFS, and BFS approaches"
+                }
+            ];
+        }
+        // Fallback for unknown problems
+        else {
+            videos = [
+                {
+                    title: "Binary Tree Algorithms for Technical Interviews - freeCodeCamp",
+                    url: "https://www.youtube.com/watch?v=fAAZixBzIAI",
+                    reason: "Comprehensive guide to binary tree algorithms and traversal methods"
+                },
+                {
+                    title: "Tree Data Structure | Illustrated Data Structures - Gaurav Sen",
+                    url: "https://www.youtube.com/watch?v=qH6yxkw0u78",
+                    reason: "Builds fundamental understanding of tree properties and operations"
+                }
+            ];
         }
         
         displayYouTubeVideos(videos);
@@ -971,8 +1206,107 @@ function render() {
     // Update button states
     document.getElementById('prevBtn').disabled = currentStep === 0;
     document.getElementById('nextBtn').disabled = currentStep === history.length - 1;
+    
+    // Array visualization for merge sorted arrays
+    if (currentProbId === '88') {
+        const engine = document.querySelector('.render-engine');
+        
+        let arrayContainer = document.getElementById('arrayContainer');
+        if (!arrayContainer) {
+            arrayContainer = document.createElement('div');
+            arrayContainer.id = 'arrayContainer';
+            arrayContainer.className = 'array-container';
+            engine.appendChild(arrayContainer);
+        }
+        
+        if (state.nums1 && state.nums2) {
+            const p1 = state.pointers?.p1 ?? -1;
+            const p2 = state.pointers?.p2 ?? -1;
+            const pMerge = state.pointers?.p ?? -1;
+            
+            let html = `
+                <div class="array-section">
+                    <div class="array-label">nums1 (merged array)</div>
+                    <div class="array-visualization">
+            `;
+            
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabel = '';
+                
+                if (idx === p1) {
+                    classes += ' pointer-1';
+                    pointerLabel = `<div class="pointer-label p1">p1</div>`;
+                }
+                if (idx === pMerge) {
+                    classes += ' pointer-merge';
+                    pointerLabel = `<div class="pointer-label p-merge">p</div>`;
+                }
+                if (val === 0 && idx >= 3) {
+                    classes += ' empty';
+                }
+                
+                html += `
+                    <div class="${classes}">
+                        ${val}
+                        ${pointerLabel}
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+                <div class="array-section">
+                    <div class="array-label">nums2 (second array)</div>
+                    <div class="array-visualization">
+            `;
+            
+            state.nums2.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabel = '';
+                
+                if (idx === p2) {
+                    classes += ' pointer-2';
+                    pointerLabel = `<div class="pointer-label p2">p2</div>`;
+                }
+                
+                html += `
+                    <div class="${classes}">
+                        ${val}
+                        ${pointerLabel}
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">p1 (nums1 pointer)</div>
+                        <div class="pointer-detail-value p1">${p1 >= 0 ? p1 : 'Done'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">p2 (nums2 pointer)</div>
+                        <div class="pointer-detail-value p2">${p2 >= 0 ? p2 : 'Done'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">p (merge pointer)</div>
+                        <div class="pointer-detail-value p-merge">${pMerge >= 0 ? pMerge : 'Done'}</div>
+                    </div>
+                </div>
+            `;
+            
+            arrayContainer.innerHTML = html;
+        }
+        return;
+    }
 }
 
+// Stack Visualization
 function updateStackVisualization(state) {
     const stackList = document.getElementById('stackList');
     
@@ -1165,10 +1499,38 @@ function init() {
     const prob = problemDB[currentProbId];
     const algorithm = prob.algorithms[currentAlgorithm];
     const engine = document.querySelector('.render-engine');
-    const centerX = engine.clientWidth / 2;
-    const centerY = engine.clientHeight / 2;
     
     baseCasesCount = 0;
+    
+    // REMOVE ARRAY CONTAINER COMPLETELY FIRST
+    const existingArrayContainer = document.getElementById('arrayContainer');
+    if (existingArrayContainer) {
+        existingArrayContainer.remove();
+    }
+    
+    // RESET LAYOUT - Remove inline styles and use CSS classes
+    const appLayout = document.querySelector('.app-layout');
+    const stackModule = document.querySelector('.stack-module');
+    
+    if (appLayout) {
+        appLayout.style.gridTemplateColumns = ''; // Clear inline style
+    }
+    
+    if (currentProbId === '88') {
+        if (appLayout) {
+            appLayout.classList.add('hide-right-panel');
+        }
+        if (stackModule) {
+            stackModule.style.display = 'none';
+        }
+    } else {
+        if (appLayout) {
+            appLayout.classList.remove('hide-right-panel');
+        }
+        if (stackModule) {
+            stackModule.style.display = '';
+        }
+    }
     
     // Update algorithm selector
     const algorithmSelect = document.getElementById('algorithmSelect');
@@ -1206,6 +1568,25 @@ function init() {
     document.getElementById('timeComplexity').textContent = algorithm.timeComplexity;
     document.getElementById('spaceComplexity').textContent = algorithm.spaceComplexity;
     
+    // Handle array visualization for problem 88
+    if (currentProbId === '88') {
+        const nodesContainer = document.getElementById('nodesContainer');
+        nodesContainer.innerHTML = '';
+        
+        // Clear SVG lines
+        const svg = document.getElementById('svgLines');
+        if (svg) {
+            svg.innerHTML = '';
+        }
+        
+        // Don't draw tree for array problems
+        history = algorithm.generateHistory();
+        currentStep = 0;
+        render();
+        setupEventListeners();
+        return;
+    }
+    
     // Clear and draw tree
     const nodesContainer = document.getElementById('nodesContainer');
     nodesContainer.innerHTML = '';
@@ -1230,6 +1611,11 @@ function init() {
     function drawTree(node) {
         if (!node) return;
         
+        // Calculate proper center point FRESH each time
+        const engine = document.querySelector('.render-engine');
+        const centerX = engine.clientWidth / 2;
+        const centerY = engine.clientHeight / 2;
+        
         const nx = centerX + node.x;
         const ny = centerY + node.y;
         
@@ -1237,8 +1623,8 @@ function init() {
         nodeEl.className = 'node';
         nodeEl.id = node.id;
         nodeEl.textContent = node.v;
-        nodeEl.style.left = (nx - 30) + 'px';
-        nodeEl.style.top = (ny - 30) + 'px';
+        nodeEl.style.left = (nx - 20) + 'px';  // offset by half node width
+        nodeEl.style.top = (ny - 20) + 'px';   // offset by half node height
         nodesContainer.appendChild(nodeEl);
         
         if (currentAlgorithm === 'recursive') {
@@ -1338,8 +1724,6 @@ function setupEventListeners() {
         }
     });
 }
-
-// ...rest of existing code...
 
 function changeStep(delta) {
     const newStep = currentStep + delta;
