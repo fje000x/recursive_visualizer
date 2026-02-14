@@ -695,30 +695,6 @@
     box-shadow: 0 8px 30px rgba(249, 115, 22, 0.4);
 }
 
-/* Stats Bar */
-.landing-stats-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 20px 24px;
-    border-top: 1px solid rgba(71, 85, 105, 0.1);
-    border-bottom: 1px solid rgba(71, 85, 105, 0.1);
-}
-
-.landing-stat {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    letter-spacing: 0.3px;
-}
-
-.landing-stat-sep {
-    color: rgba(148, 163, 184, 0.25);
-    font-size: 11px;
-}
-
 /* Footer */
 .landing-footer {
     padding: 48px 24px 36px;
@@ -797,7 +773,7 @@
     }
 
     .landing-logo-large svg {
-        height: 28px;
+        height: 48px;
     }
 
     .landing-feature {
