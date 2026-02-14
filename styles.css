@@ -1347,34 +1347,36 @@ body {
     top: 50%;
     transform: translateY(-50%);
     z-index: 20;
-    width: 24px;
-    height: 48px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-left: none;
-    border-radius: 0 8px 8px 0;
-    color: var(--text-secondary);
+    width: 28px;
+    height: 52px;
+    padding: 0;
+    background: linear-gradient(180deg, #f97316, #ea580c);
+    border: none;
+    border-radius: 0;
+    color: #fff;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 2px;
-    transition: all 0.2s;
+    gap: 3px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 10px;
-    padding: 0;
+    box-shadow: 0 2px 16px rgba(249, 115, 22, 0.35);
 }
 .code-toggle-btn .toggle-label {
-    font-size: 7px;
+    font-size: 8px;
     writing-mode: vertical-rl;
     text-orientation: mixed;
-    letter-spacing: 1px;
-    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 .code-toggle-btn:hover {
-    background: var(--bg-card-light);
-    color: var(--accent-blue);
-    width: 28px;
+    background: linear-gradient(180deg, #fb923c, #f97316);
+    color: #fff;
+    width: 32px;
+    box-shadow: 0 4px 24px rgba(249, 115, 22, 0.5);
 }
 .code-toggle-btn i {
     font-size: 10px;
