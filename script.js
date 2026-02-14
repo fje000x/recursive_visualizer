@@ -214,7 +214,7 @@ let currentAlgorithm = "recursive";
 let history = [];
 let currentStep = 0;
 let autoPlayInterval = null;
-let autoPlaySpeed = 1000;
+let autoPlaySpeed = 2000;
 let baseCasesCount = 0;
 
 
@@ -227,6 +227,12 @@ const MIN_REQUEST_INTERVAL = 5000;
 
 // YouTube Modal Functions
 function openYouTubeModal() {
+    // Pause autoplay if running
+    if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+        updatePlayButtons(false);
+    }
     const modal = document.getElementById('youtubeModal');
     modal.classList.add('show');
     getYouTubeRecommendations();
@@ -251,7 +257,17 @@ function showLoadingRecommendations() {
 function initSearch() {
     const searchInput = document.getElementById('searchInput');
     const searchDropdown = document.getElementById('searchDropdown');
+    const searchWrapper = document.querySelector('.search-bar-wrapper');
     
+    // Handle collapsed search icon click (at zoomed-in breakpoints)
+    searchWrapper.addEventListener('click', (e) => {
+        if (!searchWrapper.classList.contains('expanded') && window.innerWidth <= 960) {
+            e.stopPropagation();
+            searchWrapper.classList.add('expanded');
+            searchInput.focus();
+        }
+    });
+
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
         
@@ -282,6 +298,11 @@ function initSearch() {
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.search-bar-wrapper')) {
             searchDropdown.style.display = 'none';
+            // Collapse search back to icon at zoomed breakpoints
+            if (searchWrapper.classList.contains('expanded')) {
+                searchWrapper.classList.remove('expanded');
+                searchInput.value = '';
+            }
         }
     });
 }
@@ -298,6 +319,12 @@ function selectProblem(probId) {
 function openProblemModal() {
     const modal = document.getElementById('problemModal');
     modal.classList.add('show');
+    // Stop autoplay when modal opens
+    if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+        updatePlayButtons(false);
+    }
     renderProblemList();
 }
 
@@ -330,7 +357,7 @@ function renderProblemList(filter) {
                 <div class="problem-item-name">${prob.name}</div>
                 <div class="problem-item-tags">${prob.difficulty ? `<span class="difficulty-badge difficulty-${prob.difficulty}">${prob.difficulty}</span>` : ''}${prob.topics ? prob.topics.map(t => `<span class="problem-tag">${t}</span>`).join('') : ''}${prob.leetcode150 ? '<span class="problem-tag leetcode150">LC 150</span>' : ''}</div>
             </div>
-            <div class="problem-item-right">
+            <div class="problem-action">
                 <i class="fas fa-arrow-right"></i>
             </div>
         </div>
@@ -388,9 +415,13 @@ function generateMaxDepthRecursiveHistory(tree) {
         // Base case: leaf node
         if (!node.left && !node.right) {
             doneMap[node.id].L = true;
-            doneMap[node.id].R = true;
             frame.l = "LEAF";
+            record(node, 3, `→ Left child is null`, 'L', { frameId });
+
+            doneMap[node.id].R = true;
             frame.r = "LEAF";
+            record(node, 3, `→ Right child is null`, 'R', { frameId });
+
             frame.status = "COMPLETED";
             record(node, 2, `✓ Leaf node ${node.v} found, returning 1`, null, {
                 isBase: true,
@@ -671,10 +702,14 @@ function generateRecursiveHistory(tree, isMin = true) {
 
         let res;
         if (!node.left && !node.right) {
-            doneMap[node.id].L = true; 
-            doneMap[node.id].R = true;
+            doneMap[node.id].L = true;
             frame.l = "LEAF";
+            record(node, 3, `→ Left child is null`, 'L', { frameId });
+
+            doneMap[node.id].R = true;
             frame.r = "LEAF";
+            record(node, 3, `→ Right child is null`, 'R', { frameId });
+
             frame.status = "COMPLETED";
             record(node, 3, `✓ Leaf node ${node.v} found, returning 1`, null, { 
                 isBase: true,
@@ -1146,7 +1181,7 @@ async function getYouTubeRecommendations() {
 function displayYouTubeVideos(videos) {
     const youtubeContent = document.getElementById('youtubeContent');
     
-    let videosHTML = '<div class="video-grid">';
+    let videosHTML = '<h4 class="video-section-title">Learn More</h4><div class="video-grid">';
     
     videos.forEach((video) => {
         let videoUrl = video.url || `https://www.youtube.com/results?search_query=${encodeURIComponent(video.title || problemDB[currentProbId].name)}`;
@@ -1154,28 +1189,17 @@ function displayYouTubeVideos(videos) {
             videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(video.title || problemDB[currentProbId].name)}`;
         }
         
-        const displayUrl = videoUrl.replace('https://', '').replace('http://', '');
-        
         videosHTML += `
-            <div class="video-card">
-                <div class="video-card-header">
-                    <i class="fab fa-youtube"></i>
-                    <h4 class="video-title">${video.title || "Untitled Video"}</h4>
-                </div>
-                <div class="video-card-body">
-                    <div class="video-reason">${video.reason || "Helpful for learning this topic"}</div>
-                    <div class="video-url">
-                        <a href="${videoUrl}" target="_blank" class="video-link">
-                            <i class="fas fa-external-link-alt"></i> ${displayUrl}
-                        </a>
+            <a href="${videoUrl}" target="_blank" class="video-card" style="text-decoration:none;">
+                <div class="video-card-left">
+                    <div class="video-card-icon">
+                        <i class="fab fa-youtube"></i> YouTube
                     </div>
+                    <h4 class="video-title">${video.title || "Untitled Video"}</h4>
+                    <div class="video-reason">${video.reason || "Helpful for learning this topic"}</div>
                 </div>
-                <div class="video-card-footer">
-                    <button onclick="window.open('${videoUrl}', '_blank')" class="watch-now-btn">
-                        <i class="fas fa-play"></i> Watch Now
-                    </button>
-                </div>
-            </div>
+                <span class="video-action"><i class="fas fa-external-link-alt"></i></span>
+            </a>
         `;
     });
     
@@ -1213,7 +1237,11 @@ function render() {
     
     // Update console
     const consoleEl = document.getElementById('console');
-    consoleEl.innerHTML = `<div class="console-line">${state.msg}</div>`;
+    if (state.isComplete) {
+        consoleEl.innerHTML = `<div class="console-line console-answer">${state.msg}</div>`;
+    } else {
+        consoleEl.innerHTML = `<div class="console-line">${state.msg}</div>`;
+    }
     
     // Draw return arrows for recursive
     const svg = document.getElementById('svgLines');
@@ -1224,7 +1252,7 @@ function render() {
         const toEl = document.getElementById(state.arrowTo.id);
         
         if (fromEl && toEl) {
-            const halfNode = 24; // half of --node-size (48px)
+            const halfNode = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--node-size')) / 2 || 24;
             const fx = parseFloat(fromEl.style.left) + halfNode;
             const fy = parseFloat(fromEl.style.top) + halfNode;
             const tx = parseFloat(toEl.style.left) + halfNode;
@@ -1251,15 +1279,41 @@ function render() {
     // Update task labels for recursive
     document.querySelectorAll('.task-label span').forEach(span => {
         span.classList.remove('done', 'active-task');
+        // Reset text back to default
+        if (span.id.startsWith('L-')) span.textContent = 'L ↓';
+        if (span.id.startsWith('R-')) span.textContent = 'R ↓';
     });
     
+    // Build a lookup from nodeId -> frame for returned values
+    const frameLookup = {};
+    if (state.stack) {
+        state.stack.forEach(frame => {
+            frameLookup[frame.nodeId] = frame;
+        });
+    }
+
     if (state.done) {
         for (const [nodeId, tasks] of Object.entries(state.done)) {
             const leftSpan = document.getElementById(`L-${nodeId}`);
             const rightSpan = document.getElementById(`R-${nodeId}`);
+            const frame = frameLookup[nodeId];
             
-            if (tasks.L && leftSpan) leftSpan.classList.add('done');
-            if (tasks.R && rightSpan) rightSpan.classList.add('done');
+            if (tasks.L && leftSpan) {
+                leftSpan.classList.add('done');
+                if (frame && typeof frame.l === 'number') {
+                    leftSpan.textContent = `L:${frame.l}`;
+                } else if (frame && (frame.l === 'LEAF' || frame.l === 'NONE')) {
+                    leftSpan.textContent = 'L:∅';
+                }
+            }
+            if (tasks.R && rightSpan) {
+                rightSpan.classList.add('done');
+                if (frame && typeof frame.r === 'number') {
+                    rightSpan.textContent = `R:${frame.r}`;
+                } else if (frame && (frame.r === 'LEAF' || frame.r === 'NONE')) {
+                    rightSpan.textContent = 'R:∅';
+                }
+            }
             
             if (nodeId === state.nodeId) {
                 if (state.currentTask === 'L' && leftSpan) leftSpan.classList.add('active-task');
@@ -1467,7 +1521,7 @@ function updateStackVisualization(state) {
                 
                 div.innerHTML = `
                     <div class="stack-header-row">
-                        <div class="stack-function-name">${currentProbId === '111' ? 'minDepth' : 'maxDepth'}(node)</div>
+                        <div class="stack-function-name">${currentProbId === '111' ? 'minDepth' : 'maxDepth'}(${frame.v})</div>
                         <div class="stack-node-value">Value: ${frame.v}</div>
                     </div>
                     <div class="stack-details">
@@ -1488,7 +1542,6 @@ function updateStackVisualization(state) {
             stackList.innerHTML = `
                 <div class="empty-stack">
                     <div class="empty-state">
-                        <div class="empty-icon">📭</div>
                         <div class="empty-text">Call stack is empty</div>
                         <div class="empty-subtext">Start stepping through to see function calls</div>
                     </div>
@@ -1539,7 +1592,6 @@ function updateStackVisualization(state) {
             stackList.innerHTML = `
                 <div class="empty-stack">
                     <div class="empty-state">
-                        <div class="empty-icon">📬</div>
                         <div class="empty-text">Queue is empty</div>
                         <div class="empty-subtext">Start stepping through to see queue operations</div>
                     </div>
@@ -1589,7 +1641,6 @@ function updateStackVisualization(state) {
             stackList.innerHTML = `
                 <div class="empty-stack">
                     <div class="empty-state">
-                        <div class="empty-icon">📚</div>
                         <div class="empty-text">Stack is empty</div>
                         <div class="empty-subtext">Start stepping through to see stack operations</div>
                     </div>
@@ -1620,8 +1671,9 @@ function updateStats(state) {
 function getStatusDisplay(value, isActive) {
     if (value === "PENDING") return "Waiting";
     if (value === "PROCESSING") return isActive ? "Processing..." : "In Progress";
-    if (value === "LEAF") return "Leaf ✓";
-    if (value === "NONE") return "None";
+    if (value === "LEAF") return "null ✓";
+    if (value === "NONE") return "null";
+    if (typeof value === 'number') return `returned ${value}`;
     return value;
 }
 
@@ -1685,9 +1737,7 @@ function init() {
     // Update "All Problems" button to show current problem
     const problemListBtn = document.getElementById('problemListBtn');
     if (problemListBtn) {
-        const diffClass = prob.difficulty ? `difficulty-${prob.difficulty}` : '';
-        const diffLabel = prob.difficulty ? prob.difficulty.charAt(0).toUpperCase() + prob.difficulty.slice(1) : '';
-        problemListBtn.innerHTML = `<i class="fas fa-list"></i> #${currentProbId} ${prob.name} ${prob.difficulty ? `<span class="difficulty-badge ${diffClass}">${diffLabel}</span>` : ''}`;
+        problemListBtn.innerHTML = `<i class="fas fa-list"></i> #${currentProbId} ${prob.name}`;
     }
 
     // Update LeetCode link
@@ -1813,7 +1863,7 @@ function init() {
         `;
     }
     
-    const halfNode = 24; // half of --node-size (48px)
+    const halfNode = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--node-size')) / 2 || 24;
 
     function drawTree(node) {
         if (!node) return;
@@ -2019,6 +2069,8 @@ function setupEventListeners() {
 }
 
 function changeStep(delta) {
+    const problemModal = document.getElementById('problemModal');
+    if (problemModal && problemModal.classList.contains('show')) return;
     const ytModal = document.getElementById('youtubeModal');
     if (ytModal && ytModal.classList.contains('show')) {
         closeYouTubeModal();
@@ -2031,7 +2083,25 @@ function changeStep(delta) {
     }
 }
 
+function updatePlayButtons(isPlaying) {
+    const mobileBtn = document.getElementById('mobilePlayBtn');
+    const desktopBtn = document.getElementById('desktopPlayBtn');
+    if (mobileBtn) {
+        mobileBtn.querySelector('i').className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
+        mobileBtn.querySelector('span').textContent = isPlaying ? 'Pause' : 'Play';
+    }
+    if (desktopBtn) {
+        desktopBtn.querySelector('i').className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
+        desktopBtn.querySelector('span').textContent = isPlaying ? 'Pause' : 'Play';
+    }
+}
+
 function toggleAutoPlay() {
+    const problemModal = document.getElementById('problemModal');
+    if (problemModal && problemModal.classList.contains('show')) {
+        closeProblemModal();
+        return;
+    }
     const ytModal = document.getElementById('youtubeModal');
     if (ytModal && ytModal.classList.contains('show')) {
         closeYouTubeModal();
@@ -2040,24 +2110,34 @@ function toggleAutoPlay() {
     if (autoPlayInterval) {
         clearInterval(autoPlayInterval);
         autoPlayInterval = null;
+        updatePlayButtons(false);
     } else {
         // If we're at the end, restart from the beginning
         if (currentStep >= history.length - 1) {
             currentStep = 0;
             render();
         }
+        updatePlayButtons(true);
         autoPlayInterval = setInterval(() => {
             if (currentStep < history.length - 1) {
                 changeStep(1);
             } else {
                 clearInterval(autoPlayInterval);
                 autoPlayInterval = null;
+                updatePlayButtons(false);
+                // Auto-reset after a pause so user can see the final answer
+                setTimeout(() => {
+                    currentStep = 0;
+                    render();
+                }, 3000);
             }
         }, autoPlaySpeed);
     }
 }
 
 function resetVisualization() {
+    const problemModal = document.getElementById('problemModal');
+    if (problemModal && problemModal.classList.contains('show')) return;
     const ytModal = document.getElementById('youtubeModal');
     if (ytModal && ytModal.classList.contains('show')) {
         closeYouTubeModal();
@@ -2069,25 +2149,34 @@ function resetVisualization() {
         clearInterval(autoPlayInterval);
         autoPlayInterval = null;
     }
+    updatePlayButtons(false);
     init();
 }
 
 // Initialize on load
 window.addEventListener('DOMContentLoaded', init);
 
-// Debounced resize: only re-layout the tree canvas scale, not full init
+// Debounced resize: re-render tree to pick up new --node-size and scale
 let resizeTimer;
+let lastNodeSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--node-size')) || 48;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-        // Just re-scale the tree canvas to fit the new container size
-        const engine = document.querySelector('.render-engine');
-        const treeCanvas = document.getElementById('treeCanvas');
-        if (engine && treeCanvas) {
-            const containerW = engine.clientWidth || 800;
-            const containerH = engine.clientHeight || 600;
-            const fitScale = Math.min(containerW / 800, containerH / 600) * 1.15;
-            treeCanvas.style.transform = `translate(-50%, -50%) scale(${fitScale})`;
+        const currentNodeSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--node-size')) || 48;
+        if (currentNodeSize !== lastNodeSize) {
+            // Node size changed (e.g. crossed mobile breakpoint) — full re-render
+            lastNodeSize = currentNodeSize;
+            init();
+        } else {
+            // Just re-scale the tree canvas to fit the new container size
+            const engine = document.querySelector('.render-engine');
+            const treeCanvas = document.getElementById('treeCanvas');
+            if (engine && treeCanvas) {
+                const containerW = engine.clientWidth || 800;
+                const containerH = engine.clientHeight || 600;
+                const fitScale = Math.min(containerW / 800, containerH / 600) * 1.15;
+                treeCanvas.style.transform = `translate(-50%, -50%) scale(${fitScale})`;
+            }
         }
     }, 150);
 });
