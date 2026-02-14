@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AlgoFlowz</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,7 +13,37 @@
     <header class="global-nav">
         <div class="nav-left">
             <div class="logo">
-                <span class="logo-text">Algo</span><span class="logo-highlight">Flowz</span>
+                <svg class="logo-svg" viewBox="0 0 222 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Connecting lines -->
+                    <line x1="22" y1="14" x2="28" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="46" y1="14" x2="52" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="70" y1="14" x2="76" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="94" y1="14" x2="104" y2="14" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="2 2"/>
+                    <line x1="122" y1="14" x2="128" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="146" y1="14" x2="152" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="170" y1="14" x2="176" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="194" y1="14" x2="200" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                    <!-- ALGO nodes -->
+                    <circle cx="12" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                    <text x="12" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">A</text>
+                    <circle cx="36" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                    <text x="36" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">L</text>
+                    <circle cx="60" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                    <text x="60" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">G</text>
+                    <circle cx="84" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                    <text x="84" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">O</text>
+                    <!-- FLOWZ nodes -->
+                    <circle cx="114" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                    <text x="114" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">F</text>
+                    <circle cx="138" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                    <text x="138" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">L</text>
+                    <circle cx="162" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                    <text x="162" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">O</text>
+                    <circle cx="186" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                    <text x="186" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">W</text>
+                    <circle cx="210" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                    <text x="210" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">Z</text>
+                </svg>
             </div>
             <!-- Search bar -->
             <div class="search-bar-wrapper">
@@ -27,7 +58,7 @@
                 <div id="searchDropdown" class="search-dropdown" style="display:none;"></div>
             </div>
             <!-- All Problems button -->
-            <button id="problemListBtn" class="modern-select" style="background: var(--bg-card); border: 1px solid var(--border); cursor: pointer; padding: 10px 16px; gap: 8px; display: flex; align-items: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px;">
+            <button id="problemListBtn" class="modern-select" style="background: var(--bg-card); border: 1px solid var(--border); cursor: pointer; padding: 0 14px; height: 34px; gap: 8px; display: flex; align-items: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px;">
                 <i class="fas fa-list"></i> All Problems
             </button>
             <!-- LeetCode link -->
@@ -44,15 +75,6 @@
                 <label for="algorithmSelect" class="algorithm-label">Algorithm:</label>
                 <select id="algorithmSelect" class="modern-select">
                 </select>
-            </div>
-            <div class="step-info">
-                <div class="step-progress">
-                    <div class="progress-bar" id="progressBar">
-                        <div class="progress-fill" id="progressFill" style="width:0%"></div>
-                    </div>
-                </div>
-                <div id="stepCounter" class="step-counter">
-                </div>
             </div>
             <div class="control-info">
                 <span class="control-hint">Use ← → arrow keys or buttons to navigate</span>

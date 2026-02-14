@@ -261,7 +261,7 @@ function initSearch() {
     
     // Handle collapsed search icon click (at zoomed-in breakpoints)
     searchWrapper.addEventListener('click', (e) => {
-        if (!searchWrapper.classList.contains('expanded') && window.innerWidth <= 960) {
+        if (!searchWrapper.classList.contains('expanded') && window.innerWidth <= 840) {
             e.stopPropagation();
             searchWrapper.classList.add('expanded');
             searchInput.focus();
@@ -1373,14 +1373,6 @@ function render() {
     // Update stats
     updateStats(state);
     
-    // Update progress
-    const progress = ((currentStep + 1) / history.length) * 100;
-    document.getElementById('progressFill').style.width = `${progress}%`;
-    document.getElementById('stepCounter').innerHTML = `
-        <span class="step-label">STEP</span>
-        <span class="step-numbers">${currentStep + 1}/${history.length}</span>
-    `;
-    
     // Update button states
     document.getElementById('prevBtn').disabled = currentStep === 0;
     document.getElementById('nextBtn').disabled = currentStep === history.length - 1;
@@ -1691,6 +1683,23 @@ function init() {
     const engine = document.querySelector('.render-engine');
     
     baseCasesCount = 0;
+
+    // Stop any autoplay
+    if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+        updatePlayButtons(false);
+    }
+
+    // Reset code & stack panels to hidden on mobile
+    const codeModule = document.querySelector('.code-module');
+    const codeToggleBtn = document.getElementById('codeToggleBtn');
+    if (codeModule) codeModule.classList.remove('mobile-visible');
+
+    // Desktop: start with code panel collapsed
+    const appLayout = document.querySelector('.app-layout');
+    if (appLayout) appLayout.classList.add('hide-code-panel');
+    if (codeToggleBtn) codeToggleBtn.classList.add('collapsed');
     
     // REMOVE ARRAY CONTAINER COMPLETELY FIRST
     const existingArrayContainer = document.getElementById('arrayContainer');
@@ -1699,20 +1708,33 @@ function init() {
     }
     
     // RESET LAYOUT - Remove inline styles and use CSS classes
-    const appLayout = document.querySelector('.app-layout');
     const stackModule = document.querySelector('.stack-module');
     const stackToggleBtn = document.getElementById('stackToggleBtn');
     
     if (appLayout) {
         appLayout.style.gridTemplateColumns = ''; // Clear inline style
     }
+
+    // Reset stack panel on mobile
+    if (stackModule) stackModule.classList.remove('mobile-visible');
+    if (stackToggleBtn) stackToggleBtn.classList.remove('collapsed');
     
     const isArrayProblem = currentProbId === '88';
     const isBFS = currentAlgorithm === 'bfs';
+    const isTrueMobile = window.matchMedia('(pointer: coarse)').matches;
 
-    if (isArrayProblem || isBFS) {
-        // Array problems & BFS: hide right panel
-        // BFS shows the queue inline at bottom of canvas
+    if (isArrayProblem) {
+        // Array problems: hide right panel entirely
+        if (appLayout) appLayout.classList.add('hide-right-panel');
+        if (stackModule) {
+            stackModule.style.display = 'none';
+            stackModule.classList.remove('mobile-visible');
+        }
+        if (stackToggleBtn) {
+            stackToggleBtn.style.display = 'none';
+        }
+    } else if (isBFS && isTrueMobile) {
+        // BFS on mobile: hide right panel, queue shows as floating overlay
         if (appLayout) appLayout.classList.add('hide-right-panel');
         if (stackModule) {
             stackModule.style.display = 'none';
@@ -1722,7 +1744,7 @@ function init() {
             stackToggleBtn.style.display = 'none';
         }
     } else {
-        // Recursive & Iterative DFS: show the right panel (call stack / DFS stack)
+        // Recursive, Iterative DFS, and BFS on desktop: show right panel
         if (appLayout) {
             appLayout.classList.remove('hide-right-panel');
         }
@@ -1804,6 +1826,12 @@ function init() {
             svg.innerHTML = '';
         }
         
+        // Hide tree-canvas so it doesn't interfere with array layout
+        const treeCanvas = document.getElementById('treeCanvas');
+        if (treeCanvas) {
+            treeCanvas.style.display = 'none';
+        }
+        
         // Don't draw tree for array problems
         history = algorithm.generateHistory();
         currentStep = 0;
@@ -1817,6 +1845,15 @@ function init() {
     nodesContainer.innerHTML = '';
     const svg = document.getElementById('svgLines');
     const treeCanvas = document.getElementById('treeCanvas');
+
+    // Ensure tree-canvas is visible (may have been hidden for array problems)
+    if (treeCanvas) {
+        treeCanvas.style.display = '';
+    }
+
+    // Remove array container if switching from array problem
+    const oldArrayContainer = document.getElementById('arrayContainer');
+    if (oldArrayContainer) oldArrayContainer.remove();
 
     // The canvas is a fixed 800×600 coordinate space.
     // We scale the whole .tree-canvas div via CSS transform to fit the container.
@@ -1934,20 +1971,22 @@ function toggleCodePanel() {
     const appLayout = document.querySelector('.app-layout');
     const toggleBtn = document.getElementById('codeToggleBtn');
     const codeModule = document.querySelector('.code-module');
-    const isMobile = window.innerWidth <= 768;
+    // True mobile = touch device, not just narrow viewport from zoom
+    const isTrueMobile = window.matchMedia('(pointer: coarse)').matches;
 
-    if (isMobile) {
+    if (isTrueMobile) {
         // Mobile: toggle split visibility (code takes top half, viz shrinks)
         const nowVisible = codeModule.classList.toggle('mobile-visible');
         toggleBtn.classList.toggle('collapsed', nowVisible);
     } else {
-        // Desktop: toggle grid column collapse
+        // Desktop: toggle grid column collapse (even at high zoom)
         const isCollapsed = appLayout.classList.toggle('hide-code-panel');
         toggleBtn.classList.toggle('collapsed', isCollapsed);
     }
 
     // Re-scale tree canvas after layout transition completes
     setTimeout(() => {
+        if (currentProbId === '88') return; // array problem, no tree to scale
         const engine = document.querySelector('.render-engine');
         const treeCanvas = document.getElementById('treeCanvas');
         if (engine && treeCanvas) {
@@ -1963,15 +2002,16 @@ function toggleCodePanel() {
 function toggleStackPanel() {
     const toggleBtn = document.getElementById('stackToggleBtn');
     const stackModule = document.querySelector('.stack-module');
-    const isMobile = window.innerWidth <= 768;
+    const isTrueMobile = window.matchMedia('(pointer: coarse)').matches;
 
-    if (!isMobile) return; // only works on mobile
+    if (!isTrueMobile) return; // only works on mobile
 
     const nowVisible = stackModule.classList.toggle('mobile-visible');
     toggleBtn.classList.toggle('collapsed', nowVisible);
 
     // Re-scale tree canvas after layout transition completes
     setTimeout(() => {
+        if (currentProbId === '88') return; // array problem, no tree to scale
         const engine = document.querySelector('.render-engine');
         const treeCanvas = document.getElementById('treeCanvas');
         if (engine && treeCanvas) {
@@ -2167,7 +2207,7 @@ window.addEventListener('resize', () => {
             // Node size changed (e.g. crossed mobile breakpoint) — full re-render
             lastNodeSize = currentNodeSize;
             init();
-        } else {
+        } else if (currentProbId !== '88') {
             // Just re-scale the tree canvas to fit the new container size
             const engine = document.querySelector('.render-engine');
             const treeCanvas = document.getElementById('treeCanvas');
