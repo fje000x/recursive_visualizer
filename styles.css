@@ -1159,6 +1159,15 @@ body {
     color: var(--accent-blue);
 }
 
+/* ===== Python Syntax Highlighting ===== */
+.syn-kw      { color: #c084fc; }              /* purple — keywords */
+.syn-fn      { color: #60a5fa; }              /* blue — function names */
+.syn-builtin { color: #22d3ee; }              /* cyan — built-in functions */
+.syn-str     { color: #86efac; }              /* green — strings */
+.syn-num     { color: #fb923c; }              /* orange — numbers */
+.syn-comment { color: #64748b; font-style: italic; } /* gray — comments */
+.syn-self    { color: #f472b6; }              /* pink — self/cls */
+
 /* Layout Grid */
 .app-layout {
     display: grid;
@@ -1346,7 +1355,6 @@ body {
     text-orientation: mixed;
     letter-spacing: 1.5px;
     font-weight: 700;
-    text-transform: uppercase;
 }
 .code-toggle-btn:hover {
     background: linear-gradient(180deg, #fb923c, #f97316);
@@ -3831,9 +3839,9 @@ body > main > section.module.viz-module > div.module-header:empty {
         height: auto !important;
         padding: 5px 10px;
         border-radius: 6px;
-        border: 1px solid var(--border);
-        border-left: 1px solid var(--border);
-        background: var(--bg-card);
+        border: 1px solid var(--border) !important;
+        background: var(--bg-card) !important;
+        color: var(--text-secondary) !important;
         z-index: 30;
         display: flex;
         flex-direction: row;
@@ -3843,13 +3851,15 @@ body > main > section.module.viz-module > div.module-header:empty {
         margin-top: 0;
         transform: none;
         transition: background 0.2s, color 0.2s;
+        box-shadow: none !important;
     }
     .code-toggle-btn:hover,
     .code-toggle-btn:active {
         width: auto !important;
         height: auto !important;
-        background: var(--bg-card-light);
-        color: var(--accent-blue);
+        background: var(--bg-card-light) !important;
+        color: var(--text-primary) !important;
+        box-shadow: none !important;
     }
     .code-toggle-btn .toggle-label {
         writing-mode: horizontal-tb;

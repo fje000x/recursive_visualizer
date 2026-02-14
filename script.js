@@ -1717,6 +1717,60 @@ function getStatusClass(value) {
     return "";
 }
 
+// Python syntax highlighting — single-pass tokenizer to avoid regex conflicts
+function highlightPython(code) {
+    const keywords = new Set(['def', 'if', 'else', 'elif', 'while', 'for', 'in', 'return', 'not', 'and', 'or', 'True', 'False', 'None', 'class', 'import', 'from', 'pass', 'break', 'continue', 'is', 'lambda', 'with', 'as', 'try', 'except', 'finally', 'raise', 'yield']);
+    const builtins = new Set(['print', 'len', 'range', 'max', 'min', 'abs', 'sum', 'sorted', 'list', 'dict', 'set', 'tuple', 'int', 'str', 'float', 'bool', 'enumerate', 'zip', 'map', 'filter', 'isinstance', 'type', 'append', 'pop', 'extend', 'insert', 'remove', 'reverse', 'sort']);
+
+    // Tokenize with a single regex — order matters (strings/comments first)
+    const tokenPattern = /('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")|(#.*$)|(\b\d+\.?\d*\b)|(\b[a-zA-Z_]\w*\b)|([^\s\w]|\s)/gm;
+
+    let result = '';
+    let match;
+    while ((match = tokenPattern.exec(code)) !== null) {
+        const [full, str, comment, num, word, other] = match;
+
+        if (str) {
+            result += '<span class="syn-str">' + str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>';
+        } else if (comment) {
+            result += '<span class="syn-comment">' + comment.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>';
+        } else if (num) {
+            result += '<span class="syn-num">' + num + '</span>';
+        } else if (word) {
+            if (word === 'self' || word === 'cls') {
+                result += '<span class="syn-self">' + word + '</span>';
+            } else if (word === 'def') {
+                // Peek ahead for function name
+                result += '<span class="syn-kw">def</span>';
+                const ahead = code.slice(tokenPattern.lastIndex);
+                const fnMatch = ahead.match(/^(\s+)([a-zA-Z_]\w*)/);
+                if (fnMatch) {
+                    result += fnMatch[1] + '<span class="syn-fn">' + fnMatch[2] + '</span>';
+                    tokenPattern.lastIndex += fnMatch[0].length;
+                }
+            } else if (keywords.has(word)) {
+                result += '<span class="syn-kw">' + word + '</span>';
+            } else {
+                // Check if it's a function call (next non-space char is '(')
+                const rest = code.slice(tokenPattern.lastIndex);
+                const isCall = /^\s*\(/.test(rest);
+                if (builtins.has(word) && isCall) {
+                    result += '<span class="syn-builtin">' + word + '</span>';
+                } else if (isCall) {
+                    result += '<span class="syn-fn">' + word + '</span>';
+                } else if (builtins.has(word)) {
+                    result += '<span class="syn-builtin">' + word + '</span>';
+                } else {
+                    result += word;
+                }
+            }
+        } else if (other) {
+            result += other.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+    }
+    return result;
+}
+
 // Initialization
 function init() {
     const prob = problemDB[currentProbId];
@@ -1841,7 +1895,7 @@ function init() {
     algorithm.code.forEach((line, index) => {
         const lineEl = document.createElement('div');
         lineEl.className = 'line';
-        lineEl.textContent = line;
+        lineEl.innerHTML = highlightPython(line);
         lineEl.setAttribute('data-line', index);
         
         // Apply indentation
