@@ -62,7 +62,7 @@
 }
 
 .landing-logo-large svg {
-    height: 40px;
+    height: 54px;
     width: auto;
     filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.35));
 }
@@ -693,6 +693,30 @@
 .landing-cta-bottom:hover {
     background: linear-gradient(135deg, #fb923c, #f97316);
     box-shadow: 0 8px 30px rgba(249, 115, 22, 0.4);
+}
+
+/* Stats Bar */
+.landing-stats-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 20px 24px;
+    border-top: 1px solid rgba(71, 85, 105, 0.1);
+    border-bottom: 1px solid rgba(71, 85, 105, 0.1);
+}
+
+.landing-stat {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.3px;
+}
+
+.landing-stat-sep {
+    color: rgba(148, 163, 184, 0.25);
+    font-size: 11px;
 }
 
 /* Footer */
@@ -3689,13 +3713,17 @@ body > main > section.module.viz-module > div.module-header:empty {
     .search-bar-wrapper { display: none; }
     .control-hint { display: none; }
     .nav-right { display: none; }
-    .leetcode-link { width: 30px; height: 30px; margin-left: auto; }
+    .leetcode-link { width: 30px; height: 30px; margin-left: auto; flex-shrink: 0; }
     .leetcode-link svg { width: 14px; height: 14px; }
-    .youtube-link { width: 30px; height: 30px; font-size: 14px; }
+    .youtube-link { width: 30px; height: 30px; font-size: 14px; flex-shrink: 0; }
     #problemListBtn {
         height: 30px !important;
-        padding: 0 10px !important;
-        font-size: 8px !important;
+        padding: 0 12px !important;
+        font-size: 10px !important;
+        max-width: 60% !important;
+        flex: 0 1 auto !important;
+        min-width: 0 !important;
+        width: 60% !important;
     }
 
     /* ---- Landing page: reduce hero height on mobile ---- */
