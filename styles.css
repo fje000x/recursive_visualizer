@@ -3698,6 +3698,12 @@ body > main > section.module.viz-module > div.module-header:empty {
         font-size: 8px !important;
     }
 
+    /* ---- Landing page: reduce hero height on mobile ---- */
+    .landing-hero {
+        min-height: 80vh;
+        padding: 40px 20px 32px;
+    }
+
     /* ---- Action bar: hide on mobile (floating pill replaces) ---- */
     .action-bar {
         display: none !important;
