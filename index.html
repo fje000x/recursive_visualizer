@@ -10,9 +10,229 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- ===== LANDING PAGE OVERLAY ===== -->
+    <div id="landingOverlay" class="landing-overlay">
+        <div class="landing-scroll-container">
+            <!-- Hero Section -->
+            <section class="landing-hero">
+                <div class="landing-hero-glow"></div>
+                <div class="landing-hero-content">
+                    <div class="landing-logo-large">
+                        <svg viewBox="0 0 222 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="22" y1="14" x2="28" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="46" y1="14" x2="52" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="70" y1="14" x2="76" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="94" y1="14" x2="104" y2="14" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="2 2"/>
+                            <line x1="122" y1="14" x2="128" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="146" y1="14" x2="152" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="170" y1="14" x2="176" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="194" y1="14" x2="200" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="12" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                            <text x="12" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">A</text>
+                            <circle cx="36" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                            <text x="36" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">L</text>
+                            <circle cx="60" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                            <text x="60" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">G</text>
+                            <circle cx="84" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                            <text x="84" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">O</text>
+                            <circle cx="114" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                            <text x="114" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">F</text>
+                            <circle cx="138" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                            <text x="138" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">L</text>
+                            <circle cx="162" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                            <text x="162" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">O</text>
+                            <circle cx="186" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                            <text x="186" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">W</text>
+                            <circle cx="210" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                            <text x="210" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">Z</text>
+                        </svg>
+                    </div>
+                    <h1 class="landing-title">See the algorithm.<br><span class="landing-accent">Understand the logic.</span></h1>
+                    <p class="landing-subtitle">A curated, step-by-step visual debugger for the top 150 LeetCode interview questions — trees, arrays, two pointers, DFS, BFS, stacks, and more. Watch every algorithm unfold in real time.</p>
+                    <button id="landingCTA" class="landing-cta-btn">
+                        Start Exploring
+                    </button>
+                </div>
+                <div class="landing-scroll-hint">
+                    <span>Scroll to learn more</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </section>
+
+            <!-- Why Section -->
+            <section class="landing-section">
+                <div class="landing-section-inner">
+                    <h2 class="landing-section-title">Why I Built This</h2>
+                    <div class="landing-story-card">
+                        <p>When I was grinding LeetCode, I could read solutions but never actually <em>see</em> what they were doing. Why does the call go left first? When does the stack unwind? What does BFS look like on real input?</p>
+                        <p>YouTube wasn't the answer either. Most videos don't draw the data structure, some just read the code, and the good ones are buried. You watch four videos for one problem and still don't get it.</p>
+                        <p>I wanted something where I could pause, step forward, step back, and watch every call frame like a visual debugger built for algorithm problems.</p>
+                        <p>So I built <strong>AlgoFlowz</strong>. A curated visual walkthrough for the top 150 LeetCode interview questions. Trees, arrays, two pointers, stacks, graphs. Every major pattern. The tool I wish I had when I started.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feature 1: Tree Visualization -->
+            <section class="landing-section landing-section-alt">
+                <div class="landing-feature">
+                    <div class="landing-feature-text reveal-on-scroll">
+                        <h2 class="landing-section-title">See how algorithms move, step by step</h2>
+                        <p>Follow every node visit, every edge traversal, every comparison — on a live, interactive tree that updates in real time as the algorithm runs.</p>
+                    </div>
+                    <div class="landing-feature-visual reveal-on-scroll">
+                        <svg class="feature-svg" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Base edges (dim) -->
+                            <line x1="180" y1="52" x2="90" y2="132" stroke="#1e293b" stroke-width="2"/>
+                            <line x1="180" y1="52" x2="270" y2="132" stroke="#1e293b" stroke-width="2"/>
+                            <line x1="270" y1="132" x2="210" y2="212" stroke="#1e293b" stroke-width="2"/>
+                            <line x1="270" y1="132" x2="330" y2="212" stroke="#1e293b" stroke-width="2"/>
+                            <!-- Active edge overlays (animate per DFS step) -->
+                            <line class="dfs-edge dfs-edge-3-9"   x1="180" y1="52" x2="90"  y2="132" stroke="#3b82f6" stroke-width="2.5" opacity="0"/>
+                            <line class="dfs-edge dfs-edge-3-20"  x1="180" y1="52" x2="270" y2="132" stroke="#3b82f6" stroke-width="2.5" opacity="0"/>
+                            <line class="dfs-edge dfs-edge-20-15" x1="270" y1="132" x2="210" y2="212" stroke="#3b82f6" stroke-width="2.5" opacity="0"/>
+                            <line class="dfs-edge dfs-edge-20-7"  x1="270" y1="132" x2="330" y2="212" stroke="#3b82f6" stroke-width="2.5" opacity="0"/>
+                            <!-- Node: 3 (root) -->
+                            <circle class="dfs-node dfs-n3" cx="180" cy="44" r="22" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+                            <text class="dfs-text dfs-t3" x="180" y="49" font-family="JetBrains Mono, monospace" font-weight="600" font-size="13" fill="#64748b" text-anchor="middle">3</text>
+                            <!-- Node: 9 -->
+                            <circle class="dfs-node dfs-n9" cx="90" cy="124" r="22" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+                            <text class="dfs-text dfs-t9" x="90" y="129" font-family="JetBrains Mono, monospace" font-weight="600" font-size="13" fill="#64748b" text-anchor="middle">9</text>
+                            <!-- Node: 20 -->
+                            <circle class="dfs-node dfs-n20" cx="270" cy="124" r="22" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+                            <text class="dfs-text dfs-t20" x="270" y="129" font-family="JetBrains Mono, monospace" font-weight="600" font-size="13" fill="#64748b" text-anchor="middle">20</text>
+                            <!-- Node: 15 -->
+                            <circle class="dfs-node dfs-n15" cx="210" cy="204" r="22" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+                            <text class="dfs-text dfs-t15" x="210" y="209" font-family="JetBrains Mono, monospace" font-weight="600" font-size="13" fill="#64748b" text-anchor="middle">15</text>
+                            <!-- Node: 7 -->
+                            <circle class="dfs-node dfs-n7" cx="330" cy="204" r="22" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+                            <text class="dfs-text dfs-t7" x="330" y="209" font-family="JetBrains Mono, monospace" font-weight="600" font-size="13" fill="#64748b" text-anchor="middle">7</text>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feature 2: Code + Highlighting -->
+            <section class="landing-section">
+                <div class="landing-feature landing-feature-reverse">
+                    <div class="landing-feature-text reveal-on-scroll">
+                        <h2 class="landing-section-title">Follow the solution line by line</h2>
+                        <p>The actual solution code highlights the exact line being executed at each step. Finally connect the logic you're reading to the behavior happening on the tree.</p>
+                    </div>
+                    <div class="landing-feature-visual reveal-on-scroll">
+                        <div class="feature-code-block">
+                            <div class="feature-code-line"><span class="fcode-ln">1</span><span class="fcode-kw">def</span> <span class="fcode-fn">maxDepth</span>(root):</div>
+                            <div class="feature-code-line"><span class="fcode-ln">2</span>    <span class="fcode-kw">if not</span> root: <span class="fcode-kw">return</span> <span class="fcode-num">0</span></div>
+                            <div class="feature-code-line feature-code-scan"><span class="fcode-ln">3</span>    left = maxDepth(root.left)</div>
+                            <div class="feature-code-line"><span class="fcode-ln">4</span>    right = maxDepth(root.right)</div>
+                            <div class="feature-code-line"><span class="fcode-ln">5</span>    <span class="fcode-kw">return</span> <span class="fcode-fn">max</span>(left, right) + <span class="fcode-num">1</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feature 3: Call Stack -->
+            <section class="landing-section landing-section-alt">
+                <div class="landing-feature">
+                    <div class="landing-feature-text reveal-on-scroll">
+                        <h2 class="landing-section-title">See the call stack in real time</h2>
+                        <p>Watch the call stack grow and shrink as recursion happens. Understand depth, unwinding, and how return values propagate back up the tree.</p>
+                    </div>
+                    <div class="landing-feature-visual reveal-on-scroll">
+                        <div class="feature-stack">
+                            <div class="feature-stack-label">CALL STACK</div>
+                            <div class="feature-stack-frames">
+                                <!-- Frame 3 (top of stack — pushed last, popped first) -->
+                                <div class="feature-stack-frame stk-f3">
+                                    <span class="feature-stack-fn">maxDepth(<span class="fcode-num">15</span>)</span>
+                                    <span class="feature-stack-meta">depth 3</span>
+                                </div>
+                                <!-- Frame 2 (middle) -->
+                                <div class="feature-stack-frame stk-f2">
+                                    <span class="feature-stack-fn">maxDepth(<span class="fcode-num">20</span>)</span>
+                                    <span class="feature-stack-meta">depth 2</span>
+                                </div>
+                                <!-- Frame 1 (bottom of stack — pushed first, popped last) -->
+                                <div class="feature-stack-frame stk-f1">
+                                    <span class="feature-stack-fn">maxDepth(<span class="fcode-num">3</span>)</span>
+                                    <span class="feature-stack-meta">depth 1</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Workflow Section -->
+            <section class="landing-section landing-section-alt">
+                <div class="landing-section-inner">
+                    <h2 class="landing-section-title" style="justify-content: center; text-align: center;">Get the most out of <svg class="inline-logo" viewBox="0 0 222 28" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="22" y1="14" x2="28" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/><line x1="46" y1="14" x2="52" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/><line x1="70" y1="14" x2="76" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/><line x1="94" y1="14" x2="104" y2="14" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="2 2"/><line x1="122" y1="14" x2="128" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/><line x1="146" y1="14" x2="152" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/><line x1="170" y1="14" x2="176" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/><line x1="194" y1="14" x2="200" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/><text x="12" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">A</text><circle cx="36" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/><text x="36" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">L</text><circle cx="60" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/><text x="60" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">G</text><circle cx="84" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/><text x="84" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">O</text><circle cx="114" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/><text x="114" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">F</text><circle cx="138" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/><text x="138" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">L</text><circle cx="162" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/><text x="162" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">O</text><circle cx="186" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/><text x="186" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">W</text><circle cx="210" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/><text x="210" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">Z</text></svg></h2>
+                    <p class="landing-section-desc" style="text-align: center; max-width: 520px; margin: 0 auto 56px;">A simple loop that turns confusion into confidence.</p>
+                    <div class="landing-timeline">
+                        <div class="timeline-track"></div>
+                        <div class="timeline-item reveal-on-scroll">
+                            <div class="timeline-dot timeline-dot-blue"></div>
+                            <div class="timeline-content">
+                                <h3>Attempt the problem</h3>
+                                <p>Give it 20–30 minutes on LeetCode. Even if you don't solve it, the struggle primes your brain.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item reveal-on-scroll">
+                            <div class="timeline-dot timeline-dot-orange"></div>
+                            <div class="timeline-content">
+                                <h3>Visualize on AlgoFlowz</h3>
+                                <p>Step through the algorithm frame by frame. Watch every call, push, and traversal on real data structures.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item reveal-on-scroll">
+                            <div class="timeline-dot timeline-dot-blue"></div>
+                            <div class="timeline-content">
+                                <h3>Go back and solve it</h3>
+                                <p>Implement it from understanding — not memorization. This is where real learning happens.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item reveal-on-scroll">
+                            <div class="timeline-dot timeline-dot-orange"></div>
+                            <div class="timeline-content">
+                                <h3>Repeat &amp; build patterns</h3>
+                                <p>Over time, the same patterns click across problems. AlgoFlowz accelerates that recognition.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom CTA -->
+            <section class="landing-section landing-section-cta">
+                <div class="landing-section-inner" style="text-align: center;">
+                    <h2 class="landing-cta-heading">Ready?</h2>
+                    <p class="landing-section-desc">Stop reading solutions you don't understand.</p>
+                    <button class="landing-cta-btn landing-cta-bottom" id="landingCTABottom">
+                        Launch AlgoFlowz
+                    </button>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="landing-footer">
+                <blockquote class="landing-footer-quote">
+                    "The best way to learn is to do; the only way to learn programming is by writing programs."
+                </blockquote>
+                <cite class="landing-footer-cite">— Dennis Ritchie, creator of C</cite>
+                <div class="landing-footer-divider"></div>
+                <div class="landing-footer-row">
+                    <span class="landing-footer-text">Built by Fernando</span>
+                    <span class="landing-footer-sep">·</span>
+                    <a href="https://www.linkedin.com/in/fernando-erazo00" target="_blank" rel="noopener noreferrer" class="landing-footer-link">
+                        <i class="fab fa-linkedin"></i> LinkedIn
+                    </a>
+                </div>
+            </footer>
+        </div>
+    </div>
+
     <header class="global-nav">
         <div class="nav-left">
-            <div class="logo">
+            <div class="logo" id="navLogo" title="About AlgoFlowz" style="cursor: pointer;">
                 <svg class="logo-svg" viewBox="0 0 222 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <!-- Connecting lines -->
                     <line x1="22" y1="14" x2="28" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
@@ -85,14 +305,51 @@
     <!-- Problem List Modal - Full Screen -->
     <div id="problemModal" class="problem-modal">
         <div class="problem-modal-content">
-            <div class="problem-modal-header">
-                <h2>All Problems</h2>
-                <button id="problemModalClose" class="problem-modal-close" type="button">✕</button>
-            </div>
-            
-            <div class="problem-modal-filters">
-                <div class="filter-group">
-                    <label>Topic:</label>
+            <div class="problem-modal-top">
+                <div class="problem-modal-header">
+                    <div class="problem-modal-title" id="problemModalLogo" style="cursor: pointer;" title="About AlgoFlowz">
+                        <svg class="problem-modal-logo" viewBox="0 0 222 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="22" y1="14" x2="28" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="46" y1="14" x2="52" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="70" y1="14" x2="76" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="94" y1="14" x2="104" y2="14" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="2 2"/>
+                            <line x1="122" y1="14" x2="128" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="146" y1="14" x2="152" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="170" y1="14" x2="176" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="194" y1="14" x2="200" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="12" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                            <text x="12" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">A</text>
+                            <circle cx="36" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                            <text x="36" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">L</text>
+                            <circle cx="60" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                            <text x="60" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">G</text>
+                            <circle cx="84" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/>
+                            <text x="84" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">O</text>
+                            <circle cx="114" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                            <text x="114" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">F</text>
+                            <circle cx="138" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                            <text x="138" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">L</text>
+                            <circle cx="162" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                            <text x="162" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">O</text>
+                            <circle cx="186" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                            <text x="186" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">W</text>
+                            <circle cx="210" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+                            <text x="210" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">Z</text>
+                        </svg>
+                    </div>
+                    <button id="problemModalClose" class="problem-modal-close" type="button">✕</button>
+                </div>
+
+                <h2 class="problem-modal-heading">Choose a Problem</h2>
+
+                <div class="problem-search-bar">
+                    <div class="problem-search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="problemSearchInput" placeholder="Search by name or number..." autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="problem-modal-filters">
                     <div class="filter-options">
                         <button class="filter-btn active" data-filter="all">All</button>
                         <button class="filter-btn" data-filter="tree">Tree</button>
@@ -236,6 +493,64 @@
         </button>
     </nav>
 
+    <script>
+        // Landing page logic
+        (function() {
+            const overlay = document.getElementById('landingOverlay');
+            const cta = document.getElementById('landingCTA');
+            const ctaBottom = document.getElementById('landingCTABottom');
+            const navLogo = document.getElementById('navLogo');
+            const problemModalLogo = document.getElementById('problemModalLogo');
+            
+            // Check if user has dismissed landing page this session
+            if (sessionStorage.getItem('algoflowz_landed')) {
+                overlay.classList.add('landing-hidden');
+            }
+            
+            function dismissLanding() {
+                overlay.classList.add('landing-hidden');
+                sessionStorage.setItem('algoflowz_landed', '1');
+                // Show the problem list so user can pick a problem
+                if (typeof openProblemModal === 'function') {
+                    openProblemModal();
+                }
+            }
+
+            function showLanding() {
+                // Close problem modal if open
+                if (typeof closeProblemModal === 'function') {
+                    closeProblemModal();
+                }
+                overlay.classList.remove('landing-hidden');
+                overlay.querySelector('.landing-scroll-container').scrollTop = 0;
+            }
+            
+            cta.addEventListener('click', dismissLanding);
+            ctaBottom.addEventListener('click', dismissLanding);
+            navLogo.addEventListener('click', showLanding);
+            problemModalLogo.addEventListener('click', showLanding);
+            
+            // Also allow Escape key to dismiss
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && !overlay.classList.contains('landing-hidden')) {
+                    dismissLanding();
+                }
+            });
+
+            // Scroll-reveal: animate elements when they enter the viewport
+            const revealObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                    }
+                });
+            }, { threshold: 0.15, root: overlay.querySelector('.landing-scroll-container') });
+
+            document.querySelectorAll('.reveal-on-scroll').forEach(function(el) {
+                revealObserver.observe(el);
+            });
+        })();
+    </script>
     <script src="script.js"></script>
 </body>
 </html>

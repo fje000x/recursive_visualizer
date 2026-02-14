@@ -319,6 +319,10 @@ function selectProblem(probId) {
 function openProblemModal() {
     const modal = document.getElementById('problemModal');
     modal.classList.add('show');
+    // Reset search
+    currentSearchQuery = '';
+    const searchInput = document.getElementById('problemSearchInput');
+    if (searchInput) searchInput.value = '';
     // Stop autoplay when modal opens
     if (autoPlayInterval) {
         clearInterval(autoPlayInterval);
@@ -326,6 +330,8 @@ function openProblemModal() {
         updatePlayButtons(false);
     }
     renderProblemList();
+    // Focus search bar
+    if (searchInput) setTimeout(() => searchInput.focus(), 100);
 }
 
 function closeProblemModal() {
@@ -333,17 +339,53 @@ function closeProblemModal() {
     modal.classList.remove('show');
 }
 
+function updateFilterCounts() {
+    const allProblems = Object.entries(problemDB);
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        const f = btn.dataset.filter;
+        let count;
+        if (f === 'all') {
+            count = allProblems.length;
+        } else if (f === 'leetcode150') {
+            count = allProblems.filter(([, p]) => p.leetcode150 === true).length;
+        } else {
+            count = allProblems.filter(([, p]) => p.topics && p.topics.includes(f)).length;
+        }
+        // Get label text without any existing count
+        const label = btn.dataset.label || btn.textContent.replace(/\s*\(\d+\)/, '').trim();
+        btn.dataset.label = label;
+        btn.textContent = `${label} (${count})`;
+    });
+}
+
 let currentFilter = 'all';
+let currentSearchQuery = '';
 
 function renderProblemList(filter) {
     if (filter !== undefined) currentFilter = filter;
     const problemList = document.getElementById('problemList');
     
     const filtered = Object.entries(problemDB).filter(([id, prob]) => {
-        if (currentFilter === 'all') return true;
-        if (currentFilter === 'leetcode150') return prob.leetcode150 === true;
-        return prob.topics && prob.topics.includes(currentFilter);
+        // Apply topic filter
+        if (currentFilter !== 'all') {
+            if (currentFilter === 'leetcode150') {
+                if (prob.leetcode150 !== true) return false;
+            } else {
+                if (!prob.topics || !prob.topics.includes(currentFilter)) return false;
+            }
+        }
+        // Apply search filter
+        if (currentSearchQuery) {
+            const q = currentSearchQuery.toLowerCase();
+            const nameMatch = prob.name && prob.name.toLowerCase().includes(q);
+            const idMatch = id.toString().includes(q);
+            if (!nameMatch && !idMatch) return false;
+        }
+        return true;
     });
+
+    // Update filter counts
+    updateFilterCounts();
 
     if (filtered.length === 0) {
         problemList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">No problems found for this filter.</div>`;
@@ -353,12 +395,11 @@ function renderProblemList(filter) {
     problemList.innerHTML = filtered.map(([id, prob]) => `
         <div class="problem-item" onclick="selectProblem('${id}'); closeProblemModal();">
             <div class="problem-item-left">
-                <div class="problem-item-id">#${id}</div>
-                <div class="problem-item-name">${prob.name}</div>
-                <div class="problem-item-tags">${prob.difficulty ? `<span class="difficulty-badge difficulty-${prob.difficulty}">${prob.difficulty}</span>` : ''}${prob.topics ? prob.topics.map(t => `<span class="problem-tag">${t}</span>`).join('') : ''}${prob.leetcode150 ? '<span class="problem-tag leetcode150">LC 150</span>' : ''}</div>
+                <div class="problem-item-name"><span class="problem-item-id">${id}.</span> ${prob.name} ${prob.topics ? prob.topics.map(t => `<span class="problem-tag tag-${t}">${t}</span>`).join('') : ''}</div>
             </div>
-            <div class="problem-action">
-                <i class="fas fa-arrow-right"></i>
+            <div class="problem-item-right">
+                ${prob.difficulty ? `<span class="difficulty-badge difficulty-${prob.difficulty}">${prob.difficulty}</span>` : ''}
+                <div class="problem-action"><i class="fas fa-arrow-right"></i></div>
             </div>
         </div>
     `).join('');
@@ -2055,6 +2096,15 @@ function setupEventListeners() {
             renderProblemList(btn.dataset.filter);
         });
     });
+
+    // Search input in problem modal
+    const problemSearchInput = document.getElementById('problemSearchInput');
+    if (problemSearchInput) {
+        problemSearchInput.addEventListener('input', (e) => {
+            currentSearchQuery = e.target.value;
+            renderProblemList();
+        });
+    }
     
     document.getElementById('algorithmSelect').addEventListener('change', (e) => {
         currentAlgorithm = e.target.value;
