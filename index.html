@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AlgoFlowz — Visual Algorithm Debugger for LeetCode</title>
+    <title>AlgoFlowz — Algorithm Visualizer for Coding Interviews</title>
 
     <!-- SEO -->
-    <meta name="description" content="A step-by-step visual debugger for the top 150 LeetCode interview questions. Watch DFS, BFS, recursion, two pointers, and more unfold in real time on trees, arrays, and stacks.">
+    <meta name="description" content="Step through the top 150 coding interview problems frame by frame. Watch DFS, BFS, recursion, two pointers, sliding window, and more unfold in real time on trees, arrays, and stacks.">
 
     <!-- Open Graph (LinkedIn, Discord, iMessage, etc.) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://algoflowz.com">
     <meta property="og:title" content="AlgoFlowz — See the Algorithm. Understand the Logic.">
-    <meta property="og:description" content="A curated, step-by-step visual debugger for the top 150 LeetCode interview questions — trees, arrays, DFS, BFS, stacks, and more.">
+    <meta property="og:description" content="A curated, step-by-step algorithm visualizer for the top 150 coding interview problems — trees, arrays, DFS, BFS, stacks, and more.">
     <meta property="og:image" content="https://algoflowz.com/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="AlgoFlowz — Visual Algorithm Debugger for LeetCode">
-    <meta name="twitter:description" content="Step through DFS, BFS, recursion, and more on real data structures. The tool I wish I had when I started LeetCode.">
+    <meta name="twitter:title" content="AlgoFlowz — Algorithm Visualizer for Coding Interviews">
+    <meta name="twitter:description" content="Step through DFS, BFS, recursion, and more on real data structures. The tool I wish I had when learning algorithms.">
     <meta name="twitter:image" content="https://algoflowz.com/og-image.png">
 
     <!-- Theme color (mobile browser bar) -->
@@ -35,11 +35,10 @@
     <!-- ===== LANDING PAGE OVERLAY ===== -->
     <div id="landingOverlay" class="landing-overlay">
         <div class="landing-scroll-container">
-            <!-- Hero Section -->
-            <section class="landing-hero">
-                <div class="landing-hero-glow"></div>
-                <div class="landing-hero-content">
-                    <div class="landing-logo-large">
+            <!-- Landing Nav -->
+            <nav class="landing-nav">
+                <div class="landing-nav-inner">
+                    <div class="landing-nav-logo">
                         <svg viewBox="0 0 222 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <line x1="22" y1="14" x2="28" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
                             <line x1="46" y1="14" x2="52" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
@@ -69,11 +68,32 @@
                             <text x="210" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">Z</text>
                         </svg>
                     </div>
-                    <h1 class="landing-title">See the algorithm.<br><span class="landing-accent">Understand the logic.</span></h1>
-                    <p class="landing-subtitle">A curated, step-by-step visual debugger for the top 150 LeetCode interview questions — trees, arrays, two pointers, DFS, BFS, stacks, and more. Watch every algorithm unfold in real time.</p>
-                    <button id="landingCTA" class="landing-cta-btn">
-                        Start Exploring
+                    <button class="landing-nav-cta" id="landingNavCTA">
+                        Start Exploring <i class="fas fa-arrow-right"></i>
                     </button>
+                </div>
+            </nav>
+
+            <!-- Hero Section -->
+            <section class="landing-hero">
+                <div class="landing-hero-glow"></div>
+                <div class="landing-hero-content">
+                    <div class="landing-badge">
+                        <i class="fas fa-play"></i> Algorithm visualization platform
+                    </div>
+                    <h1 class="landing-title">Watch every algorithm<br><span class="landing-accent">unfold in real time.</span></h1>
+                    <p class="landing-subtitle">Step through 150+ of the most common coding interview problems frame by frame. Trees, arrays, graphs, two pointers, sliding window, BFS, DFS, stacks — every major pattern, visualized.</p>
+                    <div class="landing-search-wrapper" id="landingSearchWrapper">
+                        <i class="fas fa-search landing-search-icon"></i>
+                        <input type="text" id="landingSearchInput" class="landing-search-input" placeholder="Search by problem # or name..." autocomplete="off" />
+                        <div class="landing-search-dropdown" id="landingSearchDropdown"></div>
+                    </div>
+                    <div class="landing-hero-actions">
+                        <button id="landingCTA" class="landing-cta-btn">
+                            Start Exploring <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <span class="landing-hero-hint">100% free</span>
+                    </div>
                 </div>
                 <div class="landing-scroll-hint">
                     <span>Scroll to learn more</span>
@@ -81,15 +101,48 @@
                 </div>
             </section>
 
-            <!-- Why Section -->
-            <section class="landing-section">
-                <div class="landing-section-inner">
-                    <h2 class="landing-section-title">Why I Built This</h2>
-                    <div class="landing-story-card">
-                        <p>When I was grinding LeetCode, I could read solutions but never actually <em>see</em> what they were doing. Why does the call go left first? When does the stack unwind? What does BFS look like on real input?</p>
-                        <p>YouTube wasn't the answer either. Most videos don't draw the data structure, some just read the code, and the good ones are buried. You watch four videos for one problem and still don't get it.</p>
-                        <p>I wanted something where I could pause, step forward, step back, and watch every call frame like a visual debugger built for algorithm problems.</p>
-                        <p>So I built <strong>AlgoFlowz</strong>. A curated visual walkthrough for the top 150 LeetCode interview questions. Trees, arrays, two pointers, stacks, graphs. Every major pattern. The tool I wish I had when I started.</p>
+            <!-- Stats Bar -->
+            <section class="landing-stats-bar">
+                <div class="landing-stats-inner">
+                    <div class="landing-stat">
+                        <span class="landing-stat-number"><span class="stat-accent-blue">150</span>+</span>
+                        <span class="landing-stat-label">Interview Problems</span>
+                    </div>
+                    <div class="landing-stat-divider"></div>
+                    <div class="landing-stat">
+                        <span class="landing-stat-number"><span class="stat-accent-orange">10</span>+</span>
+                        <span class="landing-stat-label">Algorithm Patterns</span>
+                    </div>
+                    <div class="landing-stat-divider"></div>
+                    <div class="landing-stat">
+                        <span class="landing-stat-number"><i class="fas fa-play" style="font-size: 0.7em; opacity: 0.7;"></i></span>
+                        <span class="landing-stat-label">Frame-by-Frame Control</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Patterns Section -->
+            <section class="landing-section landing-patterns-section">
+                <div class="landing-section-inner" style="text-align: center;">
+                    <h2 class="landing-section-title" style="text-align: center;">Every pattern that matters</h2>
+                    <p class="landing-section-desc" style="text-align: center; max-width: 540px; margin: 0 auto 48px;">Not just trees. AlgoFlowz covers every major data structure and algorithm pattern tested in coding interviews.</p>
+                    <div class="floating-pills-field">
+                        <div class="floating-pill pill-blue pill-float-1">Binary Trees</div>
+                        <div class="floating-pill pill-orange pill-float-2">Two Pointers</div>
+                        <div class="floating-pill pill-purple pill-float-3">Sliding Window</div>
+                        <div class="floating-pill pill-blue pill-float-4">DFS</div>
+                        <div class="floating-pill pill-green pill-float-5">Stacks</div>
+                        <div class="floating-pill pill-orange pill-float-6">BFS</div>
+                        <div class="floating-pill pill-purple pill-float-1">Dynamic Programming</div>
+                        <div class="floating-pill pill-green pill-float-3">Sorting</div>
+                        <div class="floating-pill pill-blue pill-float-5">Binary Search</div>
+                        <div class="floating-pill pill-orange pill-float-2">Linked Lists</div>
+                        <div class="floating-pill pill-purple pill-float-4">Recursion</div>
+                        <div class="floating-pill pill-green pill-float-6">Queues</div>
+                        <div class="floating-pill pill-blue pill-float-3">Backtracking</div>
+                        <div class="floating-pill pill-orange pill-float-1">Hash Maps</div>
+                        <div class="floating-pill pill-purple pill-float-5">Graphs</div>
+                        <div class="floating-pill pill-green pill-float-2">Heaps</div>
                     </div>
                 </div>
             </section>
@@ -99,7 +152,7 @@
                 <div class="landing-feature">
                     <div class="landing-feature-text reveal-on-scroll">
                         <h2 class="landing-section-title">See how algorithms move, step by step</h2>
-                        <p>Follow every node visit, every edge traversal, every comparison — on a live, interactive tree that updates in real time as the algorithm runs.</p>
+                        <p>Follow every node visit, every comparison, every pointer shift — on live, interactive data structures that update in real time as the algorithm executes.</p>
                     </div>
                     <div class="landing-feature-visual reveal-on-scroll">
                         <svg class="feature-svg" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -137,8 +190,8 @@
             <section class="landing-section">
                 <div class="landing-feature landing-feature-reverse">
                     <div class="landing-feature-text reveal-on-scroll">
-                        <h2 class="landing-section-title">Follow the solution line by line</h2>
-                        <p>The actual solution code highlights the exact line being executed at each step. Finally connect the logic you're reading to the behavior happening on the tree.</p>
+                        <h2 class="landing-section-title">Follow the code, line by line</h2>
+                        <p>The solution highlights the exact line being executed at each step. Finally connect what you're reading to what's actually happening on the data structure.</p>
                     </div>
                     <div class="landing-feature-visual reveal-on-scroll">
                         <div class="feature-code-block">
@@ -156,8 +209,8 @@
             <section class="landing-section landing-section-alt">
                 <div class="landing-feature">
                     <div class="landing-feature-text reveal-on-scroll">
-                        <h2 class="landing-section-title">See the call stack in real time</h2>
-                        <p>Watch the call stack grow and shrink as recursion happens. Understand depth, unwinding, and how return values propagate back up the tree.</p>
+                        <h2 class="landing-section-title">Watch the call stack push &amp; pop</h2>
+                        <p>See exactly how recursion works — the stack grows as calls go deeper, then unwinds as return values propagate back. No more guessing.</p>
                     </div>
                     <div class="landing-feature-visual reveal-on-scroll">
                         <div class="feature-stack">
@@ -185,38 +238,38 @@
             </section>
 
             <!-- Workflow Section -->
-            <section class="landing-section landing-section-alt">
+            <section class="landing-section">
                 <div class="landing-section-inner">
-                    <h2 class="landing-section-title" style="justify-content: center; text-align: center;">Get the most out of <svg class="inline-logo" viewBox="0 0 222 28" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="22" y1="14" x2="28" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/><line x1="46" y1="14" x2="52" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/><line x1="70" y1="14" x2="76" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/><line x1="94" y1="14" x2="104" y2="14" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="2 2"/><line x1="122" y1="14" x2="128" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/><line x1="146" y1="14" x2="152" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/><line x1="170" y1="14" x2="176" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/><line x1="194" y1="14" x2="200" y2="14" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/><text x="12" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">A</text><circle cx="36" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/><text x="36" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">L</text><circle cx="60" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/><text x="60" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">G</text><circle cx="84" cy="14" r="11" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.8"/><text x="84" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#e2e8f0" text-anchor="middle">O</text><circle cx="114" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/><text x="114" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">F</text><circle cx="138" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/><text x="138" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">L</text><circle cx="162" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/><text x="162" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">O</text><circle cx="186" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/><text x="186" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">W</text><circle cx="210" cy="14" r="11" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/><text x="210" y="18.5" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#fb923c" text-anchor="middle">Z</text></svg></h2>
-                    <p class="landing-section-desc" style="text-align: center; max-width: 520px; margin: 0 auto 56px;">A simple loop that turns confusion into confidence.</p>
+                    <h2 class="landing-section-title" style="text-align: center;">How to use AlgoFlowz</h2>
+                    <p class="landing-section-desc" style="text-align: center; max-width: 520px; margin: 0 auto 56px;">A simple loop that turns confusion into real understanding.</p>
                     <div class="landing-timeline">
                         <div class="timeline-track"></div>
                         <div class="timeline-item reveal-on-scroll">
                             <div class="timeline-dot timeline-dot-blue"></div>
                             <div class="timeline-content">
-                                <h3>Attempt the problem</h3>
-                                <p>Give it 20–30 minutes on LeetCode. Even if you don't solve it, the struggle primes your brain.</p>
+                                <h3>1. Attempt the problem</h3>
+                                <p>Spend 20–30 minutes attempting the problem. Even if you don't solve it, the struggle primes your brain for the solution.</p>
                             </div>
                         </div>
                         <div class="timeline-item reveal-on-scroll">
                             <div class="timeline-dot timeline-dot-orange"></div>
                             <div class="timeline-content">
-                                <h3>Visualize on AlgoFlowz</h3>
-                                <p>Step through the algorithm frame by frame. Watch every call, push, and traversal on real data structures.</p>
+                                <h3>2. Step through on AlgoFlowz</h3>
+                                <p>Search for the problem, pick the algorithm, and step through frame by frame. Watch every operation on real data.</p>
                             </div>
                         </div>
                         <div class="timeline-item reveal-on-scroll">
                             <div class="timeline-dot timeline-dot-blue"></div>
                             <div class="timeline-content">
-                                <h3>Go back and solve it</h3>
-                                <p>Implement it from understanding — not memorization. This is where real learning happens.</p>
+                                <h3>3. Go back and implement</h3>
+                                <p>Now that you've seen it, write the solution from understanding — not memorization. This is where it clicks.</p>
                             </div>
                         </div>
                         <div class="timeline-item reveal-on-scroll">
                             <div class="timeline-dot timeline-dot-orange"></div>
                             <div class="timeline-content">
-                                <h3>Repeat &amp; build patterns</h3>
-                                <p>Over time, the same patterns click across problems. AlgoFlowz accelerates that recognition.</p>
+                                <h3>4. Recognize the pattern</h3>
+                                <p>After a few problems, you start seeing the same patterns everywhere. That's when interviews get easy.</p>
                             </div>
                         </div>
                     </div>
@@ -226,10 +279,10 @@
             <!-- Bottom CTA -->
             <section class="landing-section landing-section-cta">
                 <div class="landing-section-inner" style="text-align: center;">
-                    <h2 class="landing-cta-heading">Ready?</h2>
-                    <p class="landing-section-desc">Stop reading solutions you don't understand.</p>
+                    <h2 class="landing-cta-heading">Stop reading solutions<br>you don't understand.</h2>
+                    <p class="landing-section-desc" style="margin-bottom: 32px;">150+ problems. Every major pattern. Step-by-step, frame-by-frame.</p>
                     <button class="landing-cta-btn landing-cta-bottom" id="landingCTABottom">
-                        Launch AlgoFlowz
+                        Launch AlgoFlowz <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
             </section>
@@ -254,7 +307,7 @@
 
     <header class="global-nav">
         <div class="nav-left">
-            <div class="logo" id="navLogo" title="About AlgoFlowz" style="cursor: pointer;">
+            <div class="logo" id="navLogo" title="Home" style="cursor: pointer;">
                 <svg class="logo-svg" viewBox="0 0 222 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <!-- Connecting lines -->
                     <line x1="22" y1="14" x2="28" y2="14" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
@@ -311,15 +364,16 @@
             <button id="youtubeBtn" class="youtube-link" type="button" title="Recommended Videos">
                 <i class="fab fa-youtube"></i>
             </button>
+            <!-- Home button -->
+            <button class="nav-home-btn" id="navHomeBtn" title="Back to landing page">
+                <i class="fas fa-home"></i>
+            </button>
         </div>
         <div class="nav-right">
             <div class="algorithm-selector">
                 <label for="algorithmSelect" class="algorithm-label">Algorithm:</label>
                 <select id="algorithmSelect" class="modern-select">
                 </select>
-            </div>
-            <div class="control-info">
-                <span class="control-hint">Use ← → arrow keys or buttons to navigate</span>
             </div>
         </div>
     </header>
@@ -521,6 +575,7 @@
             const overlay = document.getElementById('landingOverlay');
             const cta = document.getElementById('landingCTA');
             const ctaBottom = document.getElementById('landingCTABottom');
+            const navCta = document.getElementById('landingNavCTA');
             const navLogo = document.getElementById('navLogo');
             const problemModalLogo = document.getElementById('problemModalLogo');
             
@@ -549,8 +604,78 @@
             
             cta.addEventListener('click', dismissLanding);
             ctaBottom.addEventListener('click', dismissLanding);
+            navCta.addEventListener('click', dismissLanding);
             navLogo.addEventListener('click', showLanding);
             problemModalLogo.addEventListener('click', showLanding);
+
+            // Home button in main nav
+            var navHomeBtn = document.getElementById('navHomeBtn');
+            navHomeBtn.addEventListener('click', showLanding);
+
+            // Landing search bar
+            var landingSearchInput = document.getElementById('landingSearchInput');
+            var landingSearchDropdown = document.getElementById('landingSearchDropdown');
+
+            landingSearchInput.addEventListener('input', function() {
+                var query = landingSearchInput.value.trim().toLowerCase();
+                if (query.length === 0) {
+                    landingSearchDropdown.style.display = 'none';
+                    return;
+                }
+                // Wait for problemDB to be available (loaded in script.js)
+                if (typeof problemDB === 'undefined') {
+                    landingSearchDropdown.innerHTML = '<div class="landing-search-noresult">Loading...</div>';
+                    landingSearchDropdown.style.display = 'block';
+                    return;
+                }
+                var results = Object.entries(problemDB).filter(function(entry) {
+                    var id = entry[0], prob = entry[1];
+                    return prob.name.toLowerCase().includes(query) || id.includes(query);
+                });
+                if (results.length === 0) {
+                    landingSearchDropdown.innerHTML = '<div class="landing-search-noresult"><i class="fas fa-clock"></i>Not available yet — check back soon!</div>';
+                    landingSearchDropdown.style.display = 'block';
+                    return;
+                }
+                landingSearchDropdown.innerHTML = results.slice(0, 8).map(function(entry) {
+                    var id = entry[0], prob = entry[1];
+                    return '<div class="landing-search-result" data-prob-id="' + id + '">' +
+                        '<span class="landing-search-result-name">' + prob.name + '</span>' +
+                        '<span class="landing-search-result-id">#' + id + '</span></div>';
+                }).join('');
+                landingSearchDropdown.style.display = 'block';
+            });
+
+            landingSearchDropdown.addEventListener('click', function(e) {
+                var result = e.target.closest('.landing-search-result');
+                if (result && result.dataset.probId) {
+                    overlay.classList.add('landing-hidden');
+                    sessionStorage.setItem('algoflowz_landed', '1');
+                    landingSearchInput.value = '';
+                    landingSearchDropdown.style.display = 'none';
+                    // selectProblem is defined in script.js which loads after
+                    if (typeof selectProblem === 'function') {
+                        selectProblem(result.dataset.probId);
+                    }
+                }
+            });
+
+            // Close dropdown on outside click
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.landing-search-wrapper')) {
+                    landingSearchDropdown.style.display = 'none';
+                }
+            });
+
+            // Enter key to select first result or show not-available
+            landingSearchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    var firstResult = landingSearchDropdown.querySelector('.landing-search-result');
+                    if (firstResult) {
+                        firstResult.click();
+                    }
+                }
+            });
             
             // Also allow Escape key to dismiss
             document.addEventListener('keydown', function(e) {
