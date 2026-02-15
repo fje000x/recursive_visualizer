@@ -2638,7 +2638,9 @@ body {
 
 body.problem-page-active .global-nav,
 body.problem-page-active .app-layout,
-body.problem-page-active .controls {
+body.problem-page-active .controls,
+body.problem-page-active .mobile-bottom-nav,
+body.problem-page-active .action-bar {
     visibility: hidden;
 }
 
@@ -4520,6 +4522,43 @@ body > main > section.module.viz-module > div.module-header:empty {
 
     /* Hide problem page stats on mobile */
     .problem-page-stats { display: none; }
+
+    /* ---- Problem list: clean mobile cards ---- */
+    .problem-card-inner {
+        padding: 12px 14px;
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 0;
+    }
+    .problem-card:hover .problem-card-inner,
+    .problem-card:active .problem-card-inner {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+    .problem-card-name {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    .problem-card-meta {
+        gap: 6px;
+        margin-top: 2px;
+    }
+    .difficulty-badge {
+        display: none !important;
+    }
+    .problem-card-tags-inline {
+        font-size: 10px;
+    }
+    .problem-card-inspired {
+        font-size: 10px;
+    }
+    .problem-card-arrow svg {
+        width: 12px;
+        height: 12px;
+    }
+    .problem-list {
+        gap: 0;
+    }
 
     #problemListBtn {
         height: 30px !important;

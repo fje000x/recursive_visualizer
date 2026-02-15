@@ -493,7 +493,6 @@ function renderProblemList(filter) {
                         <div class="problem-card-meta">
                             ${prob.difficulty ? `<span class="difficulty-badge difficulty-${prob.difficulty}">${prob.difficulty}</span>` : ''}
                             ${prob.inspiredBy ? `<span class="problem-card-inspired">${prob.inspiredBy}</span>` : ''}
-                            ${prob.topics ? `<span class="problem-card-tags-inline">${prob.topics.join(' · ')}</span>` : ''}
                         </div>
                     </div>
                     <div class="problem-card-right">
