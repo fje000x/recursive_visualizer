@@ -827,7 +827,7 @@
 
 /* Responsive typography base */
 html {
-    font-size: clamp(12px, 0.9vw, 18px);
+    font-size: clamp(13px, 1vw, 20px);
 }
 
 /* Fix 100vh browser bugs */
@@ -2701,7 +2701,7 @@ body {
     gap: 12px;
     padding: 16px;
     width: 100%;
-    max-width: 580px;
+    max-width: min(90%, 580px);
     margin: auto;
 }
 
@@ -4147,4 +4147,364 @@ body > main > section.module.viz-module > div.module-header:empty {
         font-size: 11px;
         padding: 4px 6px;
     }
+}
+
+/* ===== RESPONSIVE – DESKTOP PROPORTIONAL SCALING ===== */
+
+/* --- Standard Desktop: 1200px – 1439px --- */
+@media screen and (min-width: 1200px) and (max-width: 1439px) {
+    html { font-size: clamp(14px, 1.05vw, 18px); }
+
+    /* Nav */
+    .global-nav { padding: 12px 20px; gap: 14px; }
+    .logo-svg { height: 20px; }
+    .search-bar-wrapper { width: 200px; }
+    .search-bar { font-size: 11px; height: 36px; }
+    .modern-select { font-size: 11px; height: 36px; min-width: 150px; }
+    .leetcode-link { width: 36px; height: 36px; }
+    .leetcode-link svg { width: 18px; height: 18px; }
+    .youtube-link { width: 36px; height: 36px; font-size: 16px; }
+    .control-hint { font-size: 10px; padding: 5px 12px; }
+    .algorithm-label { font-size: 10px; }
+    #problemListBtn { font-size: 11px !important; height: 36px !important; }
+
+    /* App layout */
+    .app-layout {
+        grid-template-columns: minmax(0, 26%) 1fr minmax(0, 22%);
+    }
+
+    /* Code module */
+    .code-viewport { font-size: 11px; padding: 16px; line-height: 1.6; }
+    .line { padding: 5px 12px; margin: 2px 0; font-size: 11px; }
+    .module-label { font-size: 10px; }
+    .language-badge, .depth-badge { font-size: 9px; padding: 3px 9px; }
+    .complexity-label { font-size: 9px; }
+    .complexity-value { font-size: 12px; }
+    .code-info { padding: 12px 14px; }
+
+    /* Viz module */
+    .action-bar { bottom: 112px; padding: 7px 12px; gap: 3px; }
+    .control-btn { padding: 9px 14px; font-size: 14px; }
+    .control-btn span { font-size: 11px; }
+    .console-text { font-size: 13px; padding: 14px; }
+    .console-panel { min-height: 85px; }
+
+    /* Stack module */
+    .stack-controls { font-size: 10px; padding: 9px 13px; }
+    .stack-stat-label { font-size: 10px; }
+    .stack-stat-value { font-size: 20px; }
+    .stack-stat { padding: 9px 5px; }
+    .stack-function-name { font-size: 13px; }
+    .stack-node-value { font-size: 11px; padding: 3px 11px; }
+    .detail-label { font-size: 10px; }
+    .detail-value { font-size: 11px; }
+    .stack-legend { padding: 11px 13px; gap: 18px; }
+    .legend-item span { font-size: 9px; }
+
+    /* Code toggle */
+    .code-toggle-btn { width: 30px; height: 54px; }
+    .code-toggle-btn .toggle-label { font-size: 9px; }
+
+    /* Array visualization */
+    .array-inner { max-width: min(92%, 700px); }
+    .array-item { width: 44px; min-width: 44px; height: 44px; font-size: 14px; }
+    .array-visualization { gap: 7px; padding: 12px; }
+    .pointer-label { font-size: 8px; padding: 3px 7px; }
+    .array-index { font-size: 8px; padding: 3px 6px; }
+    .array-label { font-size: 11px; }
+
+    /* Queue */
+    .queue-item .qi-val { font-size: 15px; }
+    .queue-item .qi-depth { font-size: 9px; }
+    .queue-label { font-size: 9px; }
+
+    /* Problem modal */
+    .problem-modal-heading { font-size: 22px; }
+    .problem-search-bar input { font-size: 13px; padding: 10px 13px 10px 36px; }
+    .filter-btn { font-size: 12px; padding: 7px 16px; }
+    .problem-item { padding: 13px 22px; }
+    .problem-item-name { font-size: 14px; }
+    .problem-tag { font-size: 11px; }
+}
+
+/* --- Large Desktop: 1440px – 1919px --- */
+@media screen and (min-width: 1440px) and (max-width: 1919px) {
+    html { font-size: clamp(15px, 1.1vw, 20px); }
+
+    /* Nav */
+    .global-nav { padding: 13px 24px; gap: 16px; }
+    .logo-svg { height: 22px; }
+    .search-bar-wrapper { width: 220px; min-width: 160px; }
+    .search-bar { font-size: 12px; height: 38px; }
+    .modern-select { font-size: 12px; height: 38px; min-width: 160px; padding: 0 30px 0 13px; }
+    .leetcode-link { width: 38px; height: 38px; }
+    .leetcode-link svg { width: 20px; height: 20px; }
+    .youtube-link { width: 38px; height: 38px; font-size: 17px; }
+    .control-hint { font-size: 11px; padding: 6px 13px; }
+    .algorithm-label { font-size: 11px; }
+    #problemListBtn { font-size: 12px !important; height: 38px !important; padding: 0 16px !important; }
+
+    /* App layout */
+    .app-layout {
+        grid-template-columns: minmax(0, 26%) 1fr minmax(0, 22%);
+    }
+    .app-layout.hide-right-panel {
+        grid-template-columns: 26% 1fr !important;
+    }
+
+    /* Code module */
+    .code-viewport { font-size: 12px; padding: 18px; line-height: 1.6; }
+    .line { padding: 5px 13px; margin: 2px 0; font-size: 12px; }
+    .module-label { font-size: 11px; }
+    .language-badge, .depth-badge { font-size: 9px; padding: 4px 10px; }
+    .complexity-label { font-size: 10px; }
+    .complexity-value { font-size: 13px; }
+    .code-info { padding: 13px 16px; }
+
+    /* Viz module */
+    .action-bar { bottom: 118px; padding: 8px 14px; gap: 4px; border-radius: 18px; }
+    .control-btn { padding: 10px 16px; font-size: 15px; border-radius: 12px; }
+    .control-btn span { font-size: 12px; }
+    .console-text { font-size: 14px; padding: 16px; }
+    .console-panel { min-height: 90px; }
+    .console-line { padding: 6px 10px; margin-bottom: 6px; }
+
+    /* Nodes proportional */
+    :root { --node-size: 52px; }
+    .node { font-size: 17px; }
+
+    /* Stack module */
+    .stack-controls { font-size: 11px; padding: 10px 14px; }
+    .stack-stat-label { font-size: 11px; }
+    .stack-stat-value { font-size: 22px; }
+    .stack-stat { padding: 10px 6px; }
+    .stack-function-name { font-size: 14px; }
+    .stack-node-value { font-size: 12px; padding: 4px 12px; }
+    .stack-item { padding: 14px 16px; }
+    .detail-label { font-size: 10px; }
+    .detail-value { font-size: 12px; }
+    .stack-legend { padding: 12px 14px; gap: 20px; }
+    .legend-item span { font-size: 10px; }
+    .legend-color { width: 10px; height: 10px; }
+
+    /* Code toggle */
+    .code-toggle-btn { width: 32px; height: 58px; font-size: 11px; }
+    .code-toggle-btn .toggle-label { font-size: 9px; }
+
+    /* Array visualization */
+    .array-inner { max-width: min(92%, 860px); }
+    .array-container { padding: 20px; }
+    .array-item { width: 48px; min-width: 48px; height: 48px; font-size: 15px; }
+    .array-visualization { gap: 8px; padding: 14px; min-height: 80px; }
+    .pointer-label { font-size: 9px; padding: 4px 8px; top: -30px; }
+    .array-index { font-size: 9px; padding: 3px 7px; bottom: -28px; }
+    .array-label { font-size: 12px; }
+    .pointer-info { padding: 14px; gap: 14px; }
+    .pointer-detail-label { font-size: 10px; }
+    .pointer-detail-value { font-size: 15px; padding: 7px 11px; }
+
+    /* Queue */
+    .queue-item { padding: 12px 14px; min-width: 52px; }
+    .queue-item .qi-val { font-size: 16px; }
+    .queue-item .qi-depth { font-size: 10px; }
+    .queue-label { font-size: 10px; }
+
+    /* Problem modal */
+    .problem-modal-heading { font-size: 24px; }
+    .problem-search-bar input { font-size: 14px; padding: 11px 14px 11px 38px; }
+    .filter-btn { font-size: 12px; padding: 7px 17px; }
+    .problem-item { padding: 14px 24px; }
+    .problem-item-name { font-size: 15px; }
+    .problem-tag { font-size: 11px; }
+    .difficulty-badge { font-size: 11px; padding: 4px 12px; }
+
+    /* YouTube modal */
+    .youtube-modal-content { width: 420px; }
+    .youtube-modal-header h3 { font-size: 24px; }
+    .video-title { font-size: 16px; }
+    .video-reason { font-size: 12px; }
+}
+
+/* --- Ultrawide / 4K Desktop: 1920px+ --- */
+@media screen and (min-width: 1920px) {
+    html { font-size: clamp(16px, 1.05vw, 22px); }
+
+    /* Nav */
+    .global-nav { padding: 14px 32px; gap: 18px; }
+    .logo-svg { height: 24px; }
+    .search-bar-wrapper { width: 260px; min-width: 180px; }
+    .search-bar { font-size: 13px; height: 40px; }
+    .modern-select { font-size: 13px; height: 40px; min-width: 180px; padding: 0 32px 0 14px; }
+    .leetcode-link { width: 40px; height: 40px; border-radius: 10px; }
+    .leetcode-link svg { width: 22px; height: 22px; }
+    .youtube-link { width: 40px; height: 40px; font-size: 18px; border-radius: 10px; }
+    .control-hint { font-size: 12px; padding: 6px 14px; border-radius: 6px; }
+    .algorithm-label { font-size: 12px; }
+    #problemListBtn { font-size: 13px !important; height: 40px !important; padding: 0 18px !important; border-radius: 9px !important; }
+
+    /* App layout — slightly wider code and stack panels */
+    .app-layout {
+        grid-template-columns: minmax(0, 24%) 1fr minmax(0, 21%);
+    }
+    .app-layout.hide-right-panel {
+        grid-template-columns: 24% 1fr !important;
+    }
+    .app-layout.hide-code-panel {
+        grid-template-columns: 0px 1fr 21%;
+    }
+
+    /* Code module */
+    .code-viewport { font-size: 14px; padding: 22px; line-height: 1.65; }
+    .line { padding: 6px 14px; margin: 3px 0; font-size: 14px; border-radius: 5px; border-left-width: 3px; }
+    .module-header { padding: 13px 16px; }
+    .module-label { font-size: 12px; letter-spacing: 0.8px; }
+    .language-badge, .depth-badge { font-size: 10px; padding: 4px 11px; border-radius: 14px; }
+    .complexity-label { font-size: 11px; }
+    .complexity-value { font-size: 14px; }
+    .code-info { padding: 14px 18px; }
+    .complexity-info { gap: 20px; }
+
+    /* Python indentation scales */
+    .line[data-indent="1"] { padding-left: 28px; }
+    .line[data-indent="2"] { padding-left: 42px; }
+    .line[data-indent="3"] { padding-left: 56px; }
+    .line[data-indent="4"] { padding-left: 70px; }
+
+    /* Viz module */
+    .action-bar { bottom: 124px; padding: 10px 20px; gap: 6px; border-radius: 22px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), 0 0 24px rgba(255, 255, 255, 0.1); }
+    .action-bar .control-btn { padding: 14px 24px; font-size: 18px; border-radius: 14px; gap: 6px; }
+    .action-bar .control-btn span { font-size: 14px; font-weight: 700; }
+    .console-text { font-size: 15px; padding: 18px; line-height: 1.6; }
+    .console-panel { min-height: 100px; }
+    .console-line { padding: 7px 12px; margin-bottom: 7px; border-radius: 5px; }
+
+    /* Nodes proportional */
+    :root { --node-size: 56px; }
+    .node { font-size: 18px; font-weight: 700; }
+
+    /* Stack module */
+    .stack-controls { font-size: 12px; padding: 11px 16px; }
+    .stack-stat-label { font-size: 12px; }
+    .stack-stat-value { font-size: 24px; }
+    .stack-stat { padding: 11px 8px; }
+    .stack-function-name { font-size: 15px; }
+    .stack-node-value { font-size: 13px; padding: 4px 13px; border-radius: 10px; }
+    .stack-item { padding: 16px 18px; }
+    .stack-header-row { margin-bottom: 8px; }
+    .stack-details { gap: 16px; margin-top: 8px; }
+    .detail-label { font-size: 11px; }
+    .detail-value { font-size: 13px; }
+    .stack-legend { padding: 13px 16px; gap: 22px; }
+    .legend-item span { font-size: 10px; }
+    .legend-color { width: 11px; height: 11px; border-radius: 5px; }
+
+    /* Code toggle */
+    .code-toggle-btn { width: 34px; height: 62px; font-size: 12px; box-shadow: 0 3px 20px rgba(249, 115, 22, 0.35); }
+    .code-toggle-btn .toggle-label { font-size: 10px; }
+    .code-toggle-btn:hover { width: 38px; }
+
+    /* Array visualization */
+    .array-inner { max-width: min(94%, 1100px); gap: 16px; padding: 24px; }
+    .array-container { padding: 24px; }
+    .array-item { width: 56px; min-width: 56px; height: 56px; font-size: 17px; border-radius: 10px; margin-top: 30px; margin-bottom: 28px; }
+    .array-visualization { gap: 12px; padding: 18px; min-height: 100px; border-radius: 10px; }
+    .pointer-label { font-size: 11px; padding: 5px 11px; top: -34px; border-radius: 6px; }
+    .array-index { font-size: 10px; padding: 4px 9px; bottom: -32px; border-radius: 5px; }
+    .array-label { font-size: 14px; }
+    .pointer-info { padding: 18px; gap: 18px; border-radius: 10px; }
+    .pointer-detail-label { font-size: 12px; }
+    .pointer-detail-value { font-size: 17px; padding: 9px 14px; border-radius: 8px; }
+
+    /* Queue */
+    .queue-item { padding: 14px 16px; min-width: 56px; }
+    .queue-item .qi-val { font-size: 18px; }
+    .queue-item .qi-depth { font-size: 10px; }
+    .queue-label { font-size: 11px; padding: 0 12px; }
+
+    /* Problem modal */
+    .problem-modal-top { padding: 0 32px 16px; }
+    .problem-modal-header { padding: 16px 0; }
+    .problem-modal-logo { height: 20px; }
+    .problem-modal-heading { font-size: 26px; margin-bottom: 18px; }
+    .problem-search-bar input { font-size: 15px; padding: 12px 16px 12px 40px; border-radius: 8px; }
+    .problem-search-wrapper i { font-size: 14px; left: 14px; }
+    .filter-btn { font-size: 13px; padding: 8px 18px; border-radius: 22px; }
+    .filter-options { gap: 10px; }
+    .problem-item { padding: 15px 28px; gap: 20px; }
+    .problem-item-name { font-size: 16px; gap: 8px; }
+    .problem-tag { font-size: 12px; }
+    .difficulty-badge { font-size: 12px; padding: 4px 13px; }
+    .problem-modal-close { width: 32px; height: 32px; font-size: 20px; }
+
+    /* YouTube modal */
+    .youtube-modal-content { width: 460px; }
+    .youtube-modal-header { padding: 28px 32px 24px; }
+    .youtube-modal-header h3 { font-size: 26px; gap: 12px; }
+    .youtube-modal-body { padding: 10px 32px 32px; }
+    .video-title { font-size: 17px; }
+    .video-reason { font-size: 13px; }
+    .video-card { padding: 20px 0; }
+    .video-card-icon { font-size: 12px; }
+    .video-tag { font-size: 11px; padding: 5px 12px; }
+
+    /* Search dropdown */
+    .search-dropdown { border-radius: 9px; }
+    .search-result { padding: 10px 14px; font-size: 12px; }
+    .search-result-title { margin-bottom: 4px; }
+    .search-result-id { font-size: 9px; }
+}
+
+/* --- Ultra-large 4K+ Desktop: 2560px+ --- */
+@media screen and (min-width: 2560px) {
+    html { font-size: clamp(18px, 0.85vw, 26px); }
+
+    .global-nav { padding: 16px 40px; gap: 22px; }
+    .logo-svg { height: 28px; }
+    .search-bar-wrapper { width: 300px; }
+    .search-bar { font-size: 15px; height: 44px; border-radius: 9px; }
+    .modern-select { font-size: 14px; height: 44px; min-width: 200px; border-radius: 9px; }
+    .leetcode-link { width: 44px; height: 44px; }
+    .youtube-link { width: 44px; height: 44px; font-size: 20px; }
+    .control-hint { font-size: 13px; padding: 7px 16px; }
+    .algorithm-label { font-size: 13px; }
+    #problemListBtn { font-size: 14px !important; height: 44px !important; }
+
+    :root { --node-size: 64px; }
+    .node { font-size: 20px; }
+
+    .code-viewport { font-size: 16px; padding: 26px; }
+    .line { padding: 7px 16px; margin: 3px 0; font-size: 16px; }
+
+    .stack-stat-value { font-size: 28px; }
+    .stack-stat-label { font-size: 13px; }
+    .stack-function-name { font-size: 17px; }
+    .stack-node-value { font-size: 15px; }
+    .stack-item { padding: 18px 20px; }
+    .detail-label { font-size: 12px; }
+    .detail-value { font-size: 15px; }
+
+    .action-bar { bottom: 140px; padding: 12px 26px; gap: 8px; border-radius: 26px; box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.1); }
+    .action-bar .control-btn { padding: 16px 30px; font-size: 22px; border-radius: 16px; gap: 8px; }
+    .action-bar .control-btn span { font-size: 16px; font-weight: 700; }
+    .console-text { font-size: 17px; padding: 20px; }
+
+    .array-inner { max-width: min(95%, 1400px); gap: 20px; padding: 28px; }
+    .array-container { padding: 32px; }
+    .array-item { width: 66px; min-width: 66px; height: 66px; font-size: 20px; border-radius: 12px; margin-top: 34px; margin-bottom: 32px; }
+    .array-visualization { gap: 14px; padding: 20px; min-height: 110px; border-radius: 12px; }
+    .pointer-label { font-size: 12px; padding: 5px 12px; top: -38px; border-radius: 7px; }
+    .array-index { font-size: 11px; padding: 4px 10px; bottom: -36px; border-radius: 6px; }
+    .array-label { font-size: 15px; }
+    .pointer-info { padding: 20px; gap: 20px; border-radius: 12px; }
+    .pointer-detail-label { font-size: 13px; }
+    .pointer-detail-value { font-size: 19px; padding: 10px 15px; border-radius: 9px; }
+
+    .queue-item .qi-val { font-size: 20px; }
+    .queue-item { padding: 16px 18px; min-width: 64px; }
+
+    .problem-item-name { font-size: 18px; }
+    .problem-tag { font-size: 13px; }
+    .problem-modal-heading { font-size: 30px; }
+    .problem-search-bar input { font-size: 16px; }
+    .filter-btn { font-size: 14px; padding: 9px 20px; }
 }
