@@ -298,10 +298,18 @@
                 <i class="fas fa-search"></i>
                 <div id="searchDropdown" class="search-dropdown" style="display:none;"></div>
             </div>
-            <!-- All Problems button -->
-            <button id="problemListBtn" class="modern-select" style="background: var(--bg-card); border: 1px solid var(--border); cursor: pointer; padding: 0 14px; height: 34px; gap: 8px; display: flex; align-items: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                <i class="fas fa-list"></i> All Problems
-            </button>
+            <!-- Problem navigation group -->
+            <div class="problem-nav-group">
+                <button id="prevProblemBtn" class="problem-nav-btn" title="Previous Problem">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button id="problemListBtn" class="modern-select" style="background: var(--bg-card); border: 1px solid var(--border); cursor: pointer; padding: 0 14px; height: 34px; gap: 8px; display: flex; align-items: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <i class="fas fa-list"></i> All Problems
+                </button>
+                <button id="nextProblemBtn" class="problem-nav-btn" title="Next Problem">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
             <!-- YouTube button -->
             <button id="youtubeBtn" class="youtube-link" type="button" title="Recommended Videos">
                 <i class="fab fa-youtube"></i>
@@ -390,6 +398,14 @@
                             <button class="filter-btn" data-filter="dfs">DFS</button>
                             <button class="filter-btn" data-filter="bfs">BFS</button>
                             <button class="filter-btn" data-filter="two-pointers">Two Pointers</button>
+                            <button class="filter-btn" data-filter="dynamic-programming">DP</button>
+                            <button class="filter-btn" data-filter="greedy">Greedy</button>
+                            <button class="filter-btn" data-filter="math">Math</button>
+                            <button class="filter-btn" data-filter="sorting">Sorting</button>
+                            <button class="filter-btn" data-filter="hash-table">Hash Table</button>
+                            <button class="filter-btn" data-filter="design">Design</button>
+                            <button class="filter-btn" data-filter="prefix-sum">Prefix Sum</button>
+                            <button class="filter-btn" data-filter="string">String</button>
                             <button class="filter-btn" data-filter="stack">Stack</button>
                             <button class="filter-btn" data-filter="queue">Queue</button>
                             <button class="filter-btn" data-filter="graph">Graph</button>

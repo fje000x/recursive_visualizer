@@ -1521,6 +1521,63 @@ body {
     transform: translateY(0);
 }
 
+/* Problem prev/next navigation group */
+.problem-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.problem-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 34px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.problem-nav-btn:first-child {
+    border-radius: 7px 0 0 7px;
+    border-right: none;
+}
+
+.problem-nav-btn:last-child {
+    border-radius: 0 7px 7px 0;
+    border-left: none;
+}
+
+.problem-nav-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent-blue);
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.problem-nav-btn:hover + #problemListBtn,
+#problemListBtn:has(+ .problem-nav-btn:hover) {
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.problem-nav-btn:active {
+    transform: scale(0.95);
+}
+
+.problem-nav-group #problemListBtn {
+    border-radius: 0 !important;
+    min-width: 0;
+    flex-shrink: 0;
+    flex-grow: 0;
+    width: 200px;
+}
+
 /* Action Bar — floating controls inside viz area */
 .action-bar {
     position: absolute;
@@ -3500,6 +3557,111 @@ body.problem-page-active .action-bar {
     width: 100%;
 }
 
+/* Compact layout for dual-row array problems (two array-section blocks) */
+.array-inner.array-dual {
+    gap: 10px;
+    padding: 14px;
+}
+.array-inner.array-dual .array-section {
+    gap: 4px;
+}
+.array-inner.array-dual .array-label {
+    font-size: 11px;
+    letter-spacing: 0.8px;
+}
+.array-inner.array-dual .array-visualization {
+    padding: 10px 14px;
+    min-height: 70px;
+    gap: 8px;
+    border-radius: 8px;
+}
+.array-inner.array-dual .array-item {
+    width: 48px;
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 1;
+    font-size: 16px;
+    border-radius: 8px;
+    margin-top: 24px;
+    margin-bottom: 20px;
+    flex: 1 1 48px; max-width: 48px;
+}
+.array-inner.array-dual .array-index {
+    font-size: 9px;
+    bottom: -16px;
+}
+.array-inner.array-dual .pointer-label {
+    font-size: 9px;
+    top: -20px;
+    padding: 1px 5px;
+}
+.array-inner.array-dual .pointer-info {
+    padding: 10px;
+    gap: 10px;
+    margin-top: 0;
+}
+.array-inner.array-dual .pointer-detail-label {
+    font-size: 10px;
+}
+.array-inner.array-dual .pointer-detail-value {
+    font-size: 14px;
+    padding: 5px 10px;
+}
+
+/* Dense layout for 9+ items on desktop — smaller items so they all fit */
+.array-dense .array-item {
+    width: 44px;
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 1;
+    font-size: 16px;
+    margin-top: 28px;
+    margin-bottom: 24px;
+    border-radius: 10px;
+    flex: 1 1 44px; max-width: 44px;
+}
+.array-dense .array-visualization {
+    gap: 8px;
+    padding: 16px;
+}
+.array-dense .pointer-label {
+    font-size: 9px;
+    padding: 3px 7px;
+    top: -26px;
+}
+.array-dense .pointer-label-pair { top: -26px; }
+.array-dense .array-index {
+    font-size: 8px;
+    padding: 2px 6px;
+    bottom: -22px;
+}
+.array-dual.array-dense .array-item {
+    width: 36px;
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 1;
+    font-size: 14px;
+    margin-top: 22px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    flex: 1 1 36px; max-width: 36px;
+}
+.array-dual.array-dense .array-visualization {
+    gap: 6px;
+    padding: 10px 12px;
+}
+.array-dual.array-dense .pointer-label {
+    font-size: 8px;
+    padding: 2px 5px;
+    top: -20px;
+}
+.array-dual.array-dense .pointer-label-pair { top: -20px; }
+.array-dual.array-dense .array-index {
+    font-size: 7px;
+    padding: 2px 5px;
+    bottom: -16px;
+}
+
 .array-label {
     font-size: 13px;
     font-weight: 700;
@@ -3519,14 +3681,14 @@ body.problem-page-active .action-bar {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 12px;
     min-height: 110px;
-    overflow-x: auto;
+    overflow: hidden;
 }
 
 .array-item {
     position: relative;
     width: 64px;
-    min-width: 64px;
-    height: 64px;
+    min-width: 0;
+    height: auto;
     background: linear-gradient(135deg, var(--bg-card), var(--bg-card-light));
     border: 2px solid var(--border);
     border-radius: 12px;
@@ -3539,7 +3701,8 @@ body.problem-page-active .action-bar {
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     margin-top: 34px;
     margin-bottom: 30px;
-    flex-shrink: 0;
+    flex: 1 1 64px; max-width: 64px;
+    aspect-ratio: 1;
 }
 
 .array-item.pointer-1 {
@@ -3567,6 +3730,32 @@ body.problem-page-active .action-bar {
     background: rgba(255, 255, 255, 0.02);
     border: 2px dashed var(--border);
     color: var(--text-muted);
+}
+
+/* Visited/processed cells — dimmed */
+.array-item.visited-cell {
+    opacity: 0.35;
+}
+
+/* Space characters in string problems */
+.array-item.space-char {
+    background: rgba(255, 255, 255, 0.03);
+    border-style: dashed;
+    color: var(--text-muted);
+    font-size: 10px;
+}
+
+/* Roman numeral character cells — slightly wider for two-char symbols */
+.array-item.roman-char {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Rainwater — water cell highlight */
+.array-item.water-cell {
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.5), inset 0 0 8px rgba(59, 130, 246, 0.15);
+    border-color: var(--accent-blue);
 }
 
 .array-index {
@@ -3769,6 +3958,7 @@ body > main > section.module.viz-module > div.module-header:empty {
 @media screen and (max-width: 1100px) {
     .nav-home-btn { width: 30px; height: 30px; font-size: 14px; border-radius: 7px; }
     .nav-home-btn i { font-size: 9px; }
+    .problem-nav-btn { width: 26px; height: 34px; font-size: 9px; }
 
     .global-nav {
         padding: 8px 12px;
@@ -3785,7 +3975,7 @@ body > main > section.module.viz-module > div.module-header:empty {
         font-size: 8px !important;
         padding: 0 10px !important;
         height: 34px !important;
-        max-width: 180px !important;
+        width: 180px !important;
     }
 
     .search-bar-wrapper {
@@ -3826,11 +4016,13 @@ body > main > section.module.viz-module > div.module-header:empty {
     }
     .array-item {
         width: 52px;
-        min-width: 52px;
-        height: 52px;
+        min-width: 0;
+        height: auto;
+        aspect-ratio: 1;
         font-size: 17px;
         margin-top: 30px;
         margin-bottom: 26px;
+        flex: 1 1 52px; max-width: 52px;
     }
     .array-visualization {
         gap: 8px;
@@ -3856,6 +4048,26 @@ body > main > section.module.viz-module > div.module-header:empty {
     }
     .pointer-detail-label { font-size: 10px; }
     .pointer-detail-value { font-size: 15px; padding: 6px 10px; }
+
+    /* Dual-row array at ~130% zoom */
+    .array-inner.array-dual { gap: 8px; padding: 12px; }
+    .array-inner.array-dual .array-visualization { padding: 8px 12px; min-height: 60px; gap: 6px; }
+    .array-inner.array-dual .array-item {
+        width: 39px; min-width: 0; height: auto; aspect-ratio: 1; flex: 1 1 39px; max-width: 39px;
+        font-size: 14px; margin-top: 22px; margin-bottom: 18px;
+    }
+    .array-inner.array-dual .pointer-label { font-size: 8px; top: -20px; padding: 1px 5px; }
+    .array-inner.array-dual .array-index { font-size: 8px; bottom: -16px; }
+    .array-inner.array-dual .pointer-info { gap: 10px; padding: 10px; }
+    .array-inner.array-dual .pointer-detail-label { font-size: 9px; }
+    .array-inner.array-dual .pointer-detail-value { font-size: 13px; padding: 5px 8px; }
+    .array-inner.array-dual .array-label { font-size: 10px; }
+
+    /* Dense (9+ items) at ~130% zoom */
+    .array-dense .array-item { width: 36px; min-width: 0; height: auto; aspect-ratio: 1; flex: 1 1 36px; max-width: 36px; font-size: 14px; margin-top: 24px; margin-bottom: 20px; border-radius: 8px; }
+    .array-dense .array-visualization { gap: 6px; padding: 12px; }
+    .array-dense .pointer-label { font-size: 8px; padding: 2px 6px; top: -22px; }
+    .array-dense .array-index { font-size: 7px; padding: 2px 5px; bottom: -18px; }
 }
 
 /* ~150% zoom on 1440p, or ~125% on 1280p */
@@ -3872,7 +4084,7 @@ body > main > section.module.viz-module > div.module-header:empty {
         font-size: 7px !important;
         padding: 0 8px !important;
         height: 30px !important;
-        max-width: 150px !important;
+        width: 150px !important;
     }
 
     /* Search stays visible but narrower */
@@ -3897,6 +4109,7 @@ body > main > section.module.viz-module > div.module-header:empty {
     }
 
     .youtube-link { width: 30px; height: 30px; font-size: 14px; }
+    .problem-nav-btn { width: 24px; height: 30px; font-size: 8px; }
     /* search-bar-wrapper height already set above at 30px */
 
     .app-layout {
@@ -3930,12 +4143,14 @@ body > main > section.module.viz-module > div.module-header:empty {
     }
     .array-item {
         width: 46px;
-        min-width: 46px;
-        height: 46px;
+        min-width: 0;
+        height: auto;
+        aspect-ratio: 1;
         font-size: 15px;
         margin-top: 28px;
         margin-bottom: 24px;
         border-radius: 8px;
+        flex: 1 1 46px; max-width: 46px;
     }
     .array-visualization {
         gap: 6px;
@@ -3959,6 +4174,26 @@ body > main > section.module.viz-module > div.module-header:empty {
     }
     .pointer-detail-label { font-size: 9px; }
     .pointer-detail-value { font-size: 14px; padding: 5px 8px; }
+
+    /* Dual-row array at ~150% zoom */
+    .array-inner.array-dual { gap: 6px; padding: 10px; }
+    .array-inner.array-dual .array-visualization { padding: 6px 10px; min-height: 55px; gap: 5px; }
+    .array-inner.array-dual .array-item {
+        width: 35px; min-width: 0; height: auto; aspect-ratio: 1; flex: 1 1 35px; max-width: 35px;
+        font-size: 13px; margin-top: 20px; margin-bottom: 18px; border-radius: 7px;
+    }
+    .array-inner.array-dual .pointer-label { font-size: 8px; top: -18px; padding: 1px 4px; }
+    .array-inner.array-dual .array-index { font-size: 7px; bottom: -16px; }
+    .array-inner.array-dual .pointer-info { gap: 8px; padding: 8px; }
+    .array-inner.array-dual .pointer-detail-label { font-size: 8px; }
+    .array-inner.array-dual .pointer-detail-value { font-size: 12px; padding: 4px 7px; }
+    .array-inner.array-dual .array-label { font-size: 9px; }
+
+    /* Dense (9+ items) at ~150% zoom */
+    .array-dense .array-item { width: 32px; min-width: 0; height: auto; aspect-ratio: 1; flex: 1 1 32px; max-width: 32px; font-size: 12px; margin-top: 22px; margin-bottom: 18px; border-radius: 7px; }
+    .array-dense .array-visualization { gap: 5px; padding: 10px; }
+    .array-dense .pointer-label { font-size: 7px; padding: 2px 5px; top: -20px; }
+    .array-dense .array-index { font-size: 7px; padding: 2px 4px; bottom: -16px; }
 }
 
 /* ~175% zoom on 1440p, or ~150% on 1280p */
@@ -3981,7 +4216,7 @@ body > main > section.module.viz-module > div.module-header:empty {
         font-size: 7px !important;
         padding: 0 8px !important;
         height: 30px !important;
-        max-width: 130px !important;
+        width: 130px !important;
     }
 
     .step-progress { display: none; }
@@ -4181,13 +4416,15 @@ body > main > section.module.viz-module > div.module-header:empty {
     }
     .array-item {
         width: 36px;
-        min-width: 36px;
-        height: 36px;
+        min-width: 0;
+        height: auto;
+        aspect-ratio: 1;
         font-size: 13px;
         margin-top: 24px;
         margin-bottom: 20px;
         border-radius: 7px;
         border-width: 1.5px;
+        flex: 1 1 36px; max-width: 36px;
     }
     .array-visualization {
         gap: 4px;
@@ -4212,6 +4449,27 @@ body > main > section.module.viz-module > div.module-header:empty {
     }
     .pointer-detail-label { font-size: 8px; }
     .pointer-detail-value { font-size: 12px; padding: 4px 7px; }
+
+    /* Dual-row array at ~175% zoom */
+    .array-inner.array-dual { gap: 5px; padding: 7px; }
+    .array-inner.array-dual .array-visualization { padding: 5px 8px; min-height: 44px; gap: 4px; }
+    .array-inner.array-dual .array-item {
+        width: 28px; min-width: 0; height: auto; aspect-ratio: 1; flex: 1 1 28px; max-width: 28px;
+        font-size: 11px; margin-top: 18px; margin-bottom: 16px; border-radius: 5px; border-width: 1.5px;
+    }
+    .array-inner.array-dual .pointer-label { font-size: 7px; top: -16px; padding: 1px 3px; }
+    .array-inner.array-dual .array-index { font-size: 6px; bottom: -14px; }
+    .array-inner.array-dual .pointer-info { gap: 5px; padding: 6px; }
+    .array-inner.array-dual .pointer-detail-label { font-size: 7px; }
+    .array-inner.array-dual .pointer-detail-value { font-size: 10px; padding: 3px 5px; }
+    .array-inner.array-dual .array-label { font-size: 8px; }
+    .array-inner.array-dual .array-section { gap: 3px; }
+
+    /* Dense (9+ items) at ~175% zoom */
+    .array-dense .array-item { width: 26px; min-width: 0; height: auto; aspect-ratio: 1; flex: 1 1 26px; max-width: 26px; font-size: 10px; margin-top: 18px; margin-bottom: 16px; border-radius: 5px; border-width: 1.5px; }
+    .array-dense .array-visualization { gap: 3px; padding: 6px; }
+    .array-dense .pointer-label { font-size: 7px; padding: 1px 4px; top: -16px; }
+    .array-dense .array-index { font-size: 6px; padding: 2px 3px; bottom: -14px; }
 }
 
 /* ~200% zoom on 1440p — ultra-compact desktop, NOT mobile */
@@ -4244,13 +4502,14 @@ body > main > section.module.viz-module > div.module-header:empty {
     }
 
     #problemListBtn {
-        max-width: 150px;
+        width: 130px !important;
         padding: 0 8px !important;
         height: 28px !important;
         font-size: 7px;
     }
 
     .youtube-link { width: 28px; height: 28px; font-size: 12px; }
+    .problem-nav-btn { width: 22px; height: 28px; font-size: 8px; }
 
     .nav-right {
         display: flex;
@@ -4445,13 +4704,15 @@ body > main > section.module.viz-module > div.module-header:empty {
     }
     .array-item {
         width: 30px;
-        min-width: 30px;
-        height: 30px;
+        min-width: 0;
+        height: auto;
+        aspect-ratio: 1;
         font-size: 11px;
         margin-top: 20px;
         margin-bottom: 18px;
         border-radius: 5px;
         border-width: 1px;
+        flex: 1 1 30px; max-width: 30px;
     }
     .array-visualization {
         gap: 3px;
@@ -4479,6 +4740,27 @@ body > main > section.module.viz-module > div.module-header:empty {
     }
     .pointer-detail-label { font-size: 7px; }
     .pointer-detail-value { font-size: 10px; padding: 3px 5px; }
+
+    /* Dual-row array at ~200% zoom */
+    .array-inner.array-dual { gap: 4px; padding: 5px; }
+    .array-inner.array-dual .array-visualization { padding: 4px 6px; min-height: 36px; gap: 3px; }
+    .array-inner.array-dual .array-item {
+        width: 24px; min-width: 0; height: auto; aspect-ratio: 1; flex: 1 1 24px; max-width: 24px;
+        font-size: 9px; margin-top: 16px; margin-bottom: 14px; border-radius: 4px; border-width: 1px;
+    }
+    .array-inner.array-dual .pointer-label { font-size: 6px; top: -14px; padding: 1px 3px; border-width: 1px; }
+    .array-inner.array-dual .array-index { font-size: 5px; bottom: -12px; border-width: 1px; }
+    .array-inner.array-dual .pointer-info { gap: 3px; padding: 4px; }
+    .array-inner.array-dual .pointer-detail-label { font-size: 6px; }
+    .array-inner.array-dual .pointer-detail-value { font-size: 9px; padding: 2px 4px; }
+    .array-inner.array-dual .array-label { font-size: 7px; }
+    .array-inner.array-dual .array-section { gap: 3px; }
+
+    /* Dense (9+ items) at ~200% zoom */
+    .array-dense .array-item { width: 22px; min-width: 0; height: auto; aspect-ratio: 1; flex: 1 1 22px; max-width: 22px; font-size: 9px; margin-top: 14px; margin-bottom: 12px; border-radius: 4px; border-width: 1px; }
+    .array-dense .array-visualization { gap: 2px; padding: 5px; }
+    .array-dense .pointer-label { font-size: 6px; padding: 1px 3px; top: -12px; border-width: 1px; }
+    .array-dense .array-index { font-size: 5px; padding: 1px 3px; bottom: -12px; border-width: 1px; }
 }
 
 /* ===== RESPONSIVE LAYOUT – MOBILE ONLY (touch devices or truly small screens) ===== */
@@ -4519,6 +4801,9 @@ body > main > section.module.viz-module > div.module-header:empty {
     .youtube-link { width: 30px; height: 30px; font-size: 14px; flex-shrink: 0; }
     .nav-home-btn { width: 30px; height: 30px; font-size: 14px; border-radius: 7px; }
     .nav-home-btn i { font-size: 8px; }
+    .problem-nav-btn { width: 28px; height: 30px; font-size: 9px; }
+    .problem-nav-group { flex: 1; min-width: 0; }
+    .problem-nav-group #problemListBtn { width: auto !important; max-width: none !important; flex: 1; }
 
     /* Hide problem page stats on mobile */
     .problem-page-stats { display: none; }
@@ -4812,12 +5097,14 @@ body > main > section.module.viz-module > div.module-header:empty {
     }
     .array-item {
         width: 44px;
-        min-width: 44px;
-        height: 44px;
+        min-width: 0;
+        height: auto;
+        aspect-ratio: 1;
         font-size: 16px;
         margin-top: 28px;
         margin-bottom: 26px;
         border-radius: 7px;
+        flex: 1 1 44px; max-width: 44px;
     }
     .array-index {
         font-size: 9px;
@@ -4838,12 +5125,14 @@ body > main > section.module.viz-module > div.module-header:empty {
     /* Dense arrays (8+ items) — shrink to avoid wrapping */
     .array-dense .array-item {
         width: 32px;
-        min-width: 32px;
-        height: 32px;
+        min-width: 0;
+        height: auto;
+        aspect-ratio: 1;
         font-size: 12px;
         margin-top: 22px;
         margin-bottom: 20px;
         border-radius: 5px;
+        flex: 1 1 32px; max-width: 32px;
     }
     .array-dense .array-visualization {
         gap: 3px;
@@ -4860,6 +5149,64 @@ body > main > section.module.viz-module > div.module-header:empty {
         font-size: 6px;
         padding: 2px 4px;
         bottom: -18px;
+    }
+
+    /* Dual-row array problems on mobile — prevent wrapping, rely on dense sizing */
+    .array-dual {
+        gap: 6px !important;
+        padding: 0 2px !important;
+    }
+    .array-dual .array-section {
+        gap: 2px;
+    }
+    .array-dual .array-label {
+        font-size: 8px;
+        letter-spacing: 0.6px;
+    }
+    .array-dual .array-visualization {
+        flex-wrap: nowrap !important;
+        overflow: hidden;
+        min-height: auto;
+        border-radius: 6px;
+    }
+    .array-dual.array-dense .array-item {
+        width: 34px;
+        min-width: 0;
+        height: auto;
+        aspect-ratio: 1;
+        font-size: 12px;
+        margin-top: 18px;
+        margin-bottom: 16px;
+        border-radius: 5px;
+        border-width: 1.5px;
+        flex: 1 1 34px; max-width: 34px;
+    }
+    .array-dual.array-dense .array-visualization {
+        gap: 3px;
+        padding: 6px 4px;
+    }
+    .array-dual.array-dense .pointer-label {
+        font-size: 7px;
+        padding: 1px 4px;
+        top: -16px;
+    }
+    .array-dual.array-dense .pointer-label-pair { top: -16px; }
+    .array-dual.array-dense .array-index {
+        font-size: 6px;
+        padding: 2px 3px;
+        bottom: -14px;
+    }
+    .array-dual .pointer-info {
+        gap: 4px;
+        padding: 4px 6px;
+        margin-top: 0;
+    }
+    .array-dual .pointer-detail-label {
+        font-size: 6px;
+    }
+    .array-dual .pointer-detail-value {
+        font-size: 9px;
+        padding: 2px 5px;
     }
 
     .pointer-info {
@@ -5004,11 +5351,13 @@ body > main > section.module.viz-module > div.module-header:empty {
 @media screen and (max-width: 480px) {
     .array-item {
         width: 36px;
-        min-width: 36px;
-        height: 38px;
+        min-width: 0;
+        height: auto;
+        aspect-ratio: 1;
         font-size: 13px;
         margin-top: 24px;
         margin-bottom: 22px;
+        flex: 1 1 36px; max-width: 36px;
     }
     .array-visualization {
         gap: 6px;
@@ -5034,11 +5383,13 @@ body > main > section.module.viz-module > div.module-header:empty {
     /* Dense arrays (8+ items) — even smaller on tiny screens */
     .array-dense .array-item {
         width: 26px;
-        min-width: 26px;
-        height: 26px;
+        min-width: 0;
+        height: auto;
+        aspect-ratio: 1;
         font-size: 10px;
         margin-top: 18px;
         margin-bottom: 16px;
+        flex: 1 1 26px; max-width: 26px;
     }
     .array-dense .array-visualization {
         gap: 2px;
@@ -5056,6 +5407,43 @@ body > main > section.module.viz-module > div.module-header:empty {
         padding: 1px 3px;
         bottom: -14px;
     }
+
+    /* Dual-row on tiny screens — even smaller dense items */
+    .array-dual.array-dense .array-item {
+        width: 28px;
+        min-width: 0;
+        height: auto;
+        aspect-ratio: 1;
+        font-size: 10px;
+        margin-top: 14px;
+        margin-bottom: 14px;
+        border-radius: 4px;
+        flex: 1 1 28px; max-width: 28px;
+    }
+    .array-dual.array-dense .array-visualization {
+        gap: 2px;
+        padding: 4px 3px;
+    }
+    .array-dual.array-dense .array-index {
+        font-size: 5px;
+        bottom: -12px;
+    }
+    .array-dual.array-dense .pointer-label {
+        font-size: 6px;
+        padding: 1px 3px;
+        top: -12px;
+    }
+    .array-dual.array-dense .pointer-label-pair { top: -12px; }
+    .array-dual .array-index {
+        font-size: 5px;
+        bottom: -12px;
+    }
+    .array-dual .pointer-label {
+        font-size: 6px;
+        padding: 1px 3px;
+        top: -12px;
+    }
+    .array-dual .pointer-label-pair { top: -12px; }
 
     .pointer-info {
         flex-wrap: wrap;
@@ -5091,9 +5479,10 @@ body > main > section.module.viz-module > div.module-header:empty {
     .search-bar { font-size: 11px; height: 36px; }
     .modern-select { font-size: 11px; height: 36px; min-width: 150px; }
     .youtube-link { width: 36px; height: 36px; font-size: 16px; }
+    .problem-nav-btn { width: 32px; height: 36px; font-size: 11px; }
     .nav-home-btn { width: 36px; height: 36px; font-size: 16px; }
     .algorithm-label { font-size: 10px; }
-    #problemListBtn { font-size: 11px !important; height: 36px !important; }
+    #problemListBtn { font-size: 11px !important; height: 36px !important; width: 220px !important; }
 
     /* App layout */
     .app-layout {
@@ -5134,7 +5523,7 @@ body > main > section.module.viz-module > div.module-header:empty {
 
     /* Array visualization */
     .array-inner { max-width: min(94%, 900px); }
-    .array-item { width: 64px; min-width: 64px; height: 64px; font-size: 20px; }
+    .array-item { width: 64px; min-width: 0; height: auto; aspect-ratio: 1; font-size: 20px; flex: 1 1 64px; max-width: 64px; }
     .array-visualization { gap: 12px; padding: 20px; }
     .pointer-label { font-size: 11px; padding: 4px 9px; }
     .array-index { font-size: 10px; padding: 3px 7px; }
@@ -5167,9 +5556,10 @@ body > main > section.module.viz-module > div.module-header:empty {
     .search-bar { font-size: 12px; height: 38px; }
     .modern-select { font-size: 12px; height: 38px; min-width: 160px; padding: 0 30px 0 13px; }
     .youtube-link { width: 38px; height: 38px; font-size: 17px; }
+    .problem-nav-btn { width: 34px; height: 38px; font-size: 12px; }
     .nav-home-btn { width: 38px; height: 38px; font-size: 17px; }
     .algorithm-label { font-size: 11px; }
-    #problemListBtn { font-size: 12px !important; height: 38px !important; padding: 0 16px !important; }
+    #problemListBtn { font-size: 12px !important; height: 38px !important; padding: 0 16px !important; width: 240px !important; }
 
     /* App layout */
     .app-layout {
@@ -5221,7 +5611,7 @@ body > main > section.module.viz-module > div.module-header:empty {
     /* Array visualization */
     .array-inner { max-width: min(94%, 1000px); gap: 16px; padding: 22px; }
     .array-container { padding: 22px; }
-    .array-item { width: 68px; min-width: 68px; height: 68px; font-size: 21px; border-radius: 12px; margin-top: 36px; margin-bottom: 32px; }
+    .array-item { width: 68px; min-width: 0; height: auto; aspect-ratio: 1; font-size: 21px; border-radius: 12px; margin-top: 36px; margin-bottom: 32px; flex: 1 1 68px; max-width: 68px; }
     .array-visualization { gap: 12px; padding: 18px; min-height: 100px; }
     .pointer-label { font-size: 11px; padding: 5px 10px; top: -32px; }
     .pointer-label-pair { top: -32px; }
@@ -5267,9 +5657,10 @@ body > main > section.module.viz-module > div.module-header:empty {
     .search-bar { font-size: 13px; height: 40px; }
     .modern-select { font-size: 13px; height: 40px; min-width: 180px; padding: 0 32px 0 14px; }
     .youtube-link { width: 40px; height: 40px; font-size: 18px; border-radius: 10px; }
+    .problem-nav-btn { width: 36px; height: 40px; font-size: 13px; }
     .nav-home-btn { width: 40px; height: 40px; font-size: 18px; border-radius: 10px; }
     .algorithm-label { font-size: 12px; }
-    #problemListBtn { font-size: 13px !important; height: 40px !important; padding: 0 18px !important; border-radius: 9px !important; }
+    #problemListBtn { font-size: 13px !important; height: 40px !important; padding: 0 18px !important; border-radius: 9px !important; width: 260px !important; }
 
     /* App layout — slightly wider code and stack panels */
     .app-layout {
@@ -5335,7 +5726,7 @@ body > main > section.module.viz-module > div.module-header:empty {
     /* Array visualization */
     .array-inner { max-width: min(94%, 1200px); gap: 18px; padding: 26px; }
     .array-container { padding: 26px; }
-    .array-item { width: 76px; min-width: 76px; height: 76px; font-size: 22px; border-radius: 12px; margin-top: 38px; margin-bottom: 34px; }
+    .array-item { width: 76px; min-width: 0; height: auto; aspect-ratio: 1; font-size: 22px; border-radius: 12px; margin-top: 38px; margin-bottom: 34px; flex: 1 1 76px; max-width: 76px; }
     .array-visualization { gap: 14px; padding: 20px; min-height: 110px; border-radius: 12px; }
     .pointer-label { font-size: 12px; padding: 5px 12px; top: -36px; border-radius: 6px; }
     .pointer-label-pair { top: -36px; }
@@ -5395,9 +5786,10 @@ body > main > section.module.viz-module > div.module-header:empty {
     .search-bar { font-size: 15px; height: 44px; border-radius: 9px; }
     .modern-select { font-size: 14px; height: 44px; min-width: 200px; border-radius: 9px; }
     .youtube-link { width: 44px; height: 44px; font-size: 20px; }
+    .problem-nav-btn { width: 38px; height: 44px; font-size: 14px; }
     .nav-home-btn { width: 44px; height: 44px; font-size: 20px; border-radius: 10px; }
     .algorithm-label { font-size: 13px; }
-    #problemListBtn { font-size: 14px !important; height: 44px !important; }
+    #problemListBtn { font-size: 14px !important; height: 44px !important; width: 280px !important; }
 
     :root { --node-size: 64px; }
     .node { font-size: 20px; }
@@ -5420,7 +5812,7 @@ body > main > section.module.viz-module > div.module-header:empty {
 
     .array-inner { max-width: min(95%, 1500px); gap: 22px; padding: 30px; }
     .array-container { padding: 34px; }
-    .array-item { width: 88px; min-width: 88px; height: 88px; font-size: 26px; border-radius: 14px; margin-top: 40px; margin-bottom: 36px; }
+    .array-item { width: 88px; min-width: 0; height: auto; aspect-ratio: 1; font-size: 26px; border-radius: 14px; margin-top: 40px; margin-bottom: 36px; flex: 1 1 88px; max-width: 88px; }
     .array-visualization { gap: 16px; padding: 22px; min-height: 120px; border-radius: 14px; }
     .pointer-label { font-size: 13px; padding: 6px 13px; top: -42px; border-radius: 7px; }
     .pointer-label-pair { top: -42px; }

@@ -175,7 +175,7 @@ const problemDB = {
         }
     },
     "3": {
-        name: "Merge Two Sorted Lists",
+        name: "Merge Two Sorted Arrays",
         alias: "Merge Sorted Array",
         leetcodeNum: "88",
         inspiredBy: "Inspired by LeetCode Problem #88",
@@ -217,7 +217,7 @@ const problemDB = {
         }
     },
     "4": {
-        name: "Remove Element",
+        name: "Filter Values In Place",
         alias: "Remove Element",
         leetcodeNum: "27",
         inspiredBy: "Inspired by LeetCode Problem #27",
@@ -248,7 +248,7 @@ const problemDB = {
         }
     },
     "5": {
-        name: "Remove Duplicates from Sorted Array",
+        name: "Deduplicate Sorted Array",
         alias: "Remove Duplicates",
         leetcodeNum: "26",
         inspiredBy: "Inspired by LeetCode Problem #26",
@@ -278,6 +278,563 @@ const problemDB = {
                 }
             }
         }
+    },
+    "6": {
+        name: "Trim Excess Duplicates",
+        alias: "Remove Duplicates from Sorted Array II",
+        leetcodeNum: "80",
+        inspiredBy: "Inspired by LeetCode Problem #80",
+        sourceUrl: "https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/",
+        difficulty: "medium",
+        topics: ["array", "two-pointers"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            twoPointers: {
+                name: "Two Pointers",
+                code: [
+                    "def trimDuplicates(nums):",
+                    "    if len(nums) <= 2: return len(nums)",
+                    "    k = 2",
+                    "    for i in range(2, len(nums)):",
+                    "        if nums[i] != nums[k - 2]:",
+                    "            nums[k] = nums[i]",
+                    "            k += 1",
+                    "    return k"
+                ],
+                indentation: [0, 1, 1, 1, 2, 3, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateTrimExcessDuplicatesHistory();
+                }
+            }
+        }
+    },
+    "7": {
+        name: "Find the Dominant Element",
+        alias: "Majority Element",
+        leetcodeNum: "169",
+        inspiredBy: "Inspired by LeetCode Problem #169",
+        sourceUrl: "https://leetcode.com/problems/majority-element/",
+        difficulty: "easy",
+        topics: ["array", "voting-algorithm"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            boyerMoore: {
+                name: "Boyer-Moore Voting",
+                code: [
+                    "def findDominant(nums):",
+                    "    candidate = nums[0]",
+                    "    count = 1",
+                    "    for i in range(1, len(nums)):",
+                    "        if count == 0:",
+                    "            candidate = nums[i]",
+                    "            count = 1",
+                    "        elif nums[i] == candidate:",
+                    "            count += 1",
+                    "        else:",
+                    "            count -= 1",
+                    "    return candidate"
+                ],
+                indentation: [0, 1, 1, 1, 2, 3, 3, 2, 3, 2, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateDominantElementHistory();
+                }
+            }
+        }
+    },
+    "8": {
+        name: "Cycle Array Elements",
+        alias: "Rotate Array",
+        leetcodeNum: "189",
+        inspiredBy: "Inspired by LeetCode Problem #189",
+        sourceUrl: "https://leetcode.com/problems/rotate-array/",
+        difficulty: "medium",
+        topics: ["array", "math"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            reverse: {
+                name: "Reverse Three Times",
+                code: [
+                    "def cycleElements(nums, k):",
+                    "    n = len(nums)",
+                    "    k = k % n",
+                    "    reverse(nums, 0, n - 1)",
+                    "    reverse(nums, 0, k - 1)",
+                    "    reverse(nums, k, n - 1)",
+                    "",
+                    "def reverse(nums, lo, hi):",
+                    "    while lo < hi:",
+                    "        nums[lo], nums[hi] = nums[hi], nums[lo]",
+                    "        lo += 1",
+                    "        hi -= 1"
+                ],
+                indentation: [0, 1, 1, 1, 1, 1, 0, 0, 1, 2, 2, 2],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateCycleArrayHistory();
+                }
+            }
+        }
+    },
+    "9": {
+        name: "Best Moment to Trade",
+        alias: "Best Time to Buy and Sell Stock",
+        leetcodeNum: "121",
+        inspiredBy: "Inspired by LeetCode Problem #121",
+        sourceUrl: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/",
+        difficulty: "easy",
+        topics: ["array", "dynamic-programming"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            onePass: {
+                name: "Single Pass",
+                code: [
+                    "def bestTrade(prices):",
+                    "    minPrice = prices[0]",
+                    "    maxProfit = 0",
+                    "    for i in range(1, len(prices)):",
+                    "        if prices[i] < minPrice:",
+                    "            minPrice = prices[i]",
+                    "        else:",
+                    "            profit = prices[i] - minPrice",
+                    "            maxProfit = max(maxProfit, profit)",
+                    "    return maxProfit"
+                ],
+                indentation: [0, 1, 1, 1, 2, 3, 2, 3, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateBestTradeHistory();
+                }
+            }
+        }
+    },
+    "10": {
+        name: "Best Moments to Trade",
+        alias: "Best Time to Buy and Sell Stock II",
+        leetcodeNum: "122",
+        inspiredBy: "Inspired by LeetCode Problem #122",
+        sourceUrl: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/",
+        difficulty: "medium",
+        topics: ["array", "greedy"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            greedy: {
+                name: "Greedy (Collect Every Gain)",
+                code: [
+                    "def bestTrades(prices):",
+                    "    totalProfit = 0",
+                    "    for i in range(1, len(prices)):",
+                    "        if prices[i] > prices[i - 1]:",
+                    "            totalProfit += prices[i] - prices[i - 1]",
+                    "    return totalProfit"
+                ],
+                indentation: [0, 1, 1, 2, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateBestTradesHistory();
+                }
+            }
+        }
+    },
+    "11": {
+        name: "Can You Reach the End?",
+        alias: "Jump Game",
+        leetcodeNum: "55",
+        inspiredBy: "Inspired by LeetCode Problem #55",
+        sourceUrl: "https://leetcode.com/problems/jump-game/",
+        difficulty: "medium",
+        topics: ["array", "greedy"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            greedy: {
+                name: "Greedy (Track Farthest)",
+                code: [
+                    "def canReachEnd(nums):",
+                    "    farthest = 0",
+                    "    for i in range(len(nums)):",
+                    "        if i > farthest:",
+                    "            return False",
+                    "        farthest = max(farthest, i + nums[i])",
+                    "    return True"
+                ],
+                indentation: [0, 1, 1, 2, 3, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateCanReachEndHistory();
+                }
+            }
+        }
+    },
+    "12": {
+        name: "Fewest Jumps to the End",
+        alias: "Jump Game II",
+        leetcodeNum: "45",
+        inspiredBy: "Inspired by LeetCode Problem #45",
+        sourceUrl: "https://leetcode.com/problems/jump-game-ii/",
+        difficulty: "medium",
+        topics: ["array", "greedy"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            greedy: {
+                name: "Greedy (BFS-like Jumps)",
+                code: [
+                    "def fewestJumps(nums):",
+                    "    jumps = 0",
+                    "    curEnd = 0",
+                    "    farthest = 0",
+                    "    for i in range(len(nums) - 1):",
+                    "        farthest = max(farthest, i + nums[i])",
+                    "        if i == curEnd:",
+                    "            jumps += 1",
+                    "            curEnd = farthest",
+                    "    return jumps"
+                ],
+                indentation: [0, 1, 1, 1, 1, 2, 2, 3, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateFewestJumpsHistory();
+                }
+            }
+        }
+    },
+    "13": {
+        name: "Researcher Impact Score",
+        alias: "H-Index",
+        leetcodeNum: "274",
+        inspiredBy: "Inspired by LeetCode Problem #274",
+        sourceUrl: "https://leetcode.com/problems/h-index/",
+        difficulty: "medium",
+        topics: ["array", "sorting"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            sorting: {
+                name: "Sort then Scan",
+                code: [
+                    "def hIndex(citations):",
+                    "    citations.sort(reverse=True)",
+                    "    h = 0",
+                    "    for i in range(len(citations)):",
+                    "        if citations[i] >= i + 1:",
+                    "            h = i + 1",
+                    "        else:",
+                    "            break",
+                    "    return h"
+                ],
+                indentation: [0, 1, 1, 1, 2, 3, 2, 3, 1],
+                timeComplexity: "O(n log n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateHIndexHistory();
+                }
+            }
+        }
+    },
+    "14": {
+        name: "Randomized Collection",
+        alias: "Insert Delete GetRandom O(1)",
+        leetcodeNum: "380",
+        inspiredBy: "Inspired by LeetCode Problem #380",
+        sourceUrl: "https://leetcode.com/problems/insert-delete-getrandom-o1/",
+        difficulty: "medium",
+        topics: ["array", "hash-table", "design"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            design: {
+                name: "HashMap + Array",
+                code: [
+                    "class RandomizedSet:",
+                    "    def __init__(self):",
+                    "        self.vals = []",
+                    "        self.idx_map = {}",
+                    "    def insert(self, val):",
+                    "        if val in self.idx_map: return False",
+                    "        self.idx_map[val] = len(self.vals)",
+                    "        self.vals.append(val)",
+                    "        return True",
+                    "    def remove(self, val):",
+                    "        if val not in self.idx_map: return False",
+                    "        idx = self.idx_map[val]",
+                    "        last = self.vals[-1]",
+                    "        self.vals[idx] = last",
+                    "        self.idx_map[last] = idx",
+                    "        self.vals.pop()",
+                    "        del self.idx_map[val]",
+                    "        return True"
+                ],
+                indentation: [0, 1, 2, 2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2],
+                timeComplexity: "O(1) per op",
+                spaceComplexity: "O(n)",
+                generateHistory: function() {
+                    return generateRandomizedSetHistory();
+                }
+            }
+        }
+    },
+    "15": {
+        name: "Product Without Self",
+        alias: "Product of Array Except Self",
+        leetcodeNum: "238",
+        inspiredBy: "Inspired by LeetCode Problem #238",
+        sourceUrl: "https://leetcode.com/problems/product-of-array-except-self/",
+        difficulty: "medium",
+        topics: ["array", "prefix-sum"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            prefixSuffix: {
+                name: "Prefix & Suffix Products",
+                code: [
+                    "def productWithoutSelf(nums):",
+                    "    n = len(nums)",
+                    "    answer = [1] * n",
+                    "    prefix = 1",
+                    "    for i in range(n):",
+                    "        answer[i] = prefix",
+                    "        prefix *= nums[i]",
+                    "    suffix = 1",
+                    "    for i in range(n - 1, -1, -1):",
+                    "        answer[i] *= suffix",
+                    "        suffix *= nums[i]",
+                    "    return answer"
+                ],
+                indentation: [0, 1, 1, 1, 1, 2, 2, 1, 1, 2, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateProductWithoutSelfHistory();
+                }
+            }
+        }
+    },
+    "16": {
+        name: "Circular Fuel Route",
+        alias: "Gas Station",
+        leetcodeNum: "134",
+        inspiredBy: "Inspired by LeetCode Problem #134",
+        sourceUrl: "https://leetcode.com/problems/gas-station/",
+        difficulty: "medium",
+        topics: ["array", "greedy"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            greedy: {
+                name: "Greedy (Single Pass)",
+                code: [
+                    "def circularFuel(gas, cost):",
+                    "    totalSurplus = 0",
+                    "    currentSurplus = 0",
+                    "    start = 0",
+                    "    for i in range(len(gas)):",
+                    "        totalSurplus += gas[i] - cost[i]",
+                    "        currentSurplus += gas[i] - cost[i]",
+                    "        if currentSurplus < 0:",
+                    "            start = i + 1",
+                    "            currentSurplus = 0",
+                    "    return start if totalSurplus >= 0 else -1"
+                ],
+                indentation: [0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateCircularFuelHistory();
+                }
+            }
+        }
+    },
+    "17": {
+        name: "Fair Candy Distribution",
+        alias: "Candy",
+        leetcodeNum: "135",
+        inspiredBy: "Inspired by LeetCode Problem #135",
+        sourceUrl: "https://leetcode.com/problems/candy/",
+        difficulty: "hard",
+        topics: ["array", "greedy"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            twoPass: {
+                name: "Two-Pass Greedy",
+                code: [
+                    "def fairCandy(ratings):",
+                    "    n = len(ratings)",
+                    "    candies = [1] * n",
+                    "    for i in range(1, n):",
+                    "        if ratings[i] > ratings[i - 1]:",
+                    "            candies[i] = candies[i - 1] + 1",
+                    "    for i in range(n - 2, -1, -1):",
+                    "        if ratings[i] > ratings[i + 1]:",
+                    "            candies[i] = max(candies[i], candies[i+1]+1)",
+                    "    return sum(candies)"
+                ],
+                indentation: [0, 1, 1, 1, 2, 3, 1, 2, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(n)",
+                generateHistory: function() {
+                    return generateFairCandyHistory();
+                }
+            }
+        }
+    },
+    "18": {
+        name: "Trapped Rainwater",
+        alias: "Trapping Rain Water",
+        leetcodeNum: "42",
+        inspiredBy: "Inspired by LeetCode Problem #42",
+        sourceUrl: "https://leetcode.com/problems/trapping-rain-water/",
+        difficulty: "hard",
+        topics: ["array", "two-pointers", "dynamic-programming"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            twoPointers: {
+                name: "Two Pointers",
+                code: [
+                    "def trap(height):",
+                    "    l, r = 0, len(height) - 1",
+                    "    leftMax = height[l]",
+                    "    rightMax = height[r]",
+                    "    water = 0",
+                    "    while l < r:",
+                    "        if leftMax < rightMax:",
+                    "            l += 1",
+                    "            leftMax = max(leftMax, height[l])",
+                    "            water += leftMax - height[l]",
+                    "        else:",
+                    "            r -= 1",
+                    "            rightMax = max(rightMax, height[r])",
+                    "            water += rightMax - height[r]",
+                    "    return water"
+                ],
+                indentation: [0, 1, 1, 1, 1, 1, 2, 3, 3, 3, 2, 3, 3, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateTrappedRainwaterHistory();
+                }
+            }
+        }
+    },
+    "19": {
+        name: "Decode Roman Numerals",
+        alias: "Roman to Integer",
+        leetcodeNum: "13",
+        inspiredBy: "Inspired by LeetCode Problem #13",
+        sourceUrl: "https://leetcode.com/problems/roman-to-integer/",
+        difficulty: "easy",
+        topics: ["string", "hash-table", "math"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            scan: {
+                name: "Right-to-Left Scan",
+                code: [
+                    "def romanToInt(s):",
+                    "    roman = {'I':1,'V':5,'X':10,",
+                    "             'L':50,'C':100,'D':500,'M':1000}",
+                    "    total = 0",
+                    "    prev = 0",
+                    "    for ch in reversed(s):",
+                    "        curr = roman[ch]",
+                    "        if curr < prev:",
+                    "            total -= curr",
+                    "        else:",
+                    "            total += curr",
+                    "        prev = curr",
+                    "    return total"
+                ],
+                indentation: [0, 1, 1, 1, 1, 1, 2, 2, 3, 2, 3, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateRomanToIntHistory();
+                }
+            }
+        }
+    },
+    "20": {
+        name: "Encode to Roman Numerals",
+        alias: "Integer to Roman",
+        leetcodeNum: "12",
+        inspiredBy: "Inspired by LeetCode Problem #12",
+        sourceUrl: "https://leetcode.com/problems/integer-to-roman/",
+        difficulty: "medium",
+        topics: ["string", "hash-table", "math"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            greedy: {
+                name: "Greedy (Largest First)",
+                code: [
+                    "def intToRoman(num):",
+                    "    vals =  [1000,900,500,400,100,",
+                    "             90,50,40,10,9,5,4,1]",
+                    "    syms =  ['M','CM','D','CD','C',",
+                    "             'XC','L','XL','X','IX','V','IV','I']",
+                    "    result = ''",
+                    "    for i in range(len(vals)):",
+                    "        while num >= vals[i]:",
+                    "            result += syms[i]",
+                    "            num -= vals[i]",
+                    "    return result"
+                ],
+                indentation: [0, 1, 1, 1, 1, 1, 1, 2, 3, 3, 1],
+                timeComplexity: "O(1)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateIntToRomanHistory();
+                }
+            }
+        }
+    },
+    "21": {
+        name: "Length of Final Word",
+        alias: "Length of Last Word",
+        leetcodeNum: "58",
+        inspiredBy: "Inspired by LeetCode Problem #58",
+        sourceUrl: "https://leetcode.com/problems/length-of-last-word/",
+        difficulty: "easy",
+        topics: ["string"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            scan: {
+                name: "Reverse Scan",
+                code: [
+                    "def lengthOfLastWord(s):",
+                    "    i = len(s) - 1",
+                    "    while i >= 0 and s[i] == ' ':",
+                    "        i -= 1",
+                    "    length = 0",
+                    "    while i >= 0 and s[i] != ' ':",
+                    "        length += 1",
+                    "        i -= 1",
+                    "    return length"
+                ],
+                indentation: [0, 1, 1, 2, 1, 1, 2, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateLengthOfLastWordHistory();
+                }
+            }
+        }
     }
 };
 
@@ -288,6 +845,10 @@ let currentStep = 0;
 let autoPlayInterval = null;
 let autoPlaySpeed = 2000;
 let baseCasesCount = 0;
+
+function isArrayProblem(probId) {
+    return problemDB[probId || currentProbId]?.tree === null;
+}
 
 
 const OPENAI_ENDPOINT = "https://api.openai.com/v1/chat/completions";
@@ -386,7 +947,12 @@ function selectProblem(probId) {
     currentAlgorithm = Object.keys(prob.algorithms)[0]; // Get first algorithm
     document.getElementById('searchInput').value = '';
     document.getElementById('searchDropdown').style.display = 'none';
-    init();
+    // Debounce: cancel any pending init, schedule a new one
+    if (selectProblem._raf) cancelAnimationFrame(selectProblem._raf);
+    selectProblem._raf = requestAnimationFrame(() => {
+        selectProblem._raf = null;
+        init();
+    });
 }
 
 function openProblemModal() {
@@ -1171,7 +1737,794 @@ function generateRemoveDuplicatesHistory() {
     return h;
 }
 
+// Trim Excess Duplicates (LC #80) — allow at most 2 of each value
+function generateTrimExcessDuplicatesHistory() {
+    const nums = [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5];
+    const h = [];
+    const arr = [...nums];
+    let k = 2;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...arr],
+            nums2: [],
+            arrayMeta: { k, originalLength: nums.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call trimDuplicates(nums=[${nums}]). Goal: remove extras so each value appears at most twice. Return the new length.`);
+
+    if (arr.length <= 2) {
+        record(1, `Array has ≤ 2 elements — already valid. Return ${arr.length}.`, {}, { isComplete: true });
+        return h;
+    }
+
+    record(1, `Array has ${arr.length} elements (> 2) — skip the short-circuit check.`);
+    record(2, `Initialize k = 2. The first two elements [${arr[0]}, ${arr[1]}] are always valid (at most 2 of anything). Read pointer i starts at index 2.`, { k });
+
+    for (let i = 2; i < arr.length; i++) {
+        record(3, `Move read pointer → i = ${i}. Reading nums[${i}] = ${arr[i]}. Comparing against nums[k − 2] = nums[${k - 2}] = ${arr[k - 2]}.`, { i, k });
+
+        if (arr[i] !== arr[k - 2]) {
+            record(4, `nums[${i}] = ${arr[i]} ≠ nums[${k - 2}] = ${arr[k - 2]} → still room (not a third copy). Keep it!`, { i, k }, { isComparison: true });
+            const prevK = k;
+            arr[k] = arr[i];
+            record(5, `Execute nums[k] = nums[i] → nums[${prevK}] = ${arr[prevK]}. Array: [${arr}].`, { i, k });
+            k++;
+            record(6, `k++ → k = ${k}. Kept ${k} so far: [${arr.slice(0, k)}].`, { i, k });
+        } else {
+            record(4, `nums[${i}] = ${arr[i]} == nums[${k - 2}] = ${arr[k - 2]} → third (or more) copy! Skip — k stays at ${k}.`, { i, k }, { isComparison: true, isSkip: true });
+        }
+    }
+
+    record(7, `✓ Done! Scanned all ${nums.length} elements. Returned k = ${k}. Result: [${arr.slice(0, k)}] — each value appears at most twice.`, { k }, { isComplete: true });
+    return h;
+}
+
+// Find the Dominant Element (LC #169) — Boyer-Moore Voting
+function generateDominantElementHistory() {
+    const nums = [3, 1, 3, 3, 2, 3, 1, 3, 2];
+    const h = [];
+    let candidate = nums[0];
+    let count = 1;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...nums],
+            nums2: [],
+            arrayMeta: { candidate, count, originalLength: nums.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call findDominant(nums=[${nums}]). Goal: find the element that appears more than ⌊n/2⌋ times using Boyer-Moore Voting.`);
+    record(1, `Initialize candidate = nums[0] = ${candidate}.`, { i: 0 });
+    record(2, `Initialize count = 1. Start scanning from index 1.`, { i: 0 });
+
+    for (let i = 1; i < nums.length; i++) {
+        record(3, `Move to i = ${i}. nums[${i}] = ${nums[i]}. Current candidate = ${candidate}, count = ${count}.`, { i });
+
+        if (count === 0) {
+            candidate = nums[i];
+            record(4, `count == 0 → pick new candidate = nums[${i}] = ${candidate}.`, { i }, { isComparison: true });
+            count = 1;
+            record(6, `Reset count = 1 for new candidate ${candidate}.`, { i });
+        } else if (nums[i] === candidate) {
+            count++;
+            record(7, `nums[${i}] = ${nums[i]} == candidate ${candidate} → count++ → count = ${count}.`, { i }, { isComparison: true });
+        } else {
+            count--;
+            record(9, `nums[${i}] = ${nums[i]} ≠ candidate ${candidate} → count-- → count = ${count}.`, { i }, { isComparison: true, isSkip: true });
+        }
+    }
+
+    record(11, `✓ Done! The dominant element is ${candidate}. It appears more than ⌊${nums.length}/2⌋ = ${Math.floor(nums.length / 2)} times.`, {}, { isComplete: true });
+    return h;
+}
+
+// Cycle Array Elements (LC #189) — Reverse Three Times
+function generateCycleArrayHistory() {
+    const nums = [5, 12, 8, 3, 7, 10, 1];
+    const k_input = 3;
+    const h = [];
+    const arr = [...nums];
+    const n = arr.length;
+    const k = k_input % n;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...arr],
+            nums2: [],
+            arrayMeta: { k: k, n: n, phase: extra.phase || '' },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    function reverseSection(lo, hi, phase) {
+        record(8, `  reverse(nums, ${lo}, ${hi}) — begin reversing indices [${lo}..${hi}].`, { lo, hi }, { phase });
+        while (lo < hi) {
+            record(9, `  Swap nums[${lo}]=${arr[lo]} ↔ nums[${hi}]=${arr[hi]}.`, { lo, hi }, { isComparison: true, phase });
+            const tmp = arr[lo];
+            arr[lo] = arr[hi];
+            arr[hi] = tmp;
+            record(9, `  After swap: [${arr}].`, { lo, hi }, { phase });
+            lo++;
+            hi--;
+        }
+        record(11, `  Reverse done. Array: [${arr}].`, {}, { phase });
+    }
+
+    record(0, `Call cycleElements(nums=[${nums}], k=${k_input}). Goal: rotate the array to the right by ${k_input} positions.`);
+    record(1, `n = len(nums) = ${n}.`);
+    record(2, `k = ${k_input} % ${n} = ${k}. (Effective rotation amount.)`);
+    
+    record(3, `Step 1: Reverse the entire array [0..${n - 1}].`, {}, { phase: 'full' });
+    reverseSection(0, n - 1, 'full');
+
+    record(4, `Step 2: Reverse the first k = ${k} elements [0..${k - 1}].`, {}, { phase: 'left' });
+    reverseSection(0, k - 1, 'left');
+
+    record(5, `Step 3: Reverse the remaining elements [${k}..${n - 1}].`, {}, { phase: 'right' });
+    reverseSection(k, n - 1, 'right');
+
+    record(5, `✓ Done! Array rotated by ${k} positions: [${arr}].`, {}, { isComplete: true });
+    return h;
+}
+
+// Best Moment to Trade (LC #121) — Single Transaction
+function generateBestTradeHistory() {
+    const prices = [8, 3, 5, 1, 7, 4, 9, 2];
+    const h = [];
+    let minPrice = prices[0];
+    let maxProfit = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...prices],
+            nums2: [],
+            arrayMeta: { minPrice, maxProfit, originalLength: prices.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call bestTrade(prices=[${prices}]). Goal: find the maximum profit from buying once and selling once.`);
+    record(1, `Initialize minPrice = prices[0] = ${minPrice}. This tracks the cheapest price seen so far.`);
+    record(2, `Initialize maxProfit = 0. We haven't made any trade yet.`);
+
+    for (let i = 1; i < prices.length; i++) {
+        record(3, `Move to i = ${i}. prices[${i}] = ${prices[i]}. minPrice = ${minPrice}, maxProfit = ${maxProfit}.`, { i });
+
+        if (prices[i] < minPrice) {
+            const oldMin = minPrice;
+            minPrice = prices[i];
+            record(4, `prices[${i}] = ${prices[i]} < minPrice (was ${oldMin}) → new low found! minPrice = ${minPrice}.`, { i }, { isComparison: true });
+        } else {
+            const profit = prices[i] - minPrice;
+            record(6, `prices[${i}] = ${prices[i]} ≥ minPrice ${minPrice} → potential sell. profit = ${prices[i]} − ${minPrice} = ${profit}.`, { i }, { isComparison: true });
+            if (profit > maxProfit) {
+                const oldProfit = maxProfit;
+                maxProfit = profit;
+                record(8, `profit ${profit} > maxProfit (was ${oldProfit}) → maxProfit = ${maxProfit}! Buy at ${minPrice}, sell at ${prices[i]}.`, { i });
+            } else {
+                record(8, `profit ${profit} ≤ maxProfit ${maxProfit} → no update.`, { i }, { isSkip: true });
+            }
+        }
+    }
+
+    record(9, `✓ Done! Best trade: max profit = ${maxProfit}. Buy at price ${minPrice}, sell for +${maxProfit}.`, {}, { isComplete: true });
+    return h;
+}
+
+// Best Moments to Trade (LC #122) — Multiple Transactions (Greedy)
+function generateBestTradesHistory() {
+    const prices = [5, 2, 6, 1, 4, 7, 3, 8];
+    const h = [];
+    let totalProfit = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...prices],
+            nums2: [],
+            arrayMeta: { totalProfit, originalLength: prices.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call bestTrades(prices=[${prices}]). Goal: maximize total profit by buying and selling any number of times (greedy).`);
+    record(1, `Initialize totalProfit = 0.`);
+
+    for (let i = 1; i < prices.length; i++) {
+        record(2, `Move to i = ${i}. prices[${i}] = ${prices[i]}, prices[${i - 1}] = ${prices[i - 1]}. totalProfit = ${totalProfit}.`, { i });
+
+        if (prices[i] > prices[i - 1]) {
+            const gain = prices[i] - prices[i - 1];
+            totalProfit += gain;
+            record(3, `prices[${i}] = ${prices[i]} > prices[${i - 1}] = ${prices[i - 1]} → gain = +${gain}. Collect it! totalProfit = ${totalProfit}.`, { i }, { isComparison: true });
+        } else {
+            record(3, `prices[${i}] = ${prices[i]} ≤ prices[${i - 1}] = ${prices[i - 1]} → no gain. Skip.`, { i }, { isComparison: true, isSkip: true });
+        }
+    }
+
+    record(5, `✓ Done! Total profit from all trades = ${totalProfit}.`, {}, { isComplete: true });
+    return h;
+}
+
+// Can You Reach the End? (LC #55) — Greedy
+function generateCanReachEndHistory() {
+    const nums = [2, 3, 1, 1, 4];
+    const h = [];
+    let farthest = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...nums],
+            nums2: [],
+            arrayMeta: { farthest, originalLength: nums.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call canReachEnd(nums=[${nums}]). Goal: determine if we can reach the last index starting from index 0.`);
+    record(1, `Initialize farthest = 0. This tracks the farthest index we can reach so far.`);
+
+    for (let i = 0; i < nums.length; i++) {
+        record(2, `Move to i = ${i}. nums[${i}] = ${nums[i]}. farthest = ${farthest}.`, { i });
+
+        if (i > farthest) {
+            record(3, `i = ${i} > farthest = ${farthest} → we can't reach index ${i}!`, { i }, { isComparison: true });
+            record(4, `Return False — cannot reach the end.`, {}, { isComplete: true });
+            return h;
+        }
+
+        const oldFarthest = farthest;
+        farthest = Math.max(farthest, i + nums[i]);
+        record(5, `farthest = max(${oldFarthest}, ${i} + ${nums[i]}) = max(${oldFarthest}, ${i + nums[i]}) = ${farthest}.`, { i }, { isComparison: true });
+    }
+
+    record(6, `✓ Done! Scanned all indices. farthest = ${farthest} ≥ last index ${nums.length - 1}. Return True — we can reach the end!`, {}, { isComplete: true });
+    return h;
+}
+
+// Fewest Jumps to the End (LC #45) — Greedy BFS-like
+function generateFewestJumpsHistory() {
+    const nums = [2, 3, 1, 1, 4];
+    const h = [];
+    let jumps = 0;
+    let curEnd = 0;
+    let farthest = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...nums],
+            nums2: [],
+            arrayMeta: { jumps, curEnd, farthest, originalLength: nums.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call fewestJumps(nums=[${nums}]). Goal: find the minimum number of jumps to reach the last index.`);
+    record(1, `Initialize jumps = 0.`);
+    record(2, `Initialize curEnd = 0 (right boundary of current "level").`);
+    record(3, `Initialize farthest = 0 (farthest reachable from this level).`);
+
+    for (let i = 0; i < nums.length - 1; i++) {
+        record(4, `Move to i = ${i}. nums[${i}] = ${nums[i]}. curEnd = ${curEnd}, farthest = ${farthest}.`, { i });
+
+        const oldFarthest = farthest;
+        farthest = Math.max(farthest, i + nums[i]);
+        record(5, `farthest = max(${oldFarthest}, ${i} + ${nums[i]}) = ${farthest}.`, { i }, { isComparison: true });
+
+        if (i === curEnd) {
+            jumps++;
+            record(6, `i == curEnd (${curEnd}) → reached end of current level. jumps++ → jumps = ${jumps}.`, { i }, { isComparison: true });
+            curEnd = farthest;
+            record(8, `Set curEnd = farthest = ${curEnd}. Now exploring next level.`, { i });
+        }
+    }
+
+    record(9, `✓ Done! Minimum jumps to reach end = ${jumps}.`, {}, { isComplete: true });
+    return h;
+}
+
+// Researcher Impact Score (LC #274) — H-Index via Sort
+function generateHIndexHistory() {
+    const citations = [3, 0, 6, 1, 5];
+    const h_arr = [];
+    const arr = [...citations].sort((a, b) => b - a); // sort descending
+    let hIdx = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h_arr.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...arr],
+            nums2: [],
+            arrayMeta: { h: hIdx, originalLength: arr.length, sorted: true },
+            step: h_arr.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call hIndex(citations=[${citations}]). Goal: find h such that h papers have ≥ h citations each.`);
+    record(1, `Sort descending → [${arr}]. Now citations[i] = the (i+1)th most-cited paper.`);
+    record(2, `Initialize h = 0.`);
+
+    for (let i = 0; i < arr.length; i++) {
+        record(3, `Move to i = ${i}. citations[${i}] = ${arr[i]}. Need citations[i] ≥ ${i + 1} to increase h.`, { i });
+
+        if (arr[i] >= i + 1) {
+            hIdx = i + 1;
+            record(4, `${arr[i]} ≥ ${i + 1} → h = ${hIdx}. At least ${hIdx} papers have ≥ ${hIdx} citations.`, { i }, { isComparison: true });
+        } else {
+            record(6, `${arr[i]} < ${i + 1} → stop. Can't have ${i + 1} papers with ≥ ${i + 1} citations.`, { i }, { isComparison: true, isSkip: true });
+            break;
+        }
+    }
+
+    record(8, `✓ Done! H-Index = ${hIdx}. The researcher has ${hIdx} papers with at least ${hIdx} citations each.`, {}, { isComplete: true });
+    return h_arr;
+}
+
+// Randomized Collection (LC #380) — Design: HashMap + Array
+function generateRandomizedSetHistory() {
+    const ops = [
+        { op: 'insert', val: 10 },
+        { op: 'insert', val: 20 },
+        { op: 'insert', val: 30 },
+        { op: 'insert', val: 20 },  // duplicate, returns False
+        { op: 'remove', val: 20 },
+        { op: 'insert', val: 40 },
+        { op: 'remove', val: 10 },
+        { op: 'getRandom' }
+    ];
+    const h = [];
+    const vals = [];
+    const idxMap = {};
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...vals],
+            nums2: [],
+            arrayMeta: { idxMap: JSON.parse(JSON.stringify(idxMap)), opsCount: ops.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `RandomizedSet — supports insert, remove, and getRandom in O(1) average time.`);
+    record(1, `Initialize: vals = [], idx_map = {}. The array stores values, the map stores value → index.`);
+
+    for (let opIdx = 0; opIdx < ops.length; opIdx++) {
+        const { op, val } = ops[opIdx];
+
+        if (op === 'insert') {
+            record(4, `Operation: insert(${val}).`, {});
+            if (val in idxMap) {
+                record(5, `${val} already in idx_map → return False. No duplicate allowed.`, {}, { isSkip: true });
+            } else {
+                idxMap[val] = vals.length;
+                record(6, `idx_map[${val}] = ${vals.length}. Mapping value to its future index.`, {});
+                vals.push(val);
+                record(7, `vals.append(${val}) → vals = [${vals}]. Insert complete, return True.`, {}, { isComparison: true });
+            }
+        } else if (op === 'remove') {
+            record(9, `Operation: remove(${val}).`, {});
+            if (!(val in idxMap)) {
+                record(10, `${val} not in idx_map → return False. Nothing to remove.`, {}, { isSkip: true });
+            } else {
+                const idx = idxMap[val];
+                const last = vals[vals.length - 1];
+                record(11, `idx = idx_map[${val}] = ${idx}. last = vals[-1] = ${last}.`, {});
+                vals[idx] = last;
+                idxMap[last] = idx;
+                record(13, `Swap: vals[${idx}] = ${last}, idx_map[${last}] = ${idx}. vals = [${vals}].`, {});
+                vals.pop();
+                delete idxMap[val];
+                record(16, `Pop last, delete idx_map[${val}]. vals = [${vals}]. Remove complete, return True.`, {}, { isComparison: true });
+            }
+        } else if (op === 'getRandom') {
+            const randomVal = vals.length > 0 ? vals[Math.floor(Math.random() * vals.length)] : 'N/A';
+            record(4, `Operation: getRandom(). Pick any element uniformly at random from vals = [${vals}]. Result: ${randomVal}.`, {}, { isComparison: true });
+        }
+    }
+
+    record(17, `✓ Done! All operations executed in O(1) average time. Final vals = [${vals}].`, {}, { isComplete: true });
+    return h;
+}
+
+// Product Without Self (LC #238) — Prefix & Suffix
+function generateProductWithoutSelfHistory() {
+    const nums = [1, 2, 3, 4];
+    const h = [];
+    const n = nums.length;
+    const answer = new Array(n).fill(1);
+    let prefix = 1;
+    let suffix = 1;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...nums],
+            nums2: [...answer],
+            arrayMeta: { prefix, suffix, originalLength: n },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call productWithoutSelf(nums=[${nums}]). Goal: answer[i] = product of all elements except nums[i], without division.`);
+    record(1, `n = ${n}.`);
+    record(2, `Initialize answer = [${answer}] (all ones).`);
+    record(3, `Initialize prefix = 1. We'll sweep left-to-right, accumulating the product of everything before each index.`);
+
+    // Left pass
+    for (let i = 0; i < n; i++) {
+        record(4, `Left pass: i = ${i}. prefix = ${prefix}.`, { i });
+        answer[i] = prefix;
+        record(5, `answer[${i}] = prefix = ${prefix}. answer = [${answer}].`, { i }, { isComparison: true });
+        prefix *= nums[i];
+        record(6, `prefix *= nums[${i}] (${nums[i]}) → prefix = ${prefix}.`, { i });
+    }
+
+    record(7, `Left pass done. answer = [${answer}]. Each answer[i] holds the product of all elements to its left.`);
+    record(7, `Now sweep right-to-left with suffix to multiply in the product of everything to the right.`);
+
+    // Right pass
+    for (let i = n - 1; i >= 0; i--) {
+        record(8, `Right pass: i = ${i}. suffix = ${suffix}.`, { i });
+        answer[i] *= suffix;
+        record(9, `answer[${i}] *= suffix (${suffix}) → answer[${i}] = ${answer[i]}. answer = [${answer}].`, { i }, { isComparison: true });
+        suffix *= nums[i];
+        record(10, `suffix *= nums[${i}] (${nums[i]}) → suffix = ${suffix}.`, { i });
+    }
+
+    record(11, `✓ Done! answer = [${answer}]. Each answer[i] is the product of all elements except nums[i].`, {}, { isComplete: true });
+    return h;
+}
+
+// Circular Fuel Route (LC #134) — Greedy Single Pass
+function generateCircularFuelHistory() {
+    const gas  = [1, 2, 3, 4, 5];
+    const cost = [3, 4, 5, 1, 2];
+    const h = [];
+    let totalSurplus = 0;
+    let currentSurplus = 0;
+    let start = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...gas],
+            nums2: [...cost],
+            arrayMeta: { totalSurplus, currentSurplus, start, originalLength: gas.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call circularFuel(gas=[${gas}], cost=[${cost}]). Goal: find the starting station to complete the circuit, or -1 if impossible.`);
+    record(1, `Initialize totalSurplus = 0 (tracks overall feasibility).`);
+    record(2, `Initialize currentSurplus = 0 (tracks current run of fuel).`);
+    record(3, `Initialize start = 0 (candidate starting station).`);
+
+    for (let i = 0; i < gas.length; i++) {
+        const net = gas[i] - cost[i];
+        record(4, `Station i = ${i}: gas[${i}] = ${gas[i]}, cost[${i}] = ${cost[i]}, net = ${net}.`, { i });
+        totalSurplus += net;
+        record(5, `totalSurplus += ${net} → totalSurplus = ${totalSurplus}.`, { i });
+        currentSurplus += net;
+        record(6, `currentSurplus += ${net} → currentSurplus = ${currentSurplus}.`, { i }, { isComparison: true });
+
+        if (currentSurplus < 0) {
+            record(7, `currentSurplus < 0 → can't start at station ${start}..${i}. Reset!`, { i }, { isSkip: true });
+            start = i + 1;
+            currentSurplus = 0;
+            record(9, `start = ${start}, currentSurplus = 0.`, { i });
+        }
+    }
+
+    if (totalSurplus >= 0) {
+        record(10, `✓ Done! totalSurplus = ${totalSurplus} ≥ 0 → circuit possible. Start at station ${start}.`, {}, { isComplete: true });
+    } else {
+        record(10, `✗ Done! totalSurplus = ${totalSurplus} < 0 → circuit impossible. Return -1.`, {}, { isComplete: true });
+    }
+    return h;
+}
+
+// Fair Candy Distribution (LC #135) — Two-Pass Greedy
+function generateFairCandyHistory() {
+    const ratings = [1, 0, 2, 3, 1];
+    const h = [];
+    const n = ratings.length;
+    const candies = new Array(n).fill(1);
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...ratings],
+            nums2: [...candies],
+            arrayMeta: { total: candies.reduce((a, b) => a + b, 0), originalLength: n },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call fairCandy(ratings=[${ratings}]). Goal: give each child at least 1 candy; higher-rated neighbors get more. Minimize total.`);
+    record(1, `n = ${n}.`);
+    record(2, `Initialize candies = [${candies}] (everyone starts with 1).`);
+    record(3, `Left pass: if ratings[i] > ratings[i-1], give more than left neighbor.`);
+
+    for (let i = 1; i < n; i++) {
+        record(3, `Left pass: i = ${i}. ratings[${i}] = ${ratings[i]}, ratings[${i - 1}] = ${ratings[i - 1]}.`, { i });
+        if (ratings[i] > ratings[i - 1]) {
+            candies[i] = candies[i - 1] + 1;
+            record(4, `${ratings[i]} > ${ratings[i - 1]} → candies[${i}] = candies[${i - 1}] + 1 = ${candies[i]}. candies = [${candies}].`, { i }, { isComparison: true });
+        } else {
+            record(4, `${ratings[i]} ≤ ${ratings[i - 1]} → no change. candies[${i}] stays ${candies[i]}.`, { i }, { isComparison: true, isSkip: true });
+        }
+    }
+
+    record(6, `Left pass done. candies = [${candies}]. Now right pass: if ratings[i] > ratings[i+1], ensure more than right neighbor.`);
+
+    for (let i = n - 2; i >= 0; i--) {
+        record(6, `Right pass: i = ${i}. ratings[${i}] = ${ratings[i]}, ratings[${i + 1}] = ${ratings[i + 1]}.`, { i });
+        if (ratings[i] > ratings[i + 1]) {
+            const oldVal = candies[i];
+            candies[i] = Math.max(candies[i], candies[i + 1] + 1);
+            record(7, `${ratings[i]} > ${ratings[i + 1]} → candies[${i}] = max(${oldVal}, ${candies[i + 1] + 1}) = ${candies[i]}. candies = [${candies}].`, { i }, { isComparison: true });
+        } else {
+            record(7, `${ratings[i]} ≤ ${ratings[i + 1]} → no change. candies[${i}] stays ${candies[i]}.`, { i }, { isComparison: true, isSkip: true });
+        }
+    }
+
+    const total = candies.reduce((a, b) => a + b, 0);
+    record(9, `✓ Done! candies = [${candies}]. Total candies = ${total}. Each child satisfied.`, {}, { isComplete: true });
+    return h;
+}
+
 // Add this function before init()
+
+// Trapped Rainwater (LC #42) — Two Pointers
+function generateTrappedRainwaterHistory() {
+    const height = [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1];
+    const h = [];
+    let l = 0, r = height.length - 1;
+    let leftMax = height[l], rightMax = height[r];
+    let water = 0;
+    const waterAt = new Array(height.length).fill(0); // water trapped per cell
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: [...height],
+            nums2: [...waterAt],
+            arrayMeta: { leftMax, rightMax, water, originalLength: height.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call trap(height=[${height}]). Goal: compute how many units of water are trapped between bars.`);
+    record(1, `Set l = 0, r = ${r}. Two pointers start at opposite ends.`, { l, r });
+    record(2, `leftMax = height[0] = ${leftMax}. Tallest bar seen from the left.`, { l, r });
+    record(3, `rightMax = height[${r}] = ${rightMax}. Tallest bar seen from the right.`, { l, r });
+    record(4, `water = 0. We'll accumulate trapped water as we go.`, { l, r });
+
+    while (l < r) {
+        record(5, `l = ${l}, r = ${r}. l < r → continue.`, { l, r });
+
+        if (leftMax < rightMax) {
+            record(6, `leftMax (${leftMax}) < rightMax (${rightMax}) → move left pointer inward.`, { l, r }, { isComparison: true });
+            l++;
+            record(7, `l += 1 → l = ${l}. height[${l}] = ${height[l]}.`, { l, r });
+            const oldLeftMax = leftMax;
+            leftMax = Math.max(leftMax, height[l]);
+            record(8, `leftMax = max(${oldLeftMax}, ${height[l]}) = ${leftMax}.`, { l, r });
+            const trapped = leftMax - height[l];
+            water += trapped;
+            waterAt[l] = trapped;
+            record(9, `Water at index ${l} = leftMax(${leftMax}) − height(${height[l]}) = ${trapped}. Total water = ${water}.`, { l, r }, { isComparison: true });
+        } else {
+            record(10, `leftMax (${leftMax}) ≥ rightMax (${rightMax}) → move right pointer inward.`, { l, r }, { isComparison: true });
+            r--;
+            record(11, `r -= 1 → r = ${r}. height[${r}] = ${height[r]}.`, { l, r });
+            const oldRightMax = rightMax;
+            rightMax = Math.max(rightMax, height[r]);
+            record(12, `rightMax = max(${oldRightMax}, ${height[r]}) = ${rightMax}.`, { l, r });
+            const trapped = rightMax - height[r];
+            water += trapped;
+            waterAt[r] = trapped;
+            record(13, `Water at index ${r} = rightMax(${rightMax}) − height(${height[r]}) = ${trapped}. Total water = ${water}.`, { l, r }, { isComparison: true });
+        }
+    }
+
+    record(14, `✓ l meets r! Total trapped water = ${water} units.`, { l, r }, { isComplete: true });
+    return h;
+}
+
+// Decode Roman Numerals (LC #13) — Right-to-Left Scan
+function generateRomanToIntHistory() {
+    const s = "MCMXCIV";
+    const chars = s.split('');
+    const romanMap = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
+    const h = [];
+    let total = 0;
+    let prev = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: chars.map(c => c),
+            nums2: [],
+            arrayMeta: { total, prev, prevSymbol: prev > 0 ? Object.keys(romanMap).find(k => romanMap[k] === prev) : '—', originalLength: chars.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call romanToInt("${s}"). Goal: convert Roman numeral to integer.`);
+    record(1, `Set up Roman value map: I=1, V=5, X=10, L=50, C=100, D=500, M=1000.`);
+    record(2, `Initialize total = 0, prev = 0.`);
+    record(3, `Scan right-to-left. Key insight: if a smaller value appears before a larger one, subtract it.`);
+
+    for (let idx = chars.length - 1; idx >= 0; idx--) {
+        const ch = chars[idx];
+        const curr = romanMap[ch];
+        record(5, `i = ${idx}: char = '${ch}', value = ${curr}. prev = ${prev}.`, { i: idx });
+
+        if (curr < prev) {
+            record(6, `${curr} < ${prev} → subtraction case! (like IV = 4, XC = 90).`, { i: idx }, { isComparison: true });
+            total -= curr;
+            record(7, `total -= ${curr} → total = ${total}.`, { i: idx });
+        } else {
+            record(8, `${curr} ≥ ${prev} → normal addition.`, { i: idx }, { isComparison: true });
+            total += curr;
+            record(9, `total += ${curr} → total = ${total}.`, { i: idx });
+        }
+        prev = curr;
+        record(10, `prev = ${curr} (for next comparison).`, { i: idx });
+    }
+
+    record(12, `✓ Done! "${s}" = ${total}.`, {}, { isComplete: true });
+    return h;
+}
+
+// Encode to Roman Numerals (LC #12) — Greedy Largest First
+function generateIntToRomanHistory() {
+    let num = 1994;
+    const original = num;
+    const vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+    const syms = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'];
+    const h = [];
+    let result = '';
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        // nums1 = vals table, nums2 = syms shown as labels
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: [...vals],
+            nums2: [...syms],
+            arrayMeta: { num, result, original, originalLength: vals.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call intToRoman(${original}). Goal: convert integer to Roman numeral string.`);
+    record(1, `Value table: [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1].`);
+    record(3, `Symbol table: [M, CM, D, CD, C, XC, L, XL, X, IX, V, IV, I].`);
+    record(5, `result = "". We greedily subtract the largest fitting value and append its symbol.`);
+
+    for (let i = 0; i < vals.length; i++) {
+        if (num <= 0) break;
+        record(6, `i = ${i}: check vals[${i}] = ${vals[i]} (symbol "${syms[i]}"). num = ${num}.`, { i });
+
+        while (num >= vals[i]) {
+            record(7, `num (${num}) ≥ ${vals[i]} → append "${syms[i]}" to result.`, { i }, { isComparison: true });
+            result += syms[i];
+            num -= vals[i];
+            record(8, `result = "${result}". num -= ${vals[i]} → num = ${num}.`, { i });
+        }
+
+        if (num > 0) {
+            record(6, `num (${num}) < ${vals[i]} → skip symbol "${syms[i]}".`, { i }, { isSkip: true });
+        }
+    }
+
+    record(10, `✓ Done! ${original} → "${result}".`, {}, { isComplete: true });
+    return h;
+}
+
+// Length of Final Word (LC #58) — Reverse Scan
+function generateLengthOfLastWordHistory() {
+    const s = "Hello World  ";
+    const chars = s.split('');
+    const h = [];
+    let i = chars.length - 1;
+    let length = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: chars.map(c => c === ' ' ? '␣' : c),
+            nums2: [],
+            arrayMeta: { length, word: '', originalLength: chars.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call lengthOfLastWord("${s}"). Goal: find the length of the last word.`);
+    record(1, `i = ${i}. Start from the end of the string.`, { i });
+
+    // Phase 1: skip trailing spaces
+    record(2, `Phase 1: skip trailing spaces.`, { i });
+    while (i >= 0 && chars[i] === ' ') {
+        record(2, `s[${i}] = ' ' (space) → skip. i -= 1.`, { i }, { isSkip: true });
+        i--;
+    }
+    record(2, `Trailing spaces skipped. i = ${i}, s[${i}] = '${chars[i]}'.`, { i });
+
+    // Phase 2: count word characters
+    const wordEnd = i;
+    record(4, `Phase 2: count characters of the last word.`, { i });
+    while (i >= 0 && chars[i] !== ' ') {
+        length++;
+        record(5, `s[${i}] = '${chars[i]}' → letter! length = ${length}.`, { i }, { isComparison: true });
+        i--;
+        if (i >= 0 && chars[i] !== ' ') {
+            record(6, `i -= 1 → i = ${i}.`, { i });
+        }
+    }
+
+    const lastWord = s.substring(i + 1, wordEnd + 1);
+    record(7, `${i >= 0 ? `s[${i}] = ' '` : 'Reached start'} → word boundary. Stop counting.`, { i: Math.max(i, 0) });
+    record(8, `✓ Done! The last word is "${lastWord}" with length = ${length}.`, {}, { isComplete: true });
+    return h;
+}
 
 function generateMergeSortedArrayHistory() {
     // More complex test case that exercises both loops
@@ -1432,6 +2785,246 @@ async function getYouTubeRecommendations() {
                 }
             ];
         }
+        // Problem 6 - Trim Excess Duplicates
+        else if (currentProbId === '6') {
+            videos = [
+                {
+                    title: "Remove Duplicates from Sorted Array II — NeetCode",
+                    url: "https://www.youtube.com/watch?v=bucdUNFhos4",
+                    reason: "Clear explanation of the k-2 comparison trick for allowing at most 2 duplicates"
+                },
+                {
+                    title: "Two Pointer Technique Explained — GeeksforGeeks",
+                    url: "https://www.youtube.com/watch?v=pWLlJPg0Sx0",
+                    reason: "Comprehensive guide to the two-pointer technique and when to use it"
+                }
+            ];
+        }
+        // Problem 7 - Find the Dominant Element
+        else if (currentProbId === '7') {
+            videos = [
+                {
+                    title: "Majority Element — Boyer-Moore Voting Algorithm — NeetCode",
+                    url: "https://www.youtube.com/watch?v=7pnhv842keE",
+                    reason: "Intuitive explanation of the Boyer-Moore voting algorithm"
+                },
+                {
+                    title: "Boyer-Moore Majority Vote Algorithm — Visual Explanation",
+                    url: "https://www.youtube.com/watch?v=n5QY3x_GNDg",
+                    reason: "Visual step-by-step walkthrough of how candidate/count approach works"
+                }
+            ];
+        }
+        // Problem 8 - Cycle Array Elements
+        else if (currentProbId === '8') {
+            videos = [
+                {
+                    title: "Rotate Array — LeetCode 189 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=BHr381Guz3Y",
+                    reason: "Three approaches explained: brute force, extra array, and reverse trick"
+                },
+                {
+                    title: "Reverse Algorithm for Array Rotation — Abdul Bari",
+                    url: "https://www.youtube.com/watch?v=lBsQf2J-Ves",
+                    reason: "Deep dive into why reversing three times correctly rotates the array"
+                }
+            ];
+        }
+        // Problem 9 - Best Moment to Trade
+        else if (currentProbId === '9') {
+            videos = [
+                {
+                    title: "Best Time to Buy and Sell Stock — NeetCode",
+                    url: "https://www.youtube.com/watch?v=1pkOgXD63yU",
+                    reason: "Optimal single-pass solution tracking minimum price and maximum profit"
+                },
+                {
+                    title: "Stock Buy and Sell Problem — Kadane's Approach",
+                    url: "https://www.youtube.com/watch?v=nS5z4x6LyKw",
+                    reason: "Understanding the connection between stock problems and dynamic programming"
+                }
+            ];
+        }
+        // Problem 10 - Best Moments to Trade
+        else if (currentProbId === '10') {
+            videos = [
+                {
+                    title: "Best Time to Buy and Sell Stock II — NeetCode",
+                    url: "https://www.youtube.com/watch?v=3SJ3pUkPQMc",
+                    reason: "Greedy approach: collect every consecutive gain for maximum total profit"
+                },
+                {
+                    title: "Greedy Algorithms — When and How to Use Them",
+                    url: "https://www.youtube.com/watch?v=bC7o8P_Ste4",
+                    reason: "Learn the greedy paradigm and why it works for this problem"
+                }
+            ];
+        }
+        // Problem 11 - Can You Reach the End? (Jump Game)
+        else if (currentProbId === '11') {
+            videos = [
+                {
+                    title: "Jump Game — LeetCode 55 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=Yan0cv2cLy8",
+                    reason: "Greedy O(n) solution tracking the farthest reachable index"
+                },
+                {
+                    title: "Jump Game — Greedy Approach Explained",
+                    url: "https://www.youtube.com/watch?v=muDPTDrpS28",
+                    reason: "Visual walkthrough of why greedy works and DP comparison"
+                }
+            ];
+        }
+        // Problem 12 - Fewest Jumps to the End (Jump Game II)
+        else if (currentProbId === '12') {
+            videos = [
+                {
+                    title: "Jump Game II — LeetCode 45 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=dJ7sWiOoK7g",
+                    reason: "BFS-like greedy approach to find minimum jumps in O(n)"
+                },
+                {
+                    title: "Jump Game II — Greedy BFS Intuition",
+                    url: "https://www.youtube.com/watch?v=vBdo7wtwlXs",
+                    reason: "Understanding the level-by-level expansion trick for minimum jumps"
+                }
+            ];
+        }
+        // Problem 13 - Researcher Impact Score (H-Index)
+        else if (currentProbId === '13') {
+            videos = [
+                {
+                    title: "H-Index — LeetCode 274 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=INS0LBIhu2g",
+                    reason: "Sort-based and counting-sort approaches to find h-index"
+                },
+                {
+                    title: "H-Index Problem — Step by Step Explanation",
+                    url: "https://www.youtube.com/watch?v=JK-mXsmMfho",
+                    reason: "Clear explanation of what h-index means and how to compute it"
+                }
+            ];
+        }
+        // Problem 14 - Randomized Collection (Insert Delete GetRandom)
+        else if (currentProbId === '14') {
+            videos = [
+                {
+                    title: "Insert Delete GetRandom O(1) — LeetCode 380 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=j4KwhBziOpg",
+                    reason: "HashMap + Array design pattern for O(1) operations"
+                },
+                {
+                    title: "Randomized Set Design — System Design Interview",
+                    url: "https://www.youtube.com/watch?v=4lXCzhgOPCs",
+                    reason: "How the swap-with-last trick enables O(1) removal"
+                }
+            ];
+        }
+        // Problem 15 - Product Without Self
+        else if (currentProbId === '15') {
+            videos = [
+                {
+                    title: "Product of Array Except Self — LeetCode 238 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=bNvIQI2wAjk",
+                    reason: "Prefix and suffix product approach without using division"
+                },
+                {
+                    title: "Product Except Self — O(1) Space Trick",
+                    url: "https://www.youtube.com/watch?v=gREVHiZjXeQ",
+                    reason: "How to compute prefix and suffix products in a single output array"
+                }
+            ];
+        }
+        // Problem 16 - Circular Fuel Route (Gas Station)
+        else if (currentProbId === '16') {
+            videos = [
+                {
+                    title: "Gas Station — LeetCode 134 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=lJwbPZGo05A",
+                    reason: "Greedy single-pass solution to find the valid starting station"
+                },
+                {
+                    title: "Gas Station Problem — Why Greedy Works",
+                    url: "https://www.youtube.com/watch?v=nTKdYm_5-TY",
+                    reason: "Mathematical proof of why the greedy reset approach is correct"
+                }
+            ];
+        }
+        // Problem 17 - Fair Candy Distribution (Candy)
+        else if (currentProbId === '17') {
+            videos = [
+                {
+                    title: "Candy — LeetCode 135 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=h9_tOFnbSMI",
+                    reason: "Two-pass greedy approach to minimize total candies given constraints"
+                },
+                {
+                    title: "Candy Distribution — Hard Greedy Problem Explained",
+                    url: "https://www.youtube.com/watch?v=QzPWc0ilrec",
+                    reason: "Why a left pass then right pass handles all neighbor constraints"
+                }
+            ];
+        }
+        // Problem 18 - Trapped Rainwater (Trapping Rain Water)
+        else if (currentProbId === '18') {
+            videos = [
+                {
+                    title: "Trapping Rain Water — LeetCode 42 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=ZI2z5pq0TqA",
+                    reason: "Clear two-pointer approach with visual water-filling explanation"
+                },
+                {
+                    title: "Trapping Rain Water — Why Two Pointers Work",
+                    url: "https://www.youtube.com/watch?v=C8UjlJZsHBw",
+                    reason: "Deep dive into the min(leftMax, rightMax) intuition with bar diagrams"
+                }
+            ];
+        }
+        // Problem 19 - Decode Roman Numerals (Roman to Integer)
+        else if (currentProbId === '19') {
+            videos = [
+                {
+                    title: "Roman to Integer — LeetCode 13 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=3jdxYj3DD98",
+                    reason: "Simple right-to-left scan with the subtraction rule clearly explained"
+                },
+                {
+                    title: "Roman Numerals — Hash Map Approach Explained",
+                    url: "https://www.youtube.com/watch?v=dlATMslQ6Uc",
+                    reason: "How to handle subtraction cases like IV, IX, XC, CM"
+                }
+            ];
+        }
+        // Problem 20 - Encode to Roman Numerals (Integer to Roman)
+        else if (currentProbId === '20') {
+            videos = [
+                {
+                    title: "Integer to Roman — LeetCode 12 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=ohBNdSJyLh8",
+                    reason: "Greedy approach: subtract the largest symbol value that fits"
+                },
+                {
+                    title: "Integer to Roman — Lookup Table Trick",
+                    url: "https://www.youtube.com/watch?v=rsSFJwF-OWk",
+                    reason: "Why a 13-entry value/symbol table handles all subtractive cases"
+                }
+            ];
+        }
+        // Problem 21 - Length of Final Word (Length of Last Word)
+        else if (currentProbId === '21') {
+            videos = [
+                {
+                    title: "Length of Last Word — LeetCode 58 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=KT9rltZTybQ",
+                    reason: "Clean reverse-scan approach: skip trailing spaces, then count letters"
+                },
+                {
+                    title: "String Problems for Beginners — Interview Prep",
+                    url: "https://www.youtube.com/watch?v=GQr3Z7oM3Dw",
+                    reason: "Build string manipulation intuition with multiple easy problems"
+                }
+            ];
+        }
         // Fallback for unknown problems
         else {
             videos = [
@@ -1673,7 +3266,7 @@ function render() {
     if (mobileNext) mobileNext.disabled = currentStep === history.length - 1;
     
     // Array visualization for array problems
-    if (['3','4','5'].includes(currentProbId)) {
+    if (isArrayProblem()) {
         const engine = document.querySelector('.render-engine');
         
         let arrayContainer = document.getElementById('arrayContainer');
@@ -1692,7 +3285,7 @@ function render() {
             
             const itemCount = state.nums1.length;
             const denseClass = itemCount >= 9 ? ' array-dense' : '';
-            let html = `<div class="array-inner${denseClass}">`; 
+            let html = `<div class="array-inner array-dual${denseClass}">`; 
             html += `
                 <div class="array-section">
                     <div class="array-label">nums1 (merged array)</div>
@@ -1773,8 +3366,8 @@ function render() {
             arrayContainer.innerHTML = html;
         }
         
-        // Problems 4 & 5: Single-array two-pointer (Remove Element / Remove Duplicates)
-        if (['4','5'].includes(currentProbId) && state.nums1) {
+        // Problems 4, 5 & 6: Single-array two-pointer (Remove Element / Remove Duplicates / Trim Excess)
+        if (['4','5','6'].includes(currentProbId) && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const kPtr = state.pointers?.k ?? -1;
             const meta = state.arrayMeta || {};
@@ -1788,6 +3381,8 @@ function render() {
             // Problem title context
             if (currentProbId === '4') {
                 html += `<div class="array-label">nums — remove all instances of val = ${meta.val ?? '?'}</div>`;
+            } else if (currentProbId === '6') {
+                html += `<div class="array-label">nums — allow at most 2 of each value</div>`;
             } else {
                 html += `<div class="array-label">nums — remove duplicates in-place</div>`;
             }
@@ -1849,6 +3444,835 @@ function render() {
             arrayContainer.innerHTML = html;
         }
         
+        // Problem 7: Dominant Element (Boyer-Moore Voting) — single pointer, candidate/count
+        if (currentProbId === '7' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const candidate = meta.candidate;
+            const count = meta.count ?? 0;
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">nums — find element appearing &gt; ⌊n/2⌋ times</div>`;
+            html += `<div class="array-visualization">`;
+            
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                
+                if (isComplete && val === candidate) {
+                    classes += ' pointer-merge';
+                }
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+                
+                html += `
+                    <div class="${classes}">
+                        ${val}
+                        ${pointerLabels}
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (scanner)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">candidate</div>
+                        <div class="pointer-detail-value p-merge">${candidate ?? '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">count</div>
+                        <div class="pointer-detail-value p2">${count}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+        
+        // Problem 8: Cycle Array Elements (Reverse Three Times) — lo/hi swap pointers
+        if (currentProbId === '8' && state.nums1) {
+            const lo = state.pointers?.lo ?? -1;
+            const hi = state.pointers?.hi ?? -1;
+            const meta = state.arrayMeta || {};
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">nums — rotate right by k = ${meta.k ?? '?'} positions${meta.phase ? ' (phase: ' + meta.phase + ')' : ''}</div>`;
+            html += `<div class="array-visualization">`;
+            
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                
+                if (isComplete) {
+                    classes += ' pointer-merge';
+                }
+                
+                if (idx === lo && idx === hi) {
+                    classes += ' pointer-1 pointer-2';
+                    pointerLabels = `<div class="pointer-label-pair"><div class="pointer-label p1 pair-left">lo</div><div class="pointer-label p2 pair-right">hi</div></div>`;
+                } else if (idx === lo) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">lo</div>`;
+                } else if (idx === hi) {
+                    classes += ' pointer-2';
+                    pointerLabels = `<div class="pointer-label p2">hi</div>`;
+                }
+                
+                html += `
+                    <div class="${classes}">
+                        ${val}
+                        ${pointerLabels}
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">lo (left pointer)</div>
+                        <div class="pointer-detail-value p1">${lo >= 0 ? lo : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">hi (right pointer)</div>
+                        <div class="pointer-detail-value p2">${hi >= 0 ? hi : '—'}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+        
+        // Problem 9: Best Moment to Trade (single pass) — single pointer, minPrice/maxProfit
+        if (currentProbId === '9' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const minPrice = meta.minPrice;
+            const maxProfit = meta.maxProfit ?? 0;
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">prices — find max profit (buy once, sell once)</div>`;
+            html += `<div class="array-visualization">`;
+            
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                
+                if (isComplete && val === minPrice) {
+                    classes += ' pointer-2'; // highlight min price
+                }
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+                
+                html += `
+                    <div class="${classes}">
+                        ${val}
+                        ${pointerLabels}
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (scanner)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">minPrice</div>
+                        <div class="pointer-detail-value p2">${minPrice ?? '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">maxProfit</div>
+                        <div class="pointer-detail-value p-merge">${maxProfit}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+        
+        // Problem 10: Best Moments to Trade (greedy) — single pointer, totalProfit
+        if (currentProbId === '10' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const totalProfit = meta.totalProfit ?? 0;
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">prices — maximize total profit (multiple trades allowed)</div>`;
+            html += `<div class="array-visualization">`;
+            
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                
+                // Highlight gains (where price went up from previous)
+                if (isComplete && idx > 0 && val > state.nums1[idx - 1]) {
+                    classes += ' pointer-merge';
+                }
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+                
+                html += `
+                    <div class="${classes}">
+                        ${val}
+                        ${pointerLabels}
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (scanner)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">totalProfit</div>
+                        <div class="pointer-detail-value p-merge">${totalProfit}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+        
+        // Problem 11: Can You Reach the End? (Jump Game) — farthest tracker
+        if (currentProbId === '11' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const farthest = meta.farthest ?? 0;
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">nums — can we jump from index 0 to the last index?</div>`;
+            html += `<div class="array-visualization">`;
+            
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                
+                if (isComplete && idx <= farthest) {
+                    classes += ' pointer-merge';
+                }
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+                
+                html += `
+                    <div class="${classes}">
+                        ${val}
+                        ${pointerLabels}
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (current index)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">farthest reachable</div>
+                        <div class="pointer-detail-value p-merge">${farthest}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+        
+        // Problem 12: Fewest Jumps to End (Jump Game II) — jumps/curEnd/farthest
+        if (currentProbId === '12' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const jumps = meta.jumps ?? 0;
+            const curEnd = meta.curEnd ?? 0;
+            const farthest = meta.farthest ?? 0;
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">nums — find minimum jumps to reach last index</div>`;
+            html += `<div class="array-visualization">`;
+            
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                
+                if (isComplete) {
+                    classes += ' pointer-merge';
+                }
+                // Highlight curEnd boundary
+                if (!isComplete && idx === curEnd) {
+                    classes += ' pointer-2';
+                }
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+                
+                html += `
+                    <div class="${classes}">
+                        ${val}
+                        ${pointerLabels}
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (scanner)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">jumps</div>
+                        <div class="pointer-detail-value p-merge">${jumps}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">curEnd</div>
+                        <div class="pointer-detail-value p2">${curEnd}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">farthest</div>
+                        <div class="pointer-detail-value">${farthest}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+        
+        // Problem 13: H-Index — sorted descending, scan for h
+        if (currentProbId === '13' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const hVal = meta.h ?? 0;
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">citations (sorted desc) — find h such that h papers have ≥ h citations</div>`;
+            html += `<div class="array-visualization">`;
+            
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                
+                if (isComplete && idx < hVal) {
+                    classes += ' pointer-merge';
+                }
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+                
+                html += `
+                    <div class="${classes}">
+                        ${val}
+                        ${pointerLabels}
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (scanner)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">h-index</div>
+                        <div class="pointer-detail-value p-merge">${hVal}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+        
+        // Problem 14: Randomized Collection — vals array + idx_map
+        if (currentProbId === '14' && state.nums1) {
+            const meta = state.arrayMeta || {};
+            const idxMap = meta.idxMap || {};
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = Math.max(state.nums1.length, 1);
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">vals — O(1) insert, remove, and getRandom</div>`;
+            html += `<div class="array-visualization">`;
+            
+            if (state.nums1.length === 0) {
+                html += `<div class="array-item empty">∅</div>`;
+            } else {
+                state.nums1.forEach((val, idx) => {
+                    let classes = 'array-item';
+                    if (isComplete) classes += ' pointer-merge';
+                    
+                    html += `
+                        <div class="${classes}">
+                            ${val}
+                            <div class="array-index">${idx}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `</div>`;
+            // Show idx_map
+            const mapEntries = Object.entries(idxMap).map(([k, v]) => `${k}→${v}`).join(', ');
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">vals.length</div>
+                        <div class="pointer-detail-value p1">${state.nums1.length}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">idx_map</div>
+                        <div class="pointer-detail-value p2">{${mapEntries || '∅'}}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+        
+        // Problem 15: Product Without Self — two arrays (nums + answer)
+        if (currentProbId === '15' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const prefix = meta.prefix ?? 1;
+            const suffix = meta.suffix ?? 1;
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner array-dual${sDenseClass}">`;
+            
+            // nums row
+            html += `<div class="array-section"><div class="array-label">nums (input)</div><div class="array-visualization">`;
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                if (idx === iPtr) classes += ' pointer-1';
+                let pointerLabels = idx === iPtr ? `<div class="pointer-label p1">i</div>` : '';
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+            
+            // answer row
+            html += `<div class="array-section"><div class="array-label">answer (output)</div><div class="array-visualization">`;
+            (state.nums2 || []).forEach((val, idx) => {
+                let classes = 'array-item';
+                if (isComplete) classes += ' pointer-merge';
+                if (idx === iPtr) classes += ' pointer-2';
+                html += `<div class="${classes}">${val}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+            
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">prefix</div>
+                        <div class="pointer-detail-value p2">${prefix}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">suffix</div>
+                        <div class="pointer-detail-value p-merge">${suffix}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+        
+        // Problem 16: Circular Fuel Route — gas/cost arrays
+        if (currentProbId === '16' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const totalSurplus = meta.totalSurplus ?? 0;
+            const currentSurplus = meta.currentSurplus ?? 0;
+            const startStation = meta.start ?? 0;
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner array-dual${sDenseClass}">`;
+            
+            // gas row
+            html += `<div class="array-section"><div class="array-label">gas (fuel at station)</div><div class="array-visualization">`;
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                if (isComplete && idx === startStation) classes += ' pointer-merge';
+                if (idx === iPtr) classes += ' pointer-1';
+                let pointerLabels = idx === iPtr ? `<div class="pointer-label p1">i</div>` : '';
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+            
+            // cost row
+            html += `<div class="array-section"><div class="array-label">cost (fuel to next station)</div><div class="array-visualization">`;
+            (state.nums2 || []).forEach((val, idx) => {
+                let classes = 'array-item';
+                if (idx === iPtr) classes += ' pointer-2';
+                html += `<div class="${classes}">${val}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+            
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (station)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">start</div>
+                        <div class="pointer-detail-value p-merge">${startStation}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">currentSurplus</div>
+                        <div class="pointer-detail-value p2">${currentSurplus}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">totalSurplus</div>
+                        <div class="pointer-detail-value">${totalSurplus}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+        
+        // Problem 17: Fair Candy Distribution — ratings + candies
+        if (currentProbId === '17' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const total = meta.total ?? 0;
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner array-dual${sDenseClass}">`;
+            
+            // ratings row
+            html += `<div class="array-section"><div class="array-label">ratings</div><div class="array-visualization">`;
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                if (idx === iPtr) classes += ' pointer-1';
+                let pointerLabels = idx === iPtr ? `<div class="pointer-label p1">i</div>` : '';
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+            
+            // candies row
+            html += `<div class="array-section"><div class="array-label">candies</div><div class="array-visualization">`;
+            (state.nums2 || []).forEach((val, idx) => {
+                let classes = 'array-item';
+                if (isComplete) classes += ' pointer-merge';
+                if (idx === iPtr) classes += ' pointer-2';
+                html += `<div class="${classes}">${val}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+            
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">total candies</div>
+                        <div class="pointer-detail-value p-merge">${total}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+        
+        // Problem 18: Trapped Rainwater — height bars + water overlay + two pointers
+        if (currentProbId === '18' && state.nums1) {
+            const lPtr = state.pointers?.l ?? -1;
+            const rPtr = state.pointers?.r ?? -1;
+            const meta = state.arrayMeta || {};
+            const leftMax = meta.leftMax ?? 0;
+            const rightMax = meta.rightMax ?? 0;
+            const waterTotal = meta.water ?? 0;
+            const waterAt = state.nums2 || [];
+            const isComplete = state.isComplete || false;
+            const maxH = Math.max(...state.nums1, 1);
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner array-dual${sDenseClass}">`;
+
+            // Height bars with water overlay
+            html += `<div class="array-section"><div class="array-label">height — elevation map with trapped water</div><div class="array-visualization rain-viz">`;
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item rain-bar';
+                let pointerLabels = '';
+                const wLevel = waterAt[idx] || 0;
+
+                if (idx === lPtr && idx === rPtr) {
+                    classes += ' pointer-1 pointer-2';
+                    pointerLabels = `<div class="pointer-label-pair"><div class="pointer-label p1 pair-left">L</div><div class="pointer-label p2 pair-right">R</div></div>`;
+                } else if (idx === lPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">L</div>`;
+                } else if (idx === rPtr) {
+                    classes += ' pointer-2';
+                    pointerLabels = `<div class="pointer-label p2">R</div>`;
+                }
+
+                if (isComplete && wLevel > 0) classes += ' water-cell';
+
+                html += `<div class="${classes}" style="--bar-h:${(val / maxH) * 100}%;--water-h:${((val + wLevel) / maxH) * 100}%">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+
+            // Water amount row
+            html += `<div class="array-section"><div class="array-label">water trapped per index</div><div class="array-visualization">`;
+            waterAt.forEach((val, idx) => {
+                let classes = 'array-item';
+                if (val > 0) classes += ' pointer-merge';
+                html += `<div class="${classes}">${val}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">L (left)</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">R (right)</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">leftMax</div>
+                        <div class="pointer-detail-value p1">${leftMax}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">rightMax</div>
+                        <div class="pointer-detail-value p2">${rightMax}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">total water</div>
+                        <div class="pointer-detail-value p-merge">${waterTotal}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 19: Decode Roman Numerals — char array scanned right-to-left
+        if (currentProbId === '19' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const total = meta.total ?? 0;
+            const prevSym = meta.prevSymbol ?? '—';
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">Roman numeral — scan right to left</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item roman-char';
+                let pointerLabels = '';
+
+                // Already processed (to the right of i) → dim
+                if (iPtr >= 0 && idx > iPtr) classes += ' visited-cell';
+                if (isComplete) classes += ' pointer-merge';
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (scanner)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">prev</div>
+                        <div class="pointer-detail-value p2">${prevSym}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">total</div>
+                        <div class="pointer-detail-value p-merge">${total}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 20: Encode to Roman — value/symbol lookup table + building result
+        if (currentProbId === '20' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const num = meta.num ?? 0;
+            const result = meta.result ?? '';
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner array-dual${sDenseClass}">`;
+
+            // Values row
+            html += `<div class="array-section"><div class="array-label">values (greedy order)</div><div class="array-visualization">`;
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+                // Already exhausted values (before i)
+                if (iPtr >= 0 && idx < iPtr) classes += ' visited-cell';
+                if (isComplete) classes += ' pointer-merge';
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+
+            // Symbols row
+            html += `<div class="array-section"><div class="array-label">symbols</div><div class="array-visualization">`;
+            (state.nums2 || []).forEach((sym, idx) => {
+                let classes = 'array-item roman-char';
+                if (idx === iPtr) classes += ' pointer-2';
+                if (iPtr >= 0 && idx < iPtr) classes += ' visited-cell';
+                if (isComplete) classes += ' pointer-merge';
+                html += `<div class="${classes}">${sym}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (table index)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">remaining num</div>
+                        <div class="pointer-detail-value p2">${num}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">result</div>
+                        <div class="pointer-detail-value p-merge">"${result}"</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 21: Length of Final Word — char array scanned from the right
+        if (currentProbId === '21' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const wordLen = meta.length ?? 0;
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">string — find the length of the last word</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+
+                // Highlight the counted word characters
+                if (isComplete && idx > iPtr && ch !== '␣') {
+                    classes += ' pointer-merge';
+                }
+                // Spaces get a muted style
+                if (ch === '␣') classes += ' space-char';
+                // Already scanned past (right of i)
+                if (iPtr >= 0 && idx > iPtr && !isComplete) classes += ' visited-cell';
+
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (scanner)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">length</div>
+                        <div class="pointer-detail-value p-merge">${wordLen}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
         return;
     }
 }
@@ -2142,11 +4566,11 @@ function init() {
     if (stackModule) stackModule.classList.remove('mobile-visible');
     if (stackToggleBtn) stackToggleBtn.classList.remove('collapsed');
     
-    const isArrayProblem = ['3','4','5'].includes(currentProbId);
+    const isArrayProb = isArrayProblem();
     const isBFS = currentAlgorithm === 'bfs';
     const isTrueMobile = window.matchMedia('(pointer: coarse)').matches;
 
-    if (isArrayProblem) {
+    if (isArrayProb) {
         // Array problems: hide right panel entirely
         if (appLayout) appLayout.classList.add('hide-right-panel');
         if (stackModule) {
@@ -2244,7 +4668,7 @@ function init() {
     document.getElementById('spaceComplexity').textContent = algorithm.spaceComplexity;
     
     // Handle array visualization for array problems
-    if (['3','4','5'].includes(currentProbId)) {
+    if (isArrayProblem()) {
         const nodesContainer = document.getElementById('nodesContainer');
         nodesContainer.innerHTML = '';
         
@@ -2264,7 +4688,6 @@ function init() {
         history = algorithm.generateHistory();
         currentStep = 0;
         render();
-        setupEventListeners();
         return;
     }
     
@@ -2393,9 +4816,6 @@ function init() {
     history = algorithm.generateHistory(prob.tree);
     currentStep = 0;
     render();
-    
-    // Setup event listeners
-    setupEventListeners();
 }
 
 // Code panel toggle
@@ -2418,7 +4838,7 @@ function toggleCodePanel() {
 
     // Re-scale tree canvas after layout transition completes
     setTimeout(() => {
-        if (['3','4','5'].includes(currentProbId)) return; // array problem, no tree to scale
+        if (isArrayProblem()) return; // array problem, no tree to scale
         const engine = document.querySelector('.render-engine');
         const treeCanvas = document.getElementById('treeCanvas');
         if (engine && treeCanvas) {
@@ -2443,7 +4863,7 @@ function toggleStackPanel() {
 
     // Re-scale tree canvas after layout transition completes
     setTimeout(() => {
-        if (['3','4','5'].includes(currentProbId)) return; // array problem, no tree to scale
+        if (isArrayProblem()) return; // array problem, no tree to scale
         const engine = document.querySelector('.render-engine');
         const treeCanvas = document.getElementById('treeCanvas');
         if (engine && treeCanvas) {
@@ -2474,7 +4894,34 @@ function setupEventListeners() {
     }
     
     const problemListBtn = document.getElementById('problemListBtn');
-    if (problemListBtn) problemListBtn.addEventListener('click', openProblemModal);
+    if (problemListBtn) {
+        problemListBtn.removeEventListener('click', openProblemModal);
+        problemListBtn.addEventListener('click', openProblemModal);
+    }
+
+    // Prev/Next problem navigation — use named handlers to avoid stacking
+    const prevProblemBtn = document.getElementById('prevProblemBtn');
+    const nextProblemBtn = document.getElementById('nextProblemBtn');
+    if (prevProblemBtn) {
+        if (prevProblemBtn._handler) prevProblemBtn.removeEventListener('click', prevProblemBtn._handler);
+        prevProblemBtn._handler = () => {
+            const ids = Object.keys(problemDB);
+            const idx = ids.indexOf(currentProbId);
+            const prevId = ids[(idx - 1 + ids.length) % ids.length];
+            selectProblem(prevId);
+        };
+        prevProblemBtn.addEventListener('click', prevProblemBtn._handler);
+    }
+    if (nextProblemBtn) {
+        if (nextProblemBtn._handler) nextProblemBtn.removeEventListener('click', nextProblemBtn._handler);
+        nextProblemBtn._handler = () => {
+            const ids = Object.keys(problemDB);
+            const idx = ids.indexOf(currentProbId);
+            const nextId = ids[(idx + 1) % ids.length];
+            selectProblem(nextId);
+        };
+        nextProblemBtn.addEventListener('click', nextProblemBtn._handler);
+    }
 
     // Filter buttons in problem modal
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -2653,7 +5100,10 @@ function resetVisualization() {
 }
 
 // Initialize on load
-window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+    init();
+});
 
 // Debounced resize: re-render tree to pick up new --node-size and scale
 let resizeTimer;
@@ -2666,7 +5116,7 @@ window.addEventListener('resize', () => {
             // Node size changed (e.g. crossed mobile breakpoint) — full re-render
             lastNodeSize = currentNodeSize;
             init();
-        } else if (currentProbId !== '3') {
+        } else if (!isArrayProblem()) {
             // Just re-scale the tree canvas to fit the new container size
             const engine = document.querySelector('.render-engine');
             const treeCanvas = document.getElementById('treeCanvas');
