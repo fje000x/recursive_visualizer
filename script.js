@@ -3107,10 +3107,16 @@ function render() {
         edgeEl.classList.remove('edge-active', 'edge-visited', 'edge-base');
         const from = edgeEl.getAttribute('data-from');
         const to = edgeEl.getAttribute('data-to');
-        // Active edge: currently visiting this edge's child
-        if (to === state.nodeId) {
+        const side = edgeEl.getAttribute('data-side');
+
+        if (state.currentTask && from === state.nodeId && side === state.currentTask) {
+            // Processing L or R subtree: highlight the edge going DOWN to that child
+            edgeEl.classList.add('edge-active');
+        } else if (!state.currentTask && to === state.nodeId) {
+            // Entering a node or at a base case: highlight the edge coming INTO this node
             edgeEl.classList.add(state.isBase ? 'edge-base' : 'edge-active');
         }
+
         // Visited edges: both endpoints have been visited
         if (state.visited?.includes(from) && state.visited?.includes(to)) {
             edgeEl.classList.add('edge-visited');
@@ -4790,6 +4796,7 @@ function init() {
             line.setAttribute("class", "tree-edge");
             line.setAttribute("data-from", node.id);
             line.setAttribute("data-to", node.left.id);
+            line.setAttribute("data-side", "L");
             svg.appendChild(line);
             drawTree(node.left);
         }
@@ -4805,6 +4812,7 @@ function init() {
             line.setAttribute("class", "tree-edge");
             line.setAttribute("data-from", node.id);
             line.setAttribute("data-to", node.right.id);
+            line.setAttribute("data-side", "R");
             svg.appendChild(line);
             drawTree(node.right);
         }
