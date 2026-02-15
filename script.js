@@ -1,34 +1,37 @@
 const problemDB = {
-    "111": {
-        name: "Minimum Depth of Binary Tree",
-        leetcodeUrl: "https://leetcode.com/problems/minimum-depth-of-binary-tree/",
+    "1": {
+        name: "Shortest Path in Binary Tree",
+        alias: "Minimum Depth of Binary Tree",
+        leetcodeNum: "111",
+        inspiredBy: "Inspired by LeetCode Problem #111",
+        sourceUrl: "https://leetcode.com/problems/minimum-depth-of-binary-tree/",
         difficulty: "easy",
         topics: ["tree", "recursion", "bfs", "dfs"],
-        leetcode150: true,
+        interview150: true,
         tree: {
-            v: 3, id: 'n3', x: 0, y: -160,
-            left: { v: 9, id: 'n9', x: -180, y: -20, left: null, right: null },
+            v: 5, id: 'n5', x: 0, y: -160,
+            left: { v: 2, id: 'n2', x: -180, y: -20, left: null, right: null },
             right: { 
-                v: 20, id: 'n20', x: 180, y: -20,
-                left: { v: 15, id: 'n15', x: 80, y: 120, left: null, right: null },
-                right: { v: 7, id: 'n7', x: 280, y: 120, left: null, right: null }
+                v: 8, id: 'n8', x: 180, y: -20,
+                left: { v: 6, id: 'n6', x: 80, y: 120, left: null, right: null },
+                right: { v: 11, id: 'n11', x: 280, y: 120, left: null, right: null }
             }
         },
         algorithms: {
             recursive: {
                 name: "Recursive DFS",
                 code: [
-                    "def minDepth(root):",
-                    "    if not root: return 0",
-                    "    if not root.left and not root.right:",
+                    "def shortestPath(node):",
+                    "    if node is None: return 0",
+                    "    if not node.left and not node.right:",
                     "        return 1",
-                    "    if not root.left:",
-                    "        return minDepth(root.right) + 1",
-                    "    if not root.right:",
-                    "        return minDepth(root.left) + 1",
-                    "    left = minDepth(root.left)",
-                    "    right = minDepth(root.right)",
-                    "    return min(left, right) + 1"
+                    "    if node.left is None:",
+                    "        return shortestPath(node.right) + 1",
+                    "    if node.right is None:",
+                    "        return shortestPath(node.left) + 1",
+                    "    l_depth = shortestPath(node.left)",
+                    "    r_depth = shortestPath(node.right)",
+                    "    return min(l_depth, r_depth) + 1"
                 ],
                 indentation: [0, 1, 2, 2, 1, 2, 1, 2, 1, 2, 1],
                 timeComplexity: "O(n)",
@@ -40,17 +43,17 @@ const problemDB = {
             bfs: {
                 name: "BFS Queue",
                 code: [
-                    "def minDepth(root):",
-                    "    if not root: return 0",
-                    "    queue = [(root, 1)]",
-                    "    while queue:",
-                    "        node, depth = queue.pop(0)",
-                    "        if not node.left and not node.right:",
-                    "            return depth",
-                    "        if node.left:",
-                    "            queue.append((node.left, depth + 1))",
-                    "        if node.right:",
-                    "            queue.append((node.right, depth + 1))"
+                    "def shortestPath(node):",
+                    "    if node is None: return 0",
+                    "    q = deque([(node, 1)])",
+                    "    while q:",
+                    "        curr, lvl = q.popleft()",
+                    "        if not curr.left and not curr.right:",
+                    "            return lvl",
+                    "        if curr.left:",
+                    "            q.append((curr.left, lvl + 1))",
+                    "        if curr.right:",
+                    "            q.append((curr.right, lvl + 1))"
                 ],
                 indentation: [0, 1, 1, 1, 2, 2, 3, 2, 3, 2, 3],
                 timeComplexity: "O(n)",
@@ -62,19 +65,19 @@ const problemDB = {
             iterative: {
                 name: "Iterative DFS",
                 code: [
-                    "def minDepth(root):",
-                    "    if not root: return 0",
-                    "    stack = [(root, 1)]",
-                    "    min_depth = float('inf')",
-                    "    while stack:",
-                    "        node, depth = stack.pop()",
-                    "        if not node.left and not node.right:",
-                    "            min_depth = min(min_depth, depth)",
-                    "        if node.left:",
-                    "            stack.append((node.left, depth + 1))",
-                    "        if node.right:",
-                    "            stack.append((node.right, depth + 1))",
-                    "    return min_depth"
+                    "def shortestPath(node):",
+                    "    if node is None: return 0",
+                    "    stk = [(node, 1)]",
+                    "    shortest = float('inf')",
+                    "    while stk:",
+                    "        curr, lvl = stk.pop()",
+                    "        if not curr.left and not curr.right:",
+                    "            shortest = min(shortest, lvl)",
+                    "        if curr.left:",
+                    "            stk.append((curr.left, lvl + 1))",
+                    "        if curr.right:",
+                    "            stk.append((curr.right, lvl + 1))",
+                    "    return shortest"
                 ],
                 indentation: [0, 1, 1, 1, 1, 2, 2, 3, 2, 3, 2, 3, 1],
                 timeComplexity: "O(n)",
@@ -85,31 +88,34 @@ const problemDB = {
             }
         }
     },
-    "104": {
-        name: "Maximum Depth of Binary Tree",
-        leetcodeUrl: "https://leetcode.com/problems/maximum-depth-of-binary-tree/",
+    "2": {
+        name: "Longest Path in Binary Tree",
+        alias: "Maximum Depth of Binary Tree",
+        leetcodeNum: "104",
+        inspiredBy: "Inspired by LeetCode Problem #104",
+        sourceUrl: "https://leetcode.com/problems/maximum-depth-of-binary-tree/",
         difficulty: "easy",
         topics: ["tree", "recursion", "bfs", "dfs"],
-        leetcode150: true,
+        interview150: true,
         tree: {
-            v: 3, id: 'n3', x: 0, y: -160,
-            left: { v: 9, id: 'n9', x: -180, y: -20, left: null, right: null },
+            v: 10, id: 'n10', x: 0, y: -160,
+            left: { v: 4, id: 'n4', x: -180, y: -20, left: null, right: null },
             right: { 
-                v: 20, id: 'n20', x: 180, y: -20,
-                left: { v: 15, id: 'n15', x: 80, y: 120, left: null, right: null },
-                right: { v: 7, id: 'n7', x: 280, y: 120, left: null, right: null }
+                v: 17, id: 'n17', x: 180, y: -20,
+                left: { v: 12, id: 'n12', x: 80, y: 120, left: null, right: null },
+                right: { v: 22, id: 'n22', x: 280, y: 120, left: null, right: null }
             }
         },
         algorithms: {
             recursive: {
                 name: "Recursive DFS",
                 code: [
-                    "def maxDepth(root):",
-                    "    if not root:",
+                    "def longestPath(node):",
+                    "    if node is None:",
                     "        return 0",
-                    "    left_depth = maxDepth(root.left)",
-                    "    right_depth = maxDepth(root.right)",
-                    "    return max(left_depth, right_depth) + 1"
+                    "    l = longestPath(node.left)",
+                    "    r = longestPath(node.right)",
+                    "    return max(l, r) + 1"
                 ],
                 indentation: [0, 1, 2, 1, 1, 1],
                 timeComplexity: "O(n)",
@@ -121,20 +127,20 @@ const problemDB = {
             bfs: {
                 name: "BFS Level Order",
                 code: [
-                    "def maxDepth(root):",
-                    "    if not root: return 0",
-                    "    queue = [root]",
-                    "    depth = 0",
-                    "    while queue:",
-                    "        depth += 1",
-                    "        level_size = len(queue)",
-                    "        for _ in range(level_size):",
-                    "            node = queue.pop(0)",
-                    "            if node.left:",
-                    "                queue.append(node.left)",
-                    "            if node.right:",
-                    "                queue.append(node.right)",
-                    "    return depth"
+                    "def longestPath(node):",
+                    "    if node is None: return 0",
+                    "    q = deque([node])",
+                    "    levels = 0",
+                    "    while q:",
+                    "        levels += 1",
+                    "        size = len(q)",
+                    "        for _ in range(size):",
+                    "            curr = q.popleft()",
+                    "            if curr.left:",
+                    "                q.append(curr.left)",
+                    "            if curr.right:",
+                    "                q.append(curr.right)",
+                    "    return levels"
                 ],
                 indentation: [0, 1, 1, 1, 1, 2, 2, 3, 4, 5, 5, 5, 1],
                 timeComplexity: "O(n)",
@@ -146,18 +152,18 @@ const problemDB = {
             iterative: {
                 name: "Iterative DFS",
                 code: [
-                    "def maxDepth(root):",
-                    "    if not root: return 0",
-                    "    stack = [(root, 1)]",
-                    "    max_depth = 0",
-                    "    while stack:",
-                    "        node, depth = stack.pop()",
-                    "        max_depth = max(max_depth, depth)",
-                    "        if node.left:",
-                    "            stack.append((node.left, depth + 1))",
-                    "        if node.right:",
-                    "            stack.append((node.right, depth + 1))",
-                    "    return max_depth"
+                    "def longestPath(node):",
+                    "    if node is None: return 0",
+                    "    stk = [(node, 1)]",
+                    "    deepest = 0",
+                    "    while stk:",
+                    "        curr, lvl = stk.pop()",
+                    "        deepest = max(deepest, lvl)",
+                    "        if curr.left:",
+                    "            stk.append((curr.left, lvl + 1))",
+                    "        if curr.right:",
+                    "            stk.append((curr.right, lvl + 1))",
+                    "    return deepest"
                 ],
                 indentation: [0, 1, 1, 1, 1, 2, 2, 2, 3, 2, 3, 1],
                 timeComplexity: "O(n)",
@@ -168,35 +174,38 @@ const problemDB = {
             }
         }
     },
-    "88": {
-        name: "Merge Sorted Array",
-        leetcodeUrl: "https://leetcode.com/problems/merge-sorted-array/",
+    "3": {
+        name: "Merge Two Sorted Lists",
+        alias: "Merge Sorted Array",
+        leetcodeNum: "88",
+        inspiredBy: "Inspired by LeetCode Problem #88",
+        sourceUrl: "https://leetcode.com/problems/merge-sorted-array/",
         difficulty: "easy",
         topics: ["array", "two-pointers"],
-        leetcode150: true,
+        interview150: true,
         tree: null,
         algorithms: {
             twoPointers: {
                 name: "Two Pointers (Optimal)",
                 code: [
-                    "def merge(nums1, m, nums2, n):",
-                    "    p1 = m - 1",
-                    "    p2 = n - 1", 
-                    "    p = m + n - 1",
+                    "def mergeSorted(arr1, m, arr2, n):",
+                    "    i = m - 1",
+                    "    j = n - 1", 
+                    "    k = m + n - 1",
                     "    ",
-                    "    while p1 >= 0 and p2 >= 0:",
-                    "        if nums1[p1] > nums2[p2]:",
-                    "            nums1[p] = nums1[p1]",
-                    "            p1 -= 1",
+                    "    while i >= 0 and j >= 0:",
+                    "        if arr1[i] > arr2[j]:",
+                    "            arr1[k] = arr1[i]",
+                    "            i -= 1",
                     "        else:",
-                    "            nums1[p] = nums2[p2]",
-                    "            p2 -= 1",
-                    "        p -= 1",
+                    "            arr1[k] = arr2[j]",
+                    "            j -= 1",
+                    "        k -= 1",
                     "    ",
-                    "    while p2 >= 0:",
-                    "        nums1[p] = nums2[p2]",
-                    "        p2 -= 1",
-                    "        p -= 1"
+                    "    while j >= 0:",
+                    "        arr1[k] = arr2[j]",
+                    "        j -= 1",
+                    "        k -= 1"
                 ],
                 indentation: [0, 1, 1, 1, 0, 1, 2, 3, 3, 2, 3, 3, 2, 0, 1, 2, 2, 2],
                 timeComplexity: "O(m + n)",
@@ -206,10 +215,73 @@ const problemDB = {
                 }
             }
         }
+    },
+    "4": {
+        name: "Remove Element",
+        alias: "Remove Element",
+        leetcodeNum: "27",
+        inspiredBy: "Inspired by LeetCode Problem #27",
+        sourceUrl: "https://leetcode.com/problems/remove-element/",
+        difficulty: "easy",
+        topics: ["array", "two-pointers"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            twoPointers: {
+                name: "Two Pointers",
+                code: [
+                    "def removeElement(nums, val):",
+                    "    k = 0",
+                    "    for i in range(len(nums)):",
+                    "        if nums[i] != val:",
+                    "            nums[k] = nums[i]",
+                    "            k += 1",
+                    "    return k"
+                ],
+                indentation: [0, 1, 1, 2, 3, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateRemoveElementHistory();
+                }
+            }
+        }
+    },
+    "5": {
+        name: "Remove Duplicates from Sorted Array",
+        alias: "Remove Duplicates",
+        leetcodeNum: "26",
+        inspiredBy: "Inspired by LeetCode Problem #26",
+        sourceUrl: "https://leetcode.com/problems/remove-duplicates-from-sorted-array/",
+        difficulty: "easy",
+        topics: ["array", "two-pointers"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            twoPointers: {
+                name: "Two Pointers",
+                code: [
+                    "def removeDuplicates(nums):",
+                    "    if len(nums) == 0: return 0",
+                    "    k = 1",
+                    "    for i in range(1, len(nums)):",
+                    "        if nums[i] != nums[k - 1]:",
+                    "            nums[k] = nums[i]",
+                    "            k += 1",
+                    "    return k"
+                ],
+                indentation: [0, 1, 1, 1, 2, 3, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateRemoveDuplicatesHistory();
+                }
+            }
+        }
     }
 };
 
-let currentProbId = "111";
+let currentProbId = "1";
 let currentAlgorithm = "recursive";
 let history = [];
 let currentStep = 0;
@@ -277,7 +349,7 @@ function initSearch() {
         }
         
         const results = Object.entries(problemDB).filter(([id, prob]) => 
-            prob.name.toLowerCase().includes(query) || id.includes(query)
+            prob.name.toLowerCase().includes(query) || id.includes(query) || (prob.alias && prob.alias.toLowerCase().includes(query)) || (prob.leetcodeNum && prob.leetcodeNum.includes(query))
         );
         
         if (results.length === 0) {
@@ -289,6 +361,7 @@ function initSearch() {
         searchDropdown.innerHTML = results.map(([id, prob]) => `
             <div class="search-result" onclick="selectProblem('${id}')">
                 <div class="search-result-title">${prob.name}</div>
+                ${prob.alias ? `<div class="search-result-alias">LeetCode: ${prob.alias}</div>` : ''}
                 <div class="search-result-id">#${id}</div>
             </div>
         `).join('');
@@ -319,6 +392,7 @@ function selectProblem(probId) {
 function openProblemModal() {
     const modal = document.getElementById('problemModal');
     modal.classList.add('show');
+    document.body.classList.add('problem-page-active');
     // Reset search
     currentSearchQuery = '';
     const searchInput = document.getElementById('problemSearchInput');
@@ -332,11 +406,23 @@ function openProblemModal() {
     renderProblemList();
     // Focus search bar
     if (searchInput) setTimeout(() => searchInput.focus(), 100);
+    // Update filter scroll arrows
+    const filterArea = document.getElementById('filterScrollArea');
+    if (filterArea) {
+        filterArea.scrollLeft = 0;
+        setTimeout(() => {
+            const leftBtn = document.getElementById('filterScrollLeft');
+            const rightBtn = document.getElementById('filterScrollRight');
+            if (leftBtn) leftBtn.classList.toggle('hidden', true);
+            if (rightBtn) rightBtn.classList.toggle('hidden', filterArea.scrollWidth <= filterArea.clientWidth + 4);
+        }, 100);
+    }
 }
 
 function closeProblemModal() {
     const modal = document.getElementById('problemModal');
     modal.classList.remove('show');
+    document.body.classList.remove('problem-page-active');
 }
 
 function updateFilterCounts() {
@@ -346,8 +432,8 @@ function updateFilterCounts() {
         let count;
         if (f === 'all') {
             count = allProblems.length;
-        } else if (f === 'leetcode150') {
-            count = allProblems.filter(([, p]) => p.leetcode150 === true).length;
+        } else if (f === 'interview150') {
+            count = allProblems.filter(([, p]) => p.interview150 === true).length;
         } else {
             count = allProblems.filter(([, p]) => p.topics && p.topics.includes(f)).length;
         }
@@ -368,8 +454,8 @@ function renderProblemList(filter) {
     const filtered = Object.entries(problemDB).filter(([id, prob]) => {
         // Apply topic filter
         if (currentFilter !== 'all') {
-            if (currentFilter === 'leetcode150') {
-                if (prob.leetcode150 !== true) return false;
+            if (currentFilter === 'interview150') {
+                if (prob.interview150 !== true) return false;
             } else {
                 if (!prob.topics || !prob.topics.includes(currentFilter)) return false;
             }
@@ -379,7 +465,9 @@ function renderProblemList(filter) {
             const q = currentSearchQuery.toLowerCase();
             const nameMatch = prob.name && prob.name.toLowerCase().includes(q);
             const idMatch = id.toString().includes(q);
-            if (!nameMatch && !idMatch) return false;
+            const aliasMatch = prob.alias && prob.alias.toLowerCase().includes(q);
+            const lcNumMatch = prob.leetcodeNum && prob.leetcodeNum.includes(q);
+            if (!nameMatch && !idMatch && !aliasMatch && !lcNumMatch) return false;
         }
         return true;
     });
@@ -388,21 +476,35 @@ function renderProblemList(filter) {
     updateFilterCounts();
 
     if (filtered.length === 0) {
-        problemList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">No problems found for this filter.</div>`;
+        problemList.innerHTML = `<div class="problem-empty-state">
+            <p>No problems match your filters</p>
+            <span>Try adjusting your search or filter criteria</span>
+        </div>`;
         return;
     }
 
-    problemList.innerHTML = filtered.map(([id, prob]) => `
-        <div class="problem-item" onclick="selectProblem('${id}'); closeProblemModal();">
-            <div class="problem-item-left">
-                <div class="problem-item-name"><span class="problem-item-id">${id}.</span> ${prob.name} ${prob.topics ? prob.topics.map(t => `<span class="problem-tag tag-${t}">${t}</span>`).join('') : ''}</div>
+    problemList.innerHTML = filtered.map(([id, prob]) => {
+        return `
+        <div class="problem-card" onclick="selectProblem('${id}'); closeProblemModal();">
+            <div class="problem-card-inner">
+                <div class="problem-card-top">
+                    <div class="problem-card-info">
+                        <div class="problem-card-name">${id}. ${prob.name}</div>
+                        <div class="problem-card-meta">
+                            ${prob.difficulty ? `<span class="difficulty-badge difficulty-${prob.difficulty}">${prob.difficulty}</span>` : ''}
+                            ${prob.inspiredBy ? `<span class="problem-card-inspired">${prob.inspiredBy}</span>` : ''}
+                            ${prob.topics ? `<span class="problem-card-tags-inline">${prob.topics.join(' · ')}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="problem-card-right">
+                        <div class="problem-card-arrow">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="problem-item-right">
-                ${prob.difficulty ? `<span class="difficulty-badge difficulty-${prob.difficulty}">${prob.difficulty}</span>` : ''}
-                <div class="problem-action"><i class="fas fa-arrow-right"></i></div>
-            </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
 // History Generation for Maximum Depth (Different from Minimum Depth)
@@ -451,7 +553,7 @@ function generateMaxDepthRecursiveHistory(tree) {
         };
         stack.push(frame);
 
-        record(node, 1, `Entering maxDepth(${node.v})`, null, { frameId });
+        record(node, 1, `Entering longestPath(${node.v})`, null, { frameId });
 
         // Base case: leaf node
         if (!node.left && !node.right) {
@@ -549,7 +651,7 @@ function generateMaxDepthBFSHistory(tree) {
         });
     }
     
-    // line 0: def maxDepth(root):
+    // line 0: def longestPath(root):
     // line 1: if not root: return 0
     // line 2: queue = [root]
     // line 3: depth = 0
@@ -638,7 +740,7 @@ function generateMaxDepthIterativeHistory(tree) {
         });
     }
     
-    // line 0: def maxDepth(root):
+    // line 0: def longestPath(root):
     // line 1: if not root: return 0
     // line 2: stack = [(root, 1)]
     // line 3: max_depth = 0
@@ -739,7 +841,7 @@ function generateRecursiveHistory(tree, isMin = true) {
         };
         stack.push(frame);
         
-        record(node, isMin ? 1 : 0, `Entering minDepth(${node.v})`, null, { frameId });
+        record(node, isMin ? 1 : 0, `Entering shortestPath(${node.v})`, null, { frameId });
 
         let res;
         if (!node.left && !node.right) {
@@ -829,7 +931,7 @@ function generateBFSHistory(tree, isMin = true) {
         });
     }
     
-    // line 0: def minDepth(root):
+    // line 0: def shortestPath(root):
     // line 1: if not root: return 0
     // line 2: queue = [(root, 1)]
     // line 3: while queue:
@@ -913,7 +1015,7 @@ function generateIterativeHistory(tree, isMin = true) {
         });
     }
     
-    // line 0: def minDepth(root):
+    // line 0: def shortestPath(root):
     // line 1: if not root: return 0
     // line 2: stack = [(root, 1)]
     // line 3: min_depth = float('inf')
@@ -975,6 +1077,98 @@ function generateIterativeHistory(tree, isMin = true) {
         isComplete: true
     });
     
+    return h;
+}
+
+// Remove Element — Two Pointers History
+function generateRemoveElementHistory() {
+    const nums = [0, 1, 2, 2, 3, 0, 4, 2];
+    const val = 2;
+    const h = [];
+    let k = 0;
+    const arr = [...nums];
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...arr],
+            nums2: [],
+            arrayMeta: { val, k, originalLength: nums.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call removeElement(nums=[${nums}], val=${val}). Goal: remove all ${val}s in-place and return the new length.`);
+    record(1, `Initialize write pointer k = 0. Everything before index k will be "kept" values. Read pointer i will scan every element.`, { k });
+
+    for (let i = 0; i < arr.length; i++) {
+        record(2, `Move read pointer → i = ${i}. Now reading nums[${i}] = ${arr[i]}. Write pointer k is still at ${k}.`, { i, k });
+
+        if (arr[i] !== val) {
+            record(3, `nums[${i}] = ${arr[i]} ≠ ${val} → not the target value, so we keep it.`, { i, k }, { isComparison: true });
+            const prevK = k;
+            arr[k] = arr[i];
+            record(4, `Execute nums[k] = nums[i] → nums[${prevK}] = nums[${i}] = ${arr[prevK]}. Array: [${arr}].`, { i, k });
+            k++;
+            record(5, `k++ → k = ${k}. Kept ${k} so far: [${arr.slice(0, k)}]. i will move to ${i + 1} next.`, { i, k });
+        } else {
+            record(3, `nums[${i}] = ${arr[i]} == ${val} → matches target! Skip — k stays at ${k}, i moves to ${i + 1}.`, { i, k }, { isComparison: true, isSkip: true });
+        }
+    }
+
+    record(6, `✓ Done! i finished scanning all ${nums.length} elements. Returned k = ${k}. Result: first ${k} elements [${arr.slice(0, k)}] — all ${val}s removed.`, { k }, { isComplete: true });
+    return h;
+}
+
+// Remove Duplicates from Sorted Array — Two Pointers History
+function generateRemoveDuplicatesHistory() {
+    const nums = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4];
+    const h = [];
+    const arr = [...nums];
+    let k = 1;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg,
+            line,
+            pointers: { ...pointers },
+            nums1: [...arr],
+            nums2: [],
+            arrayMeta: { k, originalLength: nums.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call removeDuplicates(nums=[${nums}]). Goal: remove duplicates in-place from this sorted array and return the count of unique elements.`);
+
+    if (arr.length === 0) {
+        record(1, `Array is empty — nothing to deduplicate. Return 0.`, {}, { isComplete: true });
+        return h;
+    }
+
+    record(1, `Array is not empty (length = ${arr.length}) — skip the empty check.`);
+    record(2, `Initialize k = 1. nums[0] = ${arr[0]} is always unique, so k starts past it. Read pointer i will scan from index 1.`, { k });
+
+    for (let i = 1; i < arr.length; i++) {
+        record(3, `Move read pointer → i = ${i}. Reading nums[${i}] = ${arr[i]}. Comparing against last placed unique value nums[${k - 1}] = ${arr[k - 1]}.`, { i, k });
+
+        if (arr[i] !== arr[k - 1]) {
+            record(4, `nums[${i}] = ${arr[i]} ≠ nums[${k - 1}] = ${arr[k - 1]} → new unique value found!`, { i, k }, { isComparison: true });
+            const prevK = k;
+            arr[k] = arr[i];
+            record(5, `Execute nums[k] = nums[i] → nums[${prevK}] = nums[${i}] = ${arr[prevK]}. Array: [${arr}].`, { i, k });
+            k++;
+            record(6, `k++ → k = ${k}. Found ${k} unique so far: [${arr.slice(0, k)}]. i will move to ${i + 1} next.`, { i, k });
+        } else {
+            record(4, `nums[${i}] = ${arr[i]} == nums[${k - 1}] = ${arr[k - 1]} → duplicate! Skip — k stays at ${k}, i moves to ${i + 1}.`, { i, k }, { isComparison: true, isSkip: true });
+        }
+    }
+
+    record(7, `✓ Done! i finished scanning all ${nums.length} elements. Returned k = ${k}. Result: [${arr.slice(0, k)}] — ${k} unique values in sorted order.`, { k }, { isComplete: true });
     return h;
 }
 
@@ -1109,91 +1303,131 @@ async function getYouTubeRecommendations() {
         
         let videos = [];
         
-        // Problem 88 - Merge Sorted Array
-        if (currentProbId === '88') {
+        // Problem 4 - Remove Element
+        if (currentProbId === '4') {
             videos = [
                 {
-                    title: "Merge Sorted Array - Two Pointer Technique - LeetCode 88",
-                    url: "https://www.youtube.com/watch?v=P1Ic41zsoldQ",
-                    reason: "Step-by-step walkthrough of the two-pointer approach for merging sorted arrays"
+                    title: "Remove Element — LeetCode 27 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=Pcd1ii9P9ZI",
+                    reason: "Clear walkthrough of the two-pointer in-place removal approach"
                 },
                 {
-                    title: "Two Pointer Technique Explained - GeeksforGeeks",
+                    title: "Two Pointer Technique Explained — GeeksforGeeks",
                     url: "https://www.youtube.com/watch?v=pWLlJPg0Sx0",
                     reason: "Comprehensive guide to the two-pointer technique and when to use it"
                 },
                 {
-                    title: "Array Interview Questions - Two Pointers - Coding Interview",
+                    title: "Array In-Place Operations — Interview Essentials",
+                    url: "https://www.youtube.com/watch?v=9oZIKdLm1I8",
+                    reason: "Master in-place array modifications with O(1) space"
+                }
+            ];
+        }
+        // Problem 5 - Remove Duplicates from Sorted Array
+        else if (currentProbId === '5') {
+            videos = [
+                {
+                    title: "Remove Duplicates from Sorted Array — LeetCode 26 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=DEJAZBq0FDA",
+                    reason: "Step-by-step explanation of the two-pointer approach for deduplication"
+                },
+                {
+                    title: "Two Pointer Technique Explained — GeeksforGeeks",
+                    url: "https://www.youtube.com/watch?v=pWLlJPg0Sx0",
+                    reason: "Comprehensive guide to the two-pointer technique and when to use it"
+                },
+                {
+                    title: "Array Interview Questions — Two Pointers",
+                    url: "https://www.youtube.com/watch?v=9oZIKdLm1I8",
+                    reason: "Multiple array problems solved using two-pointer approach"
+                }
+            ];
+        }
+        // Problem 3 - Merge Two Sorted Lists
+        else if (currentProbId === '3') {
+            videos = [
+                {
+                    title: "Merging Sorted Arrays — Two Pointer Technique",
+                    url: "https://www.youtube.com/watch?v=P1Ic41zsoldQ",
+                    reason: "Step-by-step walkthrough of the two-pointer approach for merging sorted arrays"
+                },
+                {
+                    title: "Two Pointer Technique Explained — GeeksforGeeks",
+                    url: "https://www.youtube.com/watch?v=pWLlJPg0Sx0",
+                    reason: "Comprehensive guide to the two-pointer technique and when to use it"
+                },
+                {
+                    title: "Array Interview Questions — Two Pointers",
                     url: "https://www.youtube.com/watch?v=9oZIKdLm1I8",
                     reason: "Multiple array problems solved using two-pointer approach"
                 },
                 {
-                    title: "Merge Sorted Array - Optimal Solution - NeetCode",
+                    title: "Merging Sorted Arrays — Optimal Solution — NeetCode",
                     url: "https://www.youtube.com/watch?v=P1Ic41zsoldQ",
                     reason: "Optimal O(m+n) time and O(1) space solution with detailed explanation"
                 },
                 {
-                    title: "Two Pointers - Easy to Hard - Abdul Bari",
+                    title: "Two Pointers — Easy to Hard — Abdul Bari",
                     url: "https://www.youtube.com/watch?v=ypu9QXI-8S8",
                     reason: "Progressive learning from basic to advanced two-pointer problems"
                 }
             ];
         }
-        // Problem 111 - Minimum Depth
-        else if (currentProbId === '111') {
+        // Problem 1 - Shortest Path
+        else if (currentProbId === '1') {
             videos = [
                 {
-                    title: "Minimum Depth of Binary Tree - LeetCode 111 - NeetCode",
+                    title: "Shortest Path in Binary Tree — NeetCode",
                     url: "https://www.youtube.com/watch?v=hWQjewDsO1c",
                     reason: "Direct solution explanation for minimum depth problem with multiple approaches"
                 },
                 {
-                    title: "Binary Tree DFS Traversal - Complete Tutorial",
+                    title: "Binary Tree DFS Traversal — Complete Tutorial",
                     url: "https://www.youtube.com/watch?v=wcIRwqJ6KDo",
                     reason: "Master depth-first search in binary trees with visual examples"
                 },
                 {
-                    title: "Tree Recursion - In Depth Tutorial - CS Dojo",
+                    title: "Tree Recursion — In Depth Tutorial — CS Dojo",
                     url: "https://www.youtube.com/watch?v=B0NtAFf4bvU",
                     reason: "Essential fundamentals of recursion on binary trees"
                 },
                 {
-                    title: "BFS vs DFS - Binary Tree Level Order Traversal",
+                    title: "BFS vs DFS — Binary Tree Level Order Traversal",
                     url: "https://www.youtube.com/watch?v=60OdZHN12DE",
                     reason: "Compare BFS and DFS approaches for solving minimum depth"
                 },
                 {
-                    title: "Leetcode 111 - Minimum Depth of Binary Tree - Kevin Naughton Jr",
+                    title: "Shortest Path in Binary Tree — Kevin Naughton Jr",
                     url: "https://www.youtube.com/watch?v=hWQjewDsO1c",
                     reason: "Full code walkthrough and explanation of edge cases"
                 }
             ];
         }
-        // Problem 104 - Maximum Depth
-        else if (currentProbId === '104') {
+        // Problem 2 - Longest Path
+        else if (currentProbId === '2') {
             videos = [
                 {
-                    title: "Maximum Depth of Binary Tree - LeetCode 104 - NeetCode",
+                    title: "Longest Path in Binary Tree — NeetCode",
                     url: "https://www.youtube.com/watch?v=BhuvNBP4cjU",
                     reason: "Complete walkthrough of maximum depth with recursive and iterative solutions"
                 },
                 {
-                    title: "Binary Tree Traversal Algorithms - Full Tutorial",
+                    title: "Binary Tree Traversal Algorithms — Full Tutorial",
                     url: "https://www.youtube.com/watch?v=9RHaS00qXs8",
                     reason: "Learn all major tree traversal techniques including DFS and BFS"
                 },
                 {
-                    title: "Tree Height and Depth - Visual Explanation - Abdul Bari",
+                    title: "Tree Height and Depth — Visual Explanation — Abdul Bari",
                     url: "https://www.youtube.com/watch?v=_pPXW84kC8Q",
                     reason: "Clear visual explanation of height, depth, and how to calculate them"
                 },
                 {
-                    title: "Recursive Problem Solving on Trees - Coding Interview",
+                    title: "Recursive Problem Solving on Trees — Coding Interview",
                     url: "https://www.youtube.com/watch?v=gm8DW8rg97w",
                     reason: "Master recursive approaches to tree problems with examples"
                 },
                 {
-                    title: "LeetCode 104 Maximum Depth - Multiple Solutions",
+                    title: "Longest Path in Binary Tree — Multiple Solutions",
                     url: "https://www.youtube.com/watch?v=BhuvNBP4cjU",
                     reason: "Compare recursive DFS, iterative DFS, and BFS approaches"
                 }
@@ -1273,6 +1507,21 @@ function render() {
         }
         if (state.visited?.includes(nodeEl.id)) {
             nodeEl.classList.add('visited');
+        }
+    });
+    
+    // Update edge states
+    document.querySelectorAll('.tree-edge').forEach(edgeEl => {
+        edgeEl.classList.remove('edge-active', 'edge-visited', 'edge-base');
+        const from = edgeEl.getAttribute('data-from');
+        const to = edgeEl.getAttribute('data-to');
+        // Active edge: currently visiting this edge's child
+        if (to === state.nodeId) {
+            edgeEl.classList.add(state.isBase ? 'edge-base' : 'edge-active');
+        }
+        // Visited edges: both endpoints have been visited
+        if (state.visited?.includes(from) && state.visited?.includes(to)) {
+            edgeEl.classList.add('edge-visited');
         }
     });
     
@@ -1424,8 +1673,8 @@ function render() {
     if (mobilePrev) mobilePrev.disabled = currentStep === 0;
     if (mobileNext) mobileNext.disabled = currentStep === history.length - 1;
     
-    // Array visualization for merge sorted arrays
-    if (currentProbId === '88') {
+    // Array visualization for array problems
+    if (['3','4','5'].includes(currentProbId)) {
         const engine = document.querySelector('.render-engine');
         
         let arrayContainer = document.getElementById('arrayContainer');
@@ -1436,12 +1685,15 @@ function render() {
             engine.appendChild(arrayContainer);
         }
         
-        if (state.nums1 && state.nums2) {
+        // Problem 3: Merge Sorted Array (two arrays, three pointers)
+        if (currentProbId === '3' && state.nums1 && state.nums2) {
             const p1 = state.pointers?.p1 ?? -1;
             const p2 = state.pointers?.p2 ?? -1;
             const pMerge = state.pointers?.p ?? -1;
             
-            let html = `<div class="array-inner">`; 
+            const itemCount = state.nums1.length;
+            const denseClass = itemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${denseClass}">`; 
             html += `
                 <div class="array-section">
                     <div class="array-label">nums1 (merged array)</div>
@@ -1521,6 +1773,83 @@ function render() {
             
             arrayContainer.innerHTML = html;
         }
+        
+        // Problems 4 & 5: Single-array two-pointer (Remove Element / Remove Duplicates)
+        if (['4','5'].includes(currentProbId) && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const kPtr = state.pointers?.k ?? -1;
+            const meta = state.arrayMeta || {};
+            const kVal = meta.k ?? kPtr;
+            const isComplete = state.isComplete || false;
+            
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            
+            // Problem title context
+            if (currentProbId === '4') {
+                html += `<div class="array-label">nums — remove all instances of val = ${meta.val ?? '?'}</div>`;
+            } else {
+                html += `<div class="array-label">nums — remove duplicates in-place</div>`;
+            }
+            
+            html += `<div class="array-visualization">`;
+            
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                
+                // Highlight the "kept" region (indices < k)
+                if (isComplete && idx < kVal) {
+                    classes += ' pointer-merge'; // reuse merge style (orange accent)
+                }
+                
+                // Active pointers
+                if (idx === iPtr && idx === kPtr) {
+                    classes += ' pointer-1 pointer-2';
+                    pointerLabels = `<div class="pointer-label-pair"><div class="pointer-label p1 pair-left">i</div><div class="pointer-label p2 pair-right">k</div></div>`;
+                } else if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                } else if (idx === kPtr) {
+                    classes += ' pointer-2';
+                    pointerLabels = `<div class="pointer-label p2">k</div>`;
+                }
+                
+                // Dim cells beyond k when complete
+                if (isComplete && idx >= kVal) {
+                    classes += ' empty';
+                }
+                
+                html += `
+                    <div class="${classes}">
+                        ${val}
+                        ${pointerLabels}
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`; // close array-visualization
+            
+            // Pointer info bar
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (read pointer)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">k (write pointer)</div>
+                        <div class="pointer-detail-value p2">${kVal}</div>
+                    </div>
+                </div>
+            `;
+            
+            html += `</div>`; // close array-inner
+            arrayContainer.innerHTML = html;
+        }
+        
         return;
     }
 }
@@ -1554,7 +1883,7 @@ function updateStackVisualization(state) {
                 
                 div.innerHTML = `
                     <div class="stack-header-row">
-                        <div class="stack-function-name">${currentProbId === '111' ? 'minDepth' : 'maxDepth'}(${frame.v})</div>
+                        <div class="stack-function-name">${currentProbId === '1' ? 'shortestPath' : 'longestPath'}(${frame.v})</div>
                         <div class="stack-node-value">Value: ${frame.v}</div>
                     </div>
                     <div class="stack-details">
@@ -1814,7 +2143,7 @@ function init() {
     if (stackModule) stackModule.classList.remove('mobile-visible');
     if (stackToggleBtn) stackToggleBtn.classList.remove('collapsed');
     
-    const isArrayProblem = currentProbId === '88';
+    const isArrayProblem = ['3','4','5'].includes(currentProbId);
     const isBFS = currentAlgorithm === 'bfs';
     const isTrueMobile = window.matchMedia('(pointer: coarse)').matches;
 
@@ -1857,10 +2186,15 @@ function init() {
         problemListBtn.innerHTML = `<i class="fas fa-list"></i> #${currentProbId} ${prob.name}`;
     }
 
-    // Update LeetCode link
-    const leetcodeLink = document.getElementById('leetcodeLink');
-    if (leetcodeLink && prob.leetcodeUrl) {
-        leetcodeLink.href = prob.leetcodeUrl;
+    // Update "Inspired by" attribution in nav
+    const inspiredByEl = document.getElementById('inspiredBy');
+    const inspiredByLink = document.getElementById('inspiredByLink');
+    if (inspiredByEl && inspiredByLink && prob.inspiredBy) {
+        inspiredByLink.textContent = prob.inspiredBy;
+        inspiredByLink.href = prob.sourceUrl || '#';
+        inspiredByEl.style.display = '';
+    } else if (inspiredByEl) {
+        inspiredByEl.style.display = 'none';
     }
 
     // Update algorithm selector (desktop + mobile)
@@ -1910,8 +2244,8 @@ function init() {
     document.getElementById('timeComplexity').textContent = algorithm.timeComplexity;
     document.getElementById('spaceComplexity').textContent = algorithm.spaceComplexity;
     
-    // Handle array visualization for problem 88
-    if (currentProbId === '88') {
+    // Handle array visualization for array problems
+    if (['3','4','5'].includes(currentProbId)) {
         const nodesContainer = document.getElementById('nodesContainer');
         nodesContainer.innerHTML = '';
         
@@ -2032,6 +2366,8 @@ function init() {
             line.setAttribute("x2", x2);
             line.setAttribute("y2", y2);
             line.setAttribute("class", "tree-edge");
+            line.setAttribute("data-from", node.id);
+            line.setAttribute("data-to", node.left.id);
             svg.appendChild(line);
             drawTree(node.left);
         }
@@ -2045,6 +2381,8 @@ function init() {
             line.setAttribute("x2", x2);
             line.setAttribute("y2", y2);
             line.setAttribute("class", "tree-edge");
+            line.setAttribute("data-from", node.id);
+            line.setAttribute("data-to", node.right.id);
             svg.appendChild(line);
             drawTree(node.right);
         }
@@ -2081,7 +2419,7 @@ function toggleCodePanel() {
 
     // Re-scale tree canvas after layout transition completes
     setTimeout(() => {
-        if (currentProbId === '88') return; // array problem, no tree to scale
+        if (['3','4','5'].includes(currentProbId)) return; // array problem, no tree to scale
         const engine = document.querySelector('.render-engine');
         const treeCanvas = document.getElementById('treeCanvas');
         if (engine && treeCanvas) {
@@ -2106,7 +2444,7 @@ function toggleStackPanel() {
 
     // Re-scale tree canvas after layout transition completes
     setTimeout(() => {
-        if (currentProbId === '88') return; // array problem, no tree to scale
+        if (['3','4','5'].includes(currentProbId)) return; // array problem, no tree to scale
         const engine = document.querySelector('.render-engine');
         const treeCanvas = document.getElementById('treeCanvas');
         if (engine && treeCanvas) {
@@ -2138,9 +2476,6 @@ function setupEventListeners() {
     
     const problemListBtn = document.getElementById('problemListBtn');
     if (problemListBtn) problemListBtn.addEventListener('click', openProblemModal);
-    
-    const problemModalClose = document.getElementById('problemModalClose');
-    if (problemModalClose) problemModalClose.addEventListener('click', closeProblemModal);
 
     // Filter buttons in problem modal
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -2150,6 +2485,27 @@ function setupEventListeners() {
             renderProblemList(btn.dataset.filter);
         });
     });
+
+    // Filter scroll arrows
+    const filterScrollArea = document.getElementById('filterScrollArea');
+    const filterScrollLeft = document.getElementById('filterScrollLeft');
+    const filterScrollRight = document.getElementById('filterScrollRight');
+    if (filterScrollArea && filterScrollLeft && filterScrollRight) {
+        const updateFilterArrows = () => {
+            const { scrollLeft, scrollWidth, clientWidth } = filterScrollArea;
+            filterScrollLeft.classList.toggle('hidden', scrollLeft <= 4);
+            filterScrollRight.classList.toggle('hidden', scrollLeft + clientWidth >= scrollWidth - 4);
+        };
+        filterScrollLeft.addEventListener('click', () => {
+            filterScrollArea.scrollBy({ left: -150, behavior: 'smooth' });
+        });
+        filterScrollRight.addEventListener('click', () => {
+            filterScrollArea.scrollBy({ left: 150, behavior: 'smooth' });
+        });
+        filterScrollArea.addEventListener('scroll', updateFilterArrows);
+        // Initial check after modal opens
+        setTimeout(updateFilterArrows, 200);
+    }
 
     // Search input in problem modal
     const problemSearchInput = document.getElementById('problemSearchInput');
@@ -2311,7 +2667,7 @@ window.addEventListener('resize', () => {
             // Node size changed (e.g. crossed mobile breakpoint) — full re-render
             lastNodeSize = currentNodeSize;
             init();
-        } else if (currentProbId !== '88') {
+        } else if (currentProbId !== '3') {
             // Just re-scale the tree canvas to fit the new container size
             const engine = document.querySelector('.render-engine');
             const treeCanvas = document.getElementById('treeCanvas');
