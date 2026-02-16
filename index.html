@@ -483,11 +483,14 @@
                 <button onclick="toggleAutoPlay()" id="desktopPlayBtn" class="control-btn">
                     <i class="fas fa-play"></i><span>Play</span>
                 </button>
-                <button onclick="changeStep(1)" id="nextBtn" class="control-btn primary">
-                    <i class="fas fa-chevron-right"></i><span>Next</span>
+                <button onclick="cycleSpeed()" id="desktopSpeedBtn" class="control-btn speed-btn">
+                    <span class="speed-label">1x</span>
                 </button>
                 <button onclick="resetVisualization()" class="control-btn secondary">
                     <i class="fas fa-redo"></i><span>Reset</span>
+                </button>
+                <button onclick="changeStep(1)" id="nextBtn" class="control-btn primary">
+                    <i class="fas fa-chevron-right"></i><span>Next</span>
                 </button>
             </div>
         </section>
@@ -539,11 +542,14 @@
         <button onclick="toggleAutoPlay()" id="mobilePlayBtn" class="control-btn">
             <i class="fas fa-play"></i><span>Play</span>
         </button>
-        <button onclick="changeStep(1)" id="mobileNextBtn" class="control-btn primary">
-            <i class="fas fa-chevron-right"></i><span>Next</span>
+        <button onclick="cycleSpeed()" id="mobileSpeedBtn" class="control-btn speed-btn">
+            <span class="speed-label">1x</span>
         </button>
         <button onclick="resetVisualization()" class="control-btn secondary">
             <i class="fas fa-redo"></i><span>Reset</span>
+        </button>
+        <button onclick="changeStep(1)" id="mobileNextBtn" class="control-btn primary">
+            <i class="fas fa-chevron-right"></i><span>Next</span>
         </button>
     </nav>
 

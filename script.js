@@ -835,6 +835,346 @@ const problemDB = {
                 }
             }
         }
+    },
+    "22": {
+        name: "Common Prefix Finder",
+        alias: "Longest Common Prefix",
+        leetcodeNum: "14",
+        inspiredBy: "Inspired by LeetCode Problem #14",
+        sourceUrl: "https://leetcode.com/problems/longest-common-prefix/",
+        difficulty: "easy",
+        topics: ["string"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            vertical: {
+                name: "Vertical Scan",
+                code: [
+                    "def longestCommonPrefix(strs):",
+                    "    if not strs: return ''",
+                    "    for i in range(len(strs[0])):",
+                    "        ch = strs[0][i]",
+                    "        for j in range(1, len(strs)):",
+                    "            if i >= len(strs[j]) or strs[j][i] != ch:",
+                    "                return strs[0][:i]",
+                    "    return strs[0]"
+                ],
+                indentation: [0, 1, 1, 2, 2, 3, 4, 1],
+                timeComplexity: "O(S)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateLongestCommonPrefixHistory();
+                }
+            }
+        }
+    },
+    "23": {
+        name: "Flip Words in Sentence",
+        alias: "Reverse Words in a String",
+        leetcodeNum: "151",
+        inspiredBy: "Inspired by LeetCode Problem #151",
+        sourceUrl: "https://leetcode.com/problems/reverse-words-in-a-string/",
+        difficulty: "medium",
+        topics: ["string", "two-pointers"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            splitReverse: {
+                name: "Split & Reverse",
+                code: [
+                    "def reverseWords(s):",
+                    "    words = s.split()",
+                    "    left, right = 0, len(words) - 1",
+                    "    while left < right:",
+                    "        words[left], words[right] = words[right], words[left]",
+                    "        left += 1",
+                    "        right -= 1",
+                    "    return ' '.join(words)"
+                ],
+                indentation: [0, 1, 1, 1, 2, 2, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(n)",
+                generateHistory: function() {
+                    return generateReverseWordsHistory();
+                }
+            }
+        }
+    },
+    "24": {
+        name: "Zigzag Text Encoder",
+        alias: "Zigzag Conversion",
+        leetcodeNum: "6",
+        inspiredBy: "Inspired by LeetCode Problem #6",
+        sourceUrl: "https://leetcode.com/problems/zigzag-conversion/",
+        difficulty: "medium",
+        topics: ["string"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            rowBuild: {
+                name: "Row-by-Row Build",
+                code: [
+                    "def convert(s, numRows):",
+                    "    if numRows == 1: return s",
+                    "    rows = [''] * numRows",
+                    "    curRow, goingDown = 0, False",
+                    "    for ch in s:",
+                    "        rows[curRow] += ch",
+                    "        if curRow == 0 or curRow == numRows - 1:",
+                    "            goingDown = not goingDown",
+                    "        curRow += 1 if goingDown else -1",
+                    "    return ''.join(rows)"
+                ],
+                indentation: [0, 1, 1, 1, 1, 2, 2, 3, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(n)",
+                generateHistory: function() {
+                    return generateZigzagConversionHistory();
+                }
+            }
+        }
+    },
+    "25": {
+        name: "Find Needle in Haystack",
+        alias: "Find the Index of the First Occurrence",
+        leetcodeNum: "28",
+        inspiredBy: "Inspired by LeetCode Problem #28",
+        sourceUrl: "https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/",
+        difficulty: "easy",
+        topics: ["string", "two-pointers"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            sliding: {
+                name: "Sliding Window",
+                code: [
+                    "def strStr(haystack, needle):",
+                    "    n, m = len(haystack), len(needle)",
+                    "    for i in range(n - m + 1):",
+                    "        if haystack[i:i+m] == needle:",
+                    "            return i",
+                    "    return -1"
+                ],
+                indentation: [0, 1, 1, 2, 3, 1],
+                timeComplexity: "O((n−m)·m)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateStrStrHistory();
+                }
+            }
+        }
+    },
+    "26": {
+        name: "Justified Text Formatter",
+        alias: "Text Justification",
+        leetcodeNum: "68",
+        inspiredBy: "Inspired by LeetCode Problem #68",
+        sourceUrl: "https://leetcode.com/problems/text-justification/",
+        difficulty: "hard",
+        topics: ["string"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            greedy: {
+                name: "Greedy Pack Lines",
+                code: [
+                    "def fullJustify(words, maxWidth):",
+                    "    result, line, lineLen = [], [], 0",
+                    "    for w in words:",
+                    "        if lineLen + len(w) + len(line) > maxWidth:",
+                    "            for i in range(maxWidth - lineLen):",
+                    "                line[i % max(len(line)-1,1)] += ' '",
+                    "            result.append(''.join(line))",
+                    "            line, lineLen = [], 0",
+                    "        line.append(w)",
+                    "        lineLen += len(w)",
+                    "    result.append(' '.join(line).ljust(maxWidth))",
+                    "    return result"
+                ],
+                indentation: [0, 1, 1, 2, 3, 4, 3, 3, 2, 2, 1, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(n)",
+                generateHistory: function() {
+                    return generateTextJustificationHistory();
+                }
+            }
+        }
+    },
+    "27": {
+        name: "Mirror String Check",
+        alias: "Valid Palindrome",
+        leetcodeNum: "125",
+        inspiredBy: "Inspired by LeetCode Problem #125",
+        sourceUrl: "https://leetcode.com/problems/valid-palindrome/",
+        difficulty: "easy",
+        topics: ["string", "two-pointers"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            twoPointers: {
+                name: "Two Pointers",
+                code: [
+                    "def isPalindrome(s):",
+                    "    l, r = 0, len(s) - 1",
+                    "    while l < r:",
+                    "        while l < r and not s[l].isalnum():",
+                    "            l += 1",
+                    "        while l < r and not s[r].isalnum():",
+                    "            r -= 1",
+                    "        if s[l].lower() != s[r].lower():",
+                    "            return False",
+                    "        l += 1",
+                    "        r -= 1",
+                    "    return True"
+                ],
+                indentation: [0, 1, 1, 2, 3, 2, 3, 2, 3, 2, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateValidPalindromeHistory();
+                }
+            }
+        }
+    },
+    "28": {
+        name: "Subsequence Checker",
+        alias: "Is Subsequence",
+        leetcodeNum: "392",
+        inspiredBy: "Inspired by LeetCode Problem #392",
+        sourceUrl: "https://leetcode.com/problems/is-subsequence/",
+        difficulty: "easy",
+        topics: ["string", "two-pointers"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            twoPointers: {
+                name: "Two Pointers",
+                code: [
+                    "def isSubsequence(s, t):",
+                    "    i, j = 0, 0",
+                    "    while i < len(s) and j < len(t):",
+                    "        if s[i] == t[j]:",
+                    "            i += 1",
+                    "        j += 1",
+                    "    return i == len(s)"
+                ],
+                indentation: [0, 1, 1, 2, 3, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateIsSubsequenceHistory();
+                }
+            }
+        }
+    },
+    "29": {
+        name: "Sorted Pair Sum",
+        alias: "Two Sum II",
+        leetcodeNum: "167",
+        inspiredBy: "Inspired by LeetCode Problem #167",
+        sourceUrl: "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/",
+        difficulty: "medium",
+        topics: ["array", "two-pointers"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            twoPointers: {
+                name: "Two Pointers",
+                code: [
+                    "def twoSum(numbers, target):",
+                    "    l, r = 0, len(numbers) - 1",
+                    "    while l < r:",
+                    "        curSum = numbers[l] + numbers[r]",
+                    "        if curSum == target:",
+                    "            return [l + 1, r + 1]",
+                    "        elif curSum < target:",
+                    "            l += 1",
+                    "        else:",
+                    "            r -= 1",
+                    "    return []"
+                ],
+                indentation: [0, 1, 1, 2, 2, 3, 2, 3, 2, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateTwoSumIIHistory();
+                }
+            }
+        }
+    },
+    "30": {
+        name: "Widest Water Container",
+        alias: "Container With Most Water",
+        leetcodeNum: "11",
+        inspiredBy: "Inspired by LeetCode Problem #11",
+        sourceUrl: "https://leetcode.com/problems/container-with-most-water/",
+        difficulty: "medium",
+        topics: ["array", "two-pointers", "greedy"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            twoPointers: {
+                name: "Two Pointers",
+                code: [
+                    "def maxArea(height):",
+                    "    l, r = 0, len(height) - 1",
+                    "    maxWater = 0",
+                    "    while l < r:",
+                    "        area = min(height[l], height[r]) * (r - l)",
+                    "        maxWater = max(maxWater, area)",
+                    "        if height[l] < height[r]:",
+                    "            l += 1",
+                    "        else:",
+                    "            r -= 1",
+                    "    return maxWater"
+                ],
+                indentation: [0, 1, 1, 1, 2, 2, 2, 3, 2, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateContainerWaterHistory();
+                }
+            }
+        }
+    },
+    "31": {
+        name: "Triple Zero Sum",
+        alias: "3Sum",
+        leetcodeNum: "15",
+        inspiredBy: "Inspired by LeetCode Problem #15",
+        sourceUrl: "https://leetcode.com/problems/3sum/",
+        difficulty: "medium",
+        topics: ["array", "two-pointers", "sorting"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            sortAndScan: {
+                name: "Sort + Two Pointers",
+                code: [
+                    "def threeSum(nums):",
+                    "    nums.sort()",
+                    "    result = []",
+                    "    for i in range(len(nums) - 2):",
+                    "        if i > 0 and nums[i] == nums[i-1]: continue",
+                    "        l, r = i + 1, len(nums) - 1",
+                    "        while l < r:",
+                    "            total = nums[i] + nums[l] + nums[r]",
+                    "            if total == 0:",
+                    "                result.append([nums[i],nums[l],nums[r]])",
+                    "                l += 1; r -= 1",
+                    "                while l < r and nums[l] == nums[l-1]: l += 1",
+                    "            elif total < 0: l += 1",
+                    "            else: r -= 1",
+                    "    return result"
+                ],
+                indentation: [0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 3, 3, 1],
+                timeComplexity: "O(n²)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateThreeSumHistory();
+                }
+            }
+        }
     }
 };
 
@@ -844,6 +1184,13 @@ let history = [];
 let currentStep = 0;
 let autoPlayInterval = null;
 let autoPlaySpeed = 2000;
+const speedPresets = [
+    { label: '0.5x', ms: 3000 },
+    { label: '1x',   ms: 2000 },
+    { label: '1.5x', ms: 1200 },
+    { label: '2x',   ms: 700 }
+];
+let currentSpeedIndex = 1; // default 1x
 let baseCasesCount = 0;
 
 function isArrayProblem(probId) {
@@ -2526,6 +2873,503 @@ function generateLengthOfLastWordHistory() {
     return h;
 }
 
+// Longest Common Prefix (LC #14) — Vertical Scan
+function generateLongestCommonPrefixHistory() {
+    const strs = ["flower", "flow", "flight"];
+    const h = [];
+    let prefix = '';
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        // nums1 = chars of strs[0], nums2 = chars being compared
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: strs[0].split('').map(c => c),
+            nums2: [],
+            arrayMeta: { prefix, strs: strs.map(s => s), originalLength: strs[0].length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call longestCommonPrefix(["${strs.join('", "')}"]).`);
+    record(1, `strs is not empty. Use strs[0] = "${strs[0]}" as reference.`);
+
+    for (let i = 0; i < strs[0].length; i++) {
+        const ch = strs[0][i];
+        record(2, `Column i = ${i}: check char '${ch}' across all strings.`, { i });
+        record(3, `ch = strs[0][${i}] = '${ch}'.`, { i });
+
+        let mismatch = false;
+        for (let j = 1; j < strs.length; j++) {
+            record(4, `Compare with strs[${j}] = "${strs[j]}".`, { i });
+            if (i >= strs[j].length) {
+                record(5, `i = ${i} ≥ len("${strs[j]}") = ${strs[j].length} → string too short. Return prefix.`, { i });
+                prefix = strs[0].substring(0, i);
+                record(6, `✓ Done! Longest common prefix = "${prefix}".`, {}, { isComplete: true });
+                return h;
+            }
+            if (strs[j][i] !== ch) {
+                record(5, `strs[${j}][${i}] = '${strs[j][i]}' ≠ '${ch}' → mismatch! Return prefix.`, { i }, { isComparison: true });
+                prefix = strs[0].substring(0, i);
+                record(6, `✓ Done! Longest common prefix = "${prefix}".`, {}, { isComplete: true });
+                return h;
+            }
+            record(5, `strs[${j}][${i}] = '${strs[j][i]}' == '${ch}' ✓`, { i }, { isComparison: true });
+        }
+        prefix = strs[0].substring(0, i + 1);
+        record(4, `All strings match at column ${i}. Prefix so far: "${prefix}".`, { i });
+    }
+
+    record(7, `✓ Done! Longest common prefix = "${prefix}".`, {}, { isComplete: true });
+    return h;
+}
+
+// Reverse Words in a String (LC #151) — Split & Reverse
+function generateReverseWordsHistory() {
+    const s = "  the sky  is blue  ";
+    const words = s.trim().split(/\s+/);
+    const h = [];
+    const wordsArr = [...words];
+    let left = 0;
+    let right = wordsArr.length - 1;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: wordsArr.map(w => w),
+            nums2: [],
+            arrayMeta: { original: s, wordsCount: wordsArr.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call reverseWords("${s}"). Goal: reverse word order, trim spaces.`);
+    record(1, `Split by whitespace → words = ["${words.join('", "')}"].`);
+    record(2, `Set left = 0, right = ${right}. Swap words from outside in.`, { l: 0, r: right });
+
+    while (left < right) {
+        record(3, `left = ${left}, right = ${right}: left < right → swap "${wordsArr[left]}" ↔ "${wordsArr[right]}".`, { l: left, r: right }, { isComparison: true });
+        const tmp = wordsArr[left];
+        wordsArr[left] = wordsArr[right];
+        wordsArr[right] = tmp;
+        record(4, `After swap: ["${wordsArr.join('", "')}"].`, { l: left, r: right });
+        left++;
+        right--;
+        record(5, `left += 1 → ${left}, right -= 1 → ${right}.`, { l: left, r: right });
+    }
+
+    const result = wordsArr.join(' ');
+    record(7, `✓ Done! Result = "${result}".`, {}, { isComplete: true });
+    return h;
+}
+
+// Zigzag Conversion (LC #6) — Row-by-Row Build
+function generateZigzagConversionHistory() {
+    const s = "PAYPALISHIRING";
+    const numRows = 4;
+    const chars = s.split('');
+    const rows = Array.from({ length: numRows }, () => '');
+    let curRow = 0;
+    let goingDown = false;
+    const h = [];
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: chars.map(c => c),
+            nums2: [],
+            arrayMeta: { rows: rows.map(r => r), curRow, goingDown, numRows },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call convert("${s}", numRows=${numRows}).`);
+    record(1, `numRows = ${numRows} ≠ 1, so proceed.`);
+    record(2, `Create ${numRows} empty row strings.`);
+    record(3, `curRow = 0, goingDown = false.`);
+
+    for (let idx = 0; idx < chars.length; idx++) {
+        const ch = chars[idx];
+        rows[curRow] += ch;
+        record(4, `i = ${idx}: char '${ch}' → append to row ${curRow}. Row ${curRow} = "${rows[curRow]}".`, { i: idx });
+
+        if (curRow === 0 || curRow === numRows - 1) {
+            goingDown = !goingDown;
+            record(6, `curRow = ${curRow} (boundary) → flip direction. goingDown = ${goingDown}.`, { i: idx });
+        }
+        curRow += goingDown ? 1 : -1;
+        record(8, `Move curRow ${goingDown ? 'down' : 'up'} → curRow = ${curRow}.`, { i: idx });
+    }
+
+    const result = rows.join('');
+    record(9, `✓ Done! Rows: [${rows.map(r => `"${r}"`).join(', ')}] → "${result}".`, {}, { isComplete: true });
+    return h;
+}
+
+// Find the Index of the First Occurrence (LC #28) — Sliding Window
+function generateStrStrHistory() {
+    const haystack = "sadbutsad";
+    const needle = "sad";
+    const chars = haystack.split('');
+    const h = [];
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: chars.map(c => c),
+            nums2: needle.split('').map(c => c),
+            arrayMeta: { haystack, needle, hLen: haystack.length, nLen: needle.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call strStr("${haystack}", "${needle}").`);
+    record(1, `n = ${haystack.length}, m = ${needle.length}. Check windows of size ${needle.length}.`);
+
+    for (let i = 0; i <= haystack.length - needle.length; i++) {
+        const window = haystack.substring(i, i + needle.length);
+        record(2, `i = ${i}: window "${window}" vs needle "${needle}".`, { i, end: i + needle.length - 1 });
+
+        if (window === needle) {
+            record(3, `"${window}" === "${needle}" ✓ → match found!`, { i, end: i + needle.length - 1 }, { isComparison: true });
+            record(4, `✓ Done! First occurrence at index ${i}.`, {}, { isComplete: true });
+            return h;
+        } else {
+            record(3, `"${window}" ≠ "${needle}" ✗ → slide window.`, { i, end: i + needle.length - 1 }, { isComparison: true });
+        }
+    }
+
+    record(5, `✓ Done! Needle not found. Return -1.`, {}, { isComplete: true });
+    return h;
+}
+
+// Text Justification (LC #68) — Greedy Pack Lines
+function generateTextJustificationHistory() {
+    const words = ["This", "is", "an", "example", "of", "text", "justification."];
+    const maxWidth = 16;
+    const result = [];
+    let line = [];
+    let lineLen = 0;
+    const h = [];
+
+    function record(ln, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line: ln,
+            pointers: { ...pointers },
+            nums1: words.map(w => w),
+            nums2: [],
+            arrayMeta: { maxWidth, currentLine: [...line], lineLen, result: [...result], resultStr: result.map(r => `"${r}"`).join(', ') },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call fullJustify(words, maxWidth=${maxWidth}).`);
+    record(1, `result = [], line = [], lineLen = 0.`);
+
+    for (let wIdx = 0; wIdx < words.length; wIdx++) {
+        const w = words[wIdx];
+        record(2, `Word "${w}" (len=${w.length}). lineLen=${lineLen}, spaces needed=${line.length}. Total would be ${lineLen + w.length + line.length}.`, { i: wIdx });
+
+        if (lineLen + w.length + line.length > maxWidth) {
+            // Justify current line
+            const totalSpaces = maxWidth - lineLen;
+            record(3, `${lineLen + w.length + line.length} > ${maxWidth} → flush current line. Need ${totalSpaces} spaces.`, { i: wIdx });
+
+            for (let s = 0; s < totalSpaces; s++) {
+                line[s % Math.max(line.length - 1, 1)] += ' ';
+            }
+            const justified = line.join('');
+            result.push(justified);
+            record(4, `Justified: "${justified}" (${justified.length} chars).`, { i: wIdx });
+
+            line = [];
+            lineLen = 0;
+            record(7, `Reset line = [], lineLen = 0.`, { i: wIdx });
+        }
+
+        line.push(w);
+        lineLen += w.length;
+        record(8, `Append "${w}" to line → [${line.join(', ')}]. lineLen = ${lineLen}.`, { i: wIdx });
+    }
+
+    // Last line: left-justified
+    const lastLine = line.join(' ').padEnd(maxWidth);
+    result.push(lastLine);
+    record(10, `Last line (left-justified): "${lastLine}".`);
+
+    record(11, `✓ Done! Result: [${result.map(r => `"${r}"`).join(', ')}].`, {}, { isComplete: true });
+    return h;
+}
+
+// Valid Palindrome (LC #125) — Two Pointers
+function generateValidPalindromeHistory() {
+    const s = "A man, a plan, a canal: Panama";
+    const chars = s.split('');
+    const h = [];
+    let l = 0;
+    let r = chars.length - 1;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: chars.map(c => /[a-zA-Z0-9]/.test(c) ? c : c === ' ' ? '␣' : c),
+            nums2: [],
+            arrayMeta: { left: l, right: r, originalLength: chars.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call isPalindrome("${s}"). Compare only alphanumeric characters.`);
+    record(1, `l = 0, r = ${r}.`, { l, r });
+
+    while (l < r) {
+        // Skip non-alnum on left
+        while (l < r && !/[a-zA-Z0-9]/.test(chars[l])) {
+            record(3, `s[${l}] = '${chars[l]}' is not alphanumeric → skip. l += 1.`, { l, r });
+            l++;
+        }
+        // Skip non-alnum on right
+        while (l < r && !/[a-zA-Z0-9]/.test(chars[r])) {
+            record(5, `s[${r}] = '${chars[r]}' is not alphanumeric → skip. r -= 1.`, { l, r });
+            r--;
+        }
+
+        if (l >= r) break;
+
+        const lc = chars[l].toLowerCase();
+        const rc = chars[r].toLowerCase();
+        record(7, `Compare s[${l}] = '${lc}' vs s[${r}] = '${rc}'.`, { l, r }, { isComparison: true });
+
+        if (lc !== rc) {
+            record(8, `'${lc}' ≠ '${rc}' → NOT a palindrome!`, { l, r });
+            record(8, `✓ Done! Return False.`, {}, { isComplete: true });
+            return h;
+        }
+
+        record(7, `'${lc}' == '${rc}' ✓ → match!`, { l, r });
+        l++;
+        r--;
+        record(9, `l += 1 → ${l}, r -= 1 → ${r}.`, { l, r });
+    }
+
+    record(11, `✓ Done! "${s}" IS a valid palindrome. Return True.`, {}, { isComplete: true });
+    return h;
+}
+
+// Is Subsequence (LC #392) — Two Pointers
+function generateIsSubsequenceHistory() {
+    const s = "ace";
+    const t = "abcde";
+    const sChars = s.split('');
+    const tChars = t.split('');
+    const h = [];
+    let i = 0;
+    let j = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: tChars.map(c => c),
+            nums2: sChars.map(c => c),
+            arrayMeta: { s, t, sLen: s.length, tLen: t.length, i, j },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call isSubsequence("${s}", "${t}"). Is "${s}" a subsequence of "${t}"?`);
+    record(1, `i = 0 (pointer in s), j = 0 (pointer in t).`, { i: 0, j: 0 });
+
+    while (i < sChars.length && j < tChars.length) {
+        record(2, `i = ${i}, j = ${j}: s[${i}] = '${sChars[i]}', t[${j}] = '${tChars[j]}'.`, { i, j });
+
+        if (sChars[i] === tChars[j]) {
+            record(3, `'${sChars[i]}' == '${tChars[j]}' ✓ → match! Advance both.`, { i, j }, { isComparison: true });
+            i++;
+            record(4, `i += 1 → ${i}.`, { i, j });
+        } else {
+            record(3, `'${sChars[i]}' ≠ '${tChars[j]}' ✗ → no match. Advance j only.`, { i, j }, { isComparison: true });
+        }
+        j++;
+        record(5, `j += 1 → ${j}.`, { i, j });
+    }
+
+    if (i === sChars.length) {
+        record(6, `✓ Done! i = ${i} == len(s) = ${sChars.length} → "${s}" IS a subsequence of "${t}". Return True.`, {}, { isComplete: true });
+    } else {
+        record(6, `✓ Done! i = ${i} < len(s) = ${sChars.length} → "${s}" is NOT a subsequence of "${t}". Return False.`, {}, { isComplete: true });
+    }
+    return h;
+}
+
+// Two Sum II (LC #167) — Two Pointers
+function generateTwoSumIIHistory() {
+    const numbers = [2, 7, 11, 15];
+    const target = 9;
+    const h = [];
+    let l = 0;
+    let r = numbers.length - 1;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: [...numbers],
+            nums2: [],
+            arrayMeta: { target, curSum: (pointers.l != null && pointers.r != null) ? numbers[pointers.l] + numbers[pointers.r] : 0 },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call twoSum([${numbers}], target=${target}). Find two numbers that add to ${target}.`);
+    record(1, `l = 0, r = ${r}. Array is sorted, use two pointers.`, { l: 0, r });
+
+    while (l < r) {
+        const curSum = numbers[l] + numbers[r];
+        record(2, `l = ${l}, r = ${r}: check.`, { l, r });
+        record(3, `curSum = numbers[${l}] + numbers[${r}] = ${numbers[l]} + ${numbers[r]} = ${curSum}.`, { l, r });
+
+        if (curSum === target) {
+            record(4, `${curSum} == ${target} ✓ → found!`, { l, r }, { isComparison: true });
+            record(5, `✓ Done! Return [${l + 1}, ${r + 1}] (1-indexed).`, {}, { isComplete: true });
+            return h;
+        } else if (curSum < target) {
+            record(6, `${curSum} < ${target} → too small. l += 1.`, { l, r }, { isComparison: true });
+            l++;
+            record(7, `l = ${l}.`, { l, r });
+        } else {
+            record(8, `${curSum} > ${target} → too big. r -= 1.`, { l, r }, { isComparison: true });
+            r--;
+            record(9, `r = ${r}.`, { l, r });
+        }
+    }
+
+    record(10, `✓ Done! No pair found. Return [].`, {}, { isComplete: true });
+    return h;
+}
+
+// Container With Most Water (LC #11) — Two Pointers
+function generateContainerWaterHistory() {
+    const height = [1, 8, 6, 2, 5, 4, 8, 3, 7];
+    const h = [];
+    let l = 0;
+    let r = height.length - 1;
+    let maxWater = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: [...height],
+            nums2: [],
+            arrayMeta: { maxWater, area: 0 },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call maxArea([${height}]).`);
+    record(1, `l = 0, r = ${r}.`, { l: 0, r });
+    record(2, `maxWater = 0. Move pointers inward, always shrinking the shorter side.`);
+
+    while (l < r) {
+        const area = Math.min(height[l], height[r]) * (r - l);
+        maxWater = Math.max(maxWater, area);
+        record(3, `l = ${l}, r = ${r}.`, { l, r });
+        record(4, `area = min(${height[l]}, ${height[r]}) × (${r} - ${l}) = ${Math.min(height[l], height[r])} × ${r - l} = ${area}.`, { l, r });
+        record(5, `maxWater = max(${maxWater === area ? maxWater : maxWater - area + ',' + area}, ${area}) = ${maxWater}.`, { l, r });
+
+        if (height[l] < height[r]) {
+            record(6, `height[${l}] = ${height[l]} < height[${r}] = ${height[r]} → move l right.`, { l, r }, { isComparison: true });
+            l++;
+            record(7, `l = ${l}.`, { l, r });
+        } else {
+            record(8, `height[${l}] = ${height[l]} ≥ height[${r}] = ${height[r]} → move r left.`, { l, r }, { isComparison: true });
+            r--;
+            record(9, `r = ${r}.`, { l, r });
+        }
+    }
+
+    record(10, `✓ Done! Maximum water = ${maxWater}.`, {}, { isComplete: true });
+    return h;
+}
+
+// 3Sum (LC #15) — Sort + Two Pointers
+function generateThreeSumHistory() {
+    const nums = [-1, 0, 1, 2, -1, -4];
+    const sorted = [...nums].sort((a, b) => a - b);
+    const result = [];
+    const h = [];
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: [...sorted],
+            nums2: [],
+            arrayMeta: { result: result.map(r => `[${r}]`).join(', '), triplets: result.length },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call threeSum([${nums}]). Find all unique triplets summing to 0.`);
+    record(1, `Sort → [${sorted}].`);
+    record(2, `result = []. Fix one element, two-pointer the rest.`);
+
+    for (let i = 0; i < sorted.length - 2; i++) {
+        if (i > 0 && sorted[i] === sorted[i - 1]) {
+            record(4, `i = ${i}: nums[${i}] = ${sorted[i]} == nums[${i - 1}] → skip duplicate.`, { i }, { isSkip: true });
+            continue;
+        }
+        record(3, `i = ${i}: fix nums[${i}] = ${sorted[i]}. Two-pointer on [${i + 1}..${sorted.length - 1}].`, { i });
+
+        let l = i + 1;
+        let r = sorted.length - 1;
+        record(5, `l = ${l}, r = ${r}.`, { i, l, r });
+
+        while (l < r) {
+            const total = sorted[i] + sorted[l] + sorted[r];
+            record(6, `l = ${l}, r = ${r}.`, { i, l, r });
+            record(7, `total = ${sorted[i]} + ${sorted[l]} + ${sorted[r]} = ${total}.`, { i, l, r });
+
+            if (total === 0) {
+                result.push([sorted[i], sorted[l], sorted[r]]);
+                record(8, `total == 0 ✓ → found [${sorted[i]}, ${sorted[l]}, ${sorted[r]}]!`, { i, l, r }, { isComparison: true });
+                l++;
+                r--;
+                record(10, `l = ${l}, r = ${r}.`, { i, l, r });
+                // Skip duplicates
+                while (l < r && sorted[l] === sorted[l - 1]) {
+                    record(11, `nums[${l}] = ${sorted[l]} == prev → skip duplicate l.`, { i, l, r }, { isSkip: true });
+                    l++;
+                }
+            } else if (total < 0) {
+                record(12, `${total} < 0 → too small. l += 1.`, { i, l, r }, { isComparison: true });
+                l++;
+            } else {
+                record(13, `${total} > 0 → too big. r -= 1.`, { i, l, r }, { isComparison: true });
+                r--;
+            }
+        }
+    }
+
+    record(14, `✓ Done! Triplets: [${result.map(r => `[${r}]`).join(', ')}].`, {}, { isComplete: true });
+    return h;
+}
+
 function generateMergeSortedArrayHistory() {
     // More complex test case that exercises both loops
     const nums1 = [4, 5, 6, 0, 0, 0, 0, 0, 0];
@@ -3022,6 +3866,156 @@ async function getYouTubeRecommendations() {
                     title: "String Problems for Beginners — Interview Prep",
                     url: "https://www.youtube.com/watch?v=GQr3Z7oM3Dw",
                     reason: "Build string manipulation intuition with multiple easy problems"
+                }
+            ];
+        }
+        // Problem 22 - Common Prefix Finder (Longest Common Prefix)
+        else if (currentProbId === '22') {
+            videos = [
+                {
+                    title: "Longest Common Prefix — LeetCode 14 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=0sWShKIJoo4",
+                    reason: "Vertical scanning approach explained step by step"
+                },
+                {
+                    title: "Longest Common Prefix — Multiple Approaches",
+                    url: "https://www.youtube.com/watch?v=bl8nYAN3cKw",
+                    reason: "Compare vertical scan, horizontal scan, and divide-and-conquer methods"
+                }
+            ];
+        }
+        // Problem 23 - Flip Words in Sentence (Reverse Words in a String)
+        else if (currentProbId === '23') {
+            videos = [
+                {
+                    title: "Reverse Words in a String — LeetCode 151 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=MYKVfIaudfY",
+                    reason: "Split, reverse, and join approach with edge case handling"
+                },
+                {
+                    title: "String Manipulation — Two Pointer Reversal",
+                    url: "https://www.youtube.com/watch?v=pWLlJPg0Sx0",
+                    reason: "Core two-pointer reversal technique used in string problems"
+                }
+            ];
+        }
+        // Problem 24 - Zigzag Text Encoder (Zigzag Conversion)
+        else if (currentProbId === '24') {
+            videos = [
+                {
+                    title: "Zigzag Conversion — LeetCode 6 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=Q2Tw6gcVKnE",
+                    reason: "Row-by-row simulation with direction toggle explained visually"
+                },
+                {
+                    title: "Zigzag Pattern — Understand the Math",
+                    url: "https://www.youtube.com/watch?v=UkVIljgYDMs",
+                    reason: "How to derive the cycle length and index formulas for zigzag"
+                }
+            ];
+        }
+        // Problem 25 - Find Needle in Haystack (Find the Index of the First Occurrence)
+        else if (currentProbId === '25') {
+            videos = [
+                {
+                    title: "Implement strStr — LeetCode 28 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=JoF0Z7nVSrA",
+                    reason: "Sliding window and KMP approaches for substring search"
+                },
+                {
+                    title: "String Matching Algorithms — KMP and Beyond",
+                    url: "https://www.youtube.com/watch?v=V5-7GzOfADQ",
+                    reason: "Deep dive into efficient string matching algorithms"
+                }
+            ];
+        }
+        // Problem 26 - Justified Text Formatter (Text Justification)
+        else if (currentProbId === '26') {
+            videos = [
+                {
+                    title: "Text Justification — LeetCode 68 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=GqXlEbFVTXY",
+                    reason: "Greedy line packing with round-robin space distribution"
+                },
+                {
+                    title: "Text Justification — Hard String Problem Walkthrough",
+                    url: "https://www.youtube.com/watch?v=qrZLQmL6EY0",
+                    reason: "Step-by-step breakdown of the space padding logic"
+                }
+            ];
+        }
+        // Problem 27 - Mirror String Check (Valid Palindrome)
+        else if (currentProbId === '27') {
+            videos = [
+                {
+                    title: "Valid Palindrome — LeetCode 125 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=jJXJ16kPFWg",
+                    reason: "Two-pointer approach skipping non-alphanumeric characters"
+                },
+                {
+                    title: "Palindrome Problems — Two Pointer Technique",
+                    url: "https://www.youtube.com/watch?v=pWLlJPg0Sx0",
+                    reason: "Master the two-pointer palindrome pattern for interviews"
+                }
+            ];
+        }
+        // Problem 28 - Subsequence Checker (Is Subsequence)
+        else if (currentProbId === '28') {
+            videos = [
+                {
+                    title: "Is Subsequence — LeetCode 392 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=99RVfqklbCE",
+                    reason: "Two-pointer greedy scan through both strings"
+                },
+                {
+                    title: "Subsequence Problems — Follow-Up with DP",
+                    url: "https://www.youtube.com/watch?v=RFe4K_OB1uo",
+                    reason: "From O(n) two-pointer to O(n·m) DP for multiple queries"
+                }
+            ];
+        }
+        // Problem 29 - Sorted Pair Sum (Two Sum II)
+        else if (currentProbId === '29') {
+            videos = [
+                {
+                    title: "Two Sum II — LeetCode 167 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=cQ1Oz4ckceM",
+                    reason: "Two-pointer approach on sorted array: move left or right based on sum"
+                },
+                {
+                    title: "Two Pointer Technique — Complete Guide",
+                    url: "https://www.youtube.com/watch?v=pWLlJPg0Sx0",
+                    reason: "Comprehensive guide to the two-pointer pattern"
+                }
+            ];
+        }
+        // Problem 30 - Widest Water Container (Container With Most Water)
+        else if (currentProbId === '30') {
+            videos = [
+                {
+                    title: "Container With Most Water — LeetCode 11 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=UuiTKBwPgAo",
+                    reason: "Greedy two-pointer: always move the shorter side inward"
+                },
+                {
+                    title: "Container With Most Water — Why Greedy Works",
+                    url: "https://www.youtube.com/watch?v=ZHQg1mAmN0Y",
+                    reason: "Proof of correctness for the two-pointer greedy approach"
+                }
+            ];
+        }
+        // Problem 31 - Triple Zero Sum (3Sum)
+        else if (currentProbId === '31') {
+            videos = [
+                {
+                    title: "3Sum — LeetCode 15 — NeetCode",
+                    url: "https://www.youtube.com/watch?v=jzZsG8n2R9A",
+                    reason: "Sort + fix one element + two-pointer with duplicate skipping"
+                },
+                {
+                    title: "3Sum — Avoiding Duplicates Explained",
+                    url: "https://www.youtube.com/watch?v=qJSPYnS35SE",
+                    reason: "Key insight: how to skip duplicate triplets efficiently"
                 }
             ];
         }
@@ -4279,6 +5273,538 @@ function render() {
             arrayContainer.innerHTML = html;
         }
 
+        // Problem 22: Common Prefix Finder — vertical scan over strs[0] chars
+        if (currentProbId === '22' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const prefix = meta.prefix ?? '';
+            const strs = meta.strs || [];
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">strs[0] — vertical scan column by column${strs.length > 1 ? ` (comparing ${strs.length} strings)` : ''}</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+
+                if (isComplete && idx < (prefix.length)) {
+                    classes += ' pointer-merge';
+                }
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (column)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">prefix</div>
+                        <div class="pointer-detail-value p-merge">"${prefix}"</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 23: Flip Words in Sentence — words array with L/R swap pointers
+        if (currentProbId === '23' && state.nums1) {
+            const lPtr = state.pointers?.l ?? -1;
+            const rPtr = state.pointers?.r ?? -1;
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">words — reverse word order using two pointers</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((word, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+
+                if (isComplete) classes += ' pointer-merge';
+
+                if (idx === lPtr && idx === rPtr) {
+                    classes += ' pointer-1 pointer-2';
+                    pointerLabels = `<div class="pointer-label-pair"><div class="pointer-label p1 pair-left">L</div><div class="pointer-label p2 pair-right">R</div></div>`;
+                } else if (idx === lPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">L</div>`;
+                } else if (idx === rPtr) {
+                    classes += ' pointer-2';
+                    pointerLabels = `<div class="pointer-label p2">R</div>`;
+                }
+
+                html += `<div class="${classes}">${word}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">left</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">right</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 24: Zigzag Text Encoder — char array with row assignment
+        if (currentProbId === '24' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const curRow = meta.curRow ?? 0;
+            const rows = meta.rows || [];
+            const numRows = meta.numRows || 4;
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">string — distribute chars into ${numRows} zigzag rows</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+
+                if (isComplete) classes += ' pointer-merge';
+                if (iPtr >= 0 && idx < iPtr) classes += ' visited-cell';
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (char index)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">curRow</div>
+                        <div class="pointer-detail-value p2">${curRow}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">rows</div>
+                        <div class="pointer-detail-value p-merge">[${rows.map(r => `"${r}"`).join(', ')}]</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 25: Find Needle in Haystack — haystack chars + needle (dual row)
+        if (currentProbId === '25' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const endPtr = state.pointers?.end ?? -1;
+            const meta = state.arrayMeta || {};
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner array-dual${sDenseClass}">`;
+
+            // Haystack row
+            html += `<div class="array-section"><div class="array-label">haystack</div><div class="array-visualization">`;
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (isComplete && idx >= iPtr && idx <= iPtr + (meta.nLen || 0) - 1) classes += ' pointer-merge';
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+                // Highlight window
+                if (!isComplete && iPtr >= 0 && idx >= iPtr && idx < iPtr + (meta.nLen || 0)) {
+                    classes += ' pointer-2';
+                }
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+
+            // Needle row
+            html += `<div class="array-section"><div class="array-label">needle</div><div class="array-visualization">`;
+            (state.nums2 || []).forEach((ch, idx) => {
+                let classes = 'array-item';
+                if (isComplete) classes += ' pointer-merge';
+                html += `<div class="${classes}">${ch}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (window start)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">needle length</div>
+                        <div class="pointer-detail-value p2">${meta.nLen || '—'}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 26: Justified Text Formatter — words array with current line context
+        if (currentProbId === '26' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const maxWidth = meta.maxWidth || 16;
+            const currentLine = meta.currentLine || [];
+            const lineLen = meta.lineLen ?? 0;
+            const resultStr = meta.resultStr || '';
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">words — greedy line packing (maxWidth = ${maxWidth})</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((word, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+
+                if (isComplete) classes += ' pointer-merge';
+                if (iPtr >= 0 && idx < iPtr) classes += ' visited-cell';
+                if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+
+                html += `<div class="${classes}">${word}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (word)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">current line</div>
+                        <div class="pointer-detail-value p2">[${currentLine.join(', ')}]</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">lineLen</div>
+                        <div class="pointer-detail-value p-merge">${lineLen}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 27: Mirror String Check — char array with L/R pointers
+        if (currentProbId === '27' && state.nums1) {
+            const lPtr = state.pointers?.l ?? -1;
+            const rPtr = state.pointers?.r ?? -1;
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">string — check palindrome (alphanumeric only)</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+
+                if (isComplete) classes += ' pointer-merge';
+                if (ch === '␣') classes += ' space-char';
+                if (!/[a-zA-Z0-9␣]/.test(ch)) classes += ' space-char';
+
+                if (idx === lPtr && idx === rPtr) {
+                    classes += ' pointer-1 pointer-2';
+                    pointerLabels = `<div class="pointer-label-pair"><div class="pointer-label p1 pair-left">L</div><div class="pointer-label p2 pair-right">R</div></div>`;
+                } else if (idx === lPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">L</div>`;
+                } else if (idx === rPtr) {
+                    classes += ' pointer-2';
+                    pointerLabels = `<div class="pointer-label p2">R</div>`;
+                }
+
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">L (left)</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">R (right)</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 28: Subsequence Checker — t array (row 1) + s array (row 2)
+        if (currentProbId === '28' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const jPtr = state.pointers?.j ?? -1;
+            const meta = state.arrayMeta || {};
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner array-dual${sDenseClass}">`;
+
+            // t (main string) row
+            html += `<div class="array-section"><div class="array-label">t (main string)</div><div class="array-visualization">`;
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (isComplete) classes += ' pointer-merge';
+                if (jPtr >= 0 && idx < jPtr) classes += ' visited-cell';
+                if (idx === jPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">j</div>`;
+                }
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+
+            // s (subsequence) row
+            html += `<div class="array-section"><div class="array-label">s (subsequence)</div><div class="array-visualization">`;
+            (state.nums2 || []).forEach((ch, idx) => {
+                let classes = 'array-item';
+                if (isComplete) classes += ' pointer-merge';
+                if (iPtr >= 0 && idx < iPtr) classes += ' visited-cell';
+                if (idx === iPtr) classes += ' pointer-2';
+                html += `<div class="${classes}">${ch}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (s pointer)</div>
+                        <div class="pointer-detail-value p2">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">j (t pointer)</div>
+                        <div class="pointer-detail-value p1">${jPtr >= 0 ? jPtr : '—'}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 29: Sorted Pair Sum — array with L/R two pointers
+        if (currentProbId === '29' && state.nums1) {
+            const lPtr = state.pointers?.l ?? -1;
+            const rPtr = state.pointers?.r ?? -1;
+            const meta = state.arrayMeta || {};
+            const target = meta.target ?? 0;
+            const curSum = meta.curSum ?? 0;
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">numbers (sorted) — find two that sum to ${target}</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+
+                if (isComplete && (idx === lPtr || idx === rPtr)) classes += ' pointer-merge';
+
+                if (idx === lPtr && idx === rPtr) {
+                    classes += ' pointer-1 pointer-2';
+                    pointerLabels = `<div class="pointer-label-pair"><div class="pointer-label p1 pair-left">L</div><div class="pointer-label p2 pair-right">R</div></div>`;
+                } else if (idx === lPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">L</div>`;
+                } else if (idx === rPtr) {
+                    classes += ' pointer-2';
+                    pointerLabels = `<div class="pointer-label p2">R</div>`;
+                }
+
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">L (left)</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">R (right)</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">target</div>
+                        <div class="pointer-detail-value">${target}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">curSum</div>
+                        <div class="pointer-detail-value p-merge">${curSum}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 30: Widest Water Container — height bars with L/R pointers
+        if (currentProbId === '30' && state.nums1) {
+            const lPtr = state.pointers?.l ?? -1;
+            const rPtr = state.pointers?.r ?? -1;
+            const meta = state.arrayMeta || {};
+            const maxWater = meta.maxWater ?? 0;
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">height — find container with most water</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+
+                if (isComplete && (idx === lPtr || idx === rPtr)) classes += ' pointer-merge';
+
+                if (idx === lPtr && idx === rPtr) {
+                    classes += ' pointer-1 pointer-2';
+                    pointerLabels = `<div class="pointer-label-pair"><div class="pointer-label p1 pair-left">L</div><div class="pointer-label p2 pair-right">R</div></div>`;
+                } else if (idx === lPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">L</div>`;
+                } else if (idx === rPtr) {
+                    classes += ' pointer-2';
+                    pointerLabels = `<div class="pointer-label p2">R</div>`;
+                }
+
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">L (left)</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">R (right)</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">maxWater</div>
+                        <div class="pointer-detail-value p-merge">${maxWater}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 31: Triple Zero Sum — sorted array with i fixed + L/R two pointers
+        if (currentProbId === '31' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const lPtr = state.pointers?.l ?? -1;
+            const rPtr = state.pointers?.r ?? -1;
+            const meta = state.arrayMeta || {};
+            const resultStr = meta.result || '';
+            const triplets = meta.triplets ?? 0;
+            const isComplete = state.isComplete || false;
+
+            const sItemCount = state.nums1.length;
+            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            let html = `<div class="array-inner${sDenseClass}">`;
+            html += `<div class="array-label">nums (sorted) — find all unique triplets summing to 0</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+
+                if (isComplete) classes += ' pointer-merge';
+
+                if (idx === iPtr) {
+                    classes += ' pointer-merge';
+                    pointerLabels = `<div class="pointer-label p-merge">i</div>`;
+                }
+                if (idx === lPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels += `<div class="pointer-label p1">L</div>`;
+                }
+                if (idx === rPtr) {
+                    classes += ' pointer-2';
+                    pointerLabels += `<div class="pointer-label p2">R</div>`;
+                }
+
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            html += `
+                <div class="pointer-info">
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">i (fixed)</div>
+                        <div class="pointer-detail-value p-merge">${iPtr >= 0 ? iPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">L (left)</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">R (right)</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">triplets</div>
+                        <div class="pointer-detail-value">${triplets}</div>
+                    </div>
+                </div>
+            `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
         return;
     }
 }
@@ -5047,6 +6573,38 @@ function updatePlayButtons(isPlaying) {
     if (desktopBtn) {
         desktopBtn.querySelector('i').className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
         desktopBtn.querySelector('span').textContent = isPlaying ? 'Pause' : 'Play';
+    }
+}
+
+function updateSpeedButtons() {
+    const label = speedPresets[currentSpeedIndex].label;
+    const desktopBtn = document.getElementById('desktopSpeedBtn');
+    const mobileBtn = document.getElementById('mobileSpeedBtn');
+    if (desktopBtn) desktopBtn.querySelector('.speed-label').textContent = label;
+    if (mobileBtn) mobileBtn.querySelector('.speed-label').textContent = label;
+}
+
+function cycleSpeed() {
+    currentSpeedIndex = (currentSpeedIndex + 1) % speedPresets.length;
+    autoPlaySpeed = speedPresets[currentSpeedIndex].ms;
+    updateSpeedButtons();
+
+    // If autoplay is running, restart interval with new speed
+    if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = setInterval(() => {
+            if (currentStep < history.length - 1) {
+                changeStep(1);
+            } else {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+                updatePlayButtons(false);
+                setTimeout(() => {
+                    currentStep = 0;
+                    render();
+                }, 3000);
+            }
+        }, autoPlaySpeed);
     }
 }
 
