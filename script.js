@@ -1175,6 +1175,626 @@ const problemDB = {
                 }
             }
         }
+    },
+    "32": {
+        name: "Smallest Subarray Sum",
+        alias: "Minimum Size Subarray Sum",
+        leetcodeNum: "209",
+        inspiredBy: "Inspired by LeetCode Problem #209",
+        sourceUrl: "https://leetcode.com/problems/minimum-size-subarray-sum/",
+        difficulty: "medium",
+        topics: ["array", "sliding-window"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            slidingWindow: {
+                name: "Sliding Window",
+                code: [
+                    "def minSubArrayLen(target, nums):",
+                    "    l, total, res = 0, 0, float('inf')",
+                    "    for r in range(len(nums)):",
+                    "        total += nums[r]",
+                    "        while total >= target:",
+                    "            res = min(res, r - l + 1)",
+                    "            total -= nums[l]",
+                    "            l += 1",
+                    "    return res if res != float('inf') else 0"
+                ],
+                indentation: [0, 1, 1, 2, 2, 3, 3, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateMinSubArrayLenHistory();
+                }
+            }
+        }
+    },
+    "33": {
+        name: "Longest Unique Substring",
+        alias: "Longest Substring Without Repeating Characters",
+        leetcodeNum: "3",
+        inspiredBy: "Inspired by LeetCode Problem #3",
+        sourceUrl: "https://leetcode.com/problems/longest-substring-without-repeating-characters/",
+        difficulty: "medium",
+        topics: ["string", "sliding-window", "hash-table"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            slidingWindow: {
+                name: "Sliding Window + Set",
+                code: [
+                    "def lengthOfLongestSubstring(s):",
+                    "    charSet = set()",
+                    "    l, res = 0, 0",
+                    "    for r in range(len(s)):",
+                    "        while s[r] in charSet:",
+                    "            charSet.remove(s[l])",
+                    "            l += 1",
+                    "        charSet.add(s[r])",
+                    "        res = max(res, r - l + 1)",
+                    "    return res"
+                ],
+                indentation: [0, 1, 1, 1, 2, 3, 3, 2, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(min(n, m))",
+                generateHistory: function() {
+                    return generateLongestSubstringHistory();
+                }
+            }
+        }
+    },
+    "34": {
+        name: "Longest Repeating After Replace",
+        alias: "Longest Repeating Character Replacement",
+        leetcodeNum: "424",
+        inspiredBy: "Inspired by LeetCode Problem #424",
+        sourceUrl: "https://leetcode.com/problems/longest-repeating-character-replacement/",
+        difficulty: "medium",
+        topics: ["string", "sliding-window"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            slidingWindow: {
+                name: "Sliding Window + Count",
+                code: [
+                    "def characterReplacement(s, k):",
+                    "    count = {}",
+                    "    l, maxf, res = 0, 0, 0",
+                    "    for r in range(len(s)):",
+                    "        count[s[r]] = count.get(s[r], 0) + 1",
+                    "        maxf = max(maxf, count[s[r]])",
+                    "        while (r - l + 1) - maxf > k:",
+                    "            count[s[l]] -= 1",
+                    "            l += 1",
+                    "        res = max(res, r - l + 1)",
+                    "    return res"
+                ],
+                indentation: [0, 1, 1, 1, 2, 2, 2, 3, 3, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateCharReplacementHistory();
+                }
+            }
+        }
+    },
+    "35": {
+        name: "Minimum Window Match",
+        alias: "Minimum Window Substring",
+        leetcodeNum: "76",
+        inspiredBy: "Inspired by LeetCode Problem #76",
+        sourceUrl: "https://leetcode.com/problems/minimum-window-substring/",
+        difficulty: "hard",
+        topics: ["string", "sliding-window", "hash-table"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            slidingWindow: {
+                name: "Sliding Window + HashMap",
+                code: [
+                    "def minWindow(s, t):",
+                    "    need = Counter(t)",
+                    "    have, total = 0, len(need)",
+                    "    res, resLen = [-1,-1], float('inf')",
+                    "    l = 0",
+                    "    window = {}",
+                    "    for r in range(len(s)):",
+                    "        window[s[r]] = window.get(s[r],0) + 1",
+                    "        if s[r] in need and window[s[r]] == need[s[r]]:",
+                    "            have += 1",
+                    "        while have == total:",
+                    "            if (r - l + 1) < resLen:",
+                    "                res, resLen = [l, r], r - l + 1",
+                    "            window[s[l]] -= 1",
+                    "            if s[l] in need and window[s[l]] < need[s[l]]:",
+                    "                have -= 1",
+                    "            l += 1",
+                    "    return s[res[0]:res[1]+1] if resLen != float('inf') else ''"
+                ],
+                indentation: [0, 1, 1, 1, 1, 1, 1, 2, 2, 3, 2, 3, 4, 3, 3, 4, 3, 1],
+                timeComplexity: "O(n + m)",
+                spaceComplexity: "O(n + m)",
+                generateHistory: function() {
+                    return generateMinWindowHistory();
+                }
+            }
+        }
+    },
+    "36": {
+        name: "Valid Bracket Sequence",
+        alias: "Valid Parentheses",
+        leetcodeNum: "20",
+        inspiredBy: "Inspired by LeetCode Problem #20",
+        sourceUrl: "https://leetcode.com/problems/valid-parentheses/",
+        difficulty: "easy",
+        topics: ["string", "stack"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            stackApproach: {
+                name: "Stack",
+                code: [
+                    "def isValid(s):",
+                    "    stack = []",
+                    "    pairs = {')':'(', '}':'{', ']':'['}",
+                    "    for c in s:",
+                    "        if c in pairs:",
+                    "            if not stack or stack[-1] != pairs[c]:",
+                    "                return False",
+                    "            stack.pop()",
+                    "        else:",
+                    "            stack.append(c)",
+                    "    return len(stack) == 0"
+                ],
+                indentation: [0, 1, 1, 1, 2, 3, 3, 2, 2, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(n)",
+                generateHistory: function() {
+                    return generateValidParenthesesHistory();
+                }
+            }
+        }
+    },
+    "37": {
+        name: "Spiral Matrix Reader",
+        alias: "Spiral Matrix",
+        leetcodeNum: "54",
+        inspiredBy: "Inspired by LeetCode Problem #54",
+        sourceUrl: "https://leetcode.com/problems/spiral-matrix/",
+        difficulty: "medium",
+        topics: ["array", "matrix"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            boundaryPeel: {
+                name: "Boundary Peel",
+                code: [
+                    "def spiralOrder(matrix):",
+                    "    res = []",
+                    "    top, bot = 0, len(matrix) - 1",
+                    "    left, right = 0, len(matrix[0]) - 1",
+                    "    while top <= bot and left <= right:",
+                    "        for i in range(left, right + 1): res.append(matrix[top][i])",
+                    "        top += 1",
+                    "        for i in range(top, bot + 1): res.append(matrix[i][right])",
+                    "        right -= 1",
+                    "        if top <= bot:",
+                    "            for i in range(right, left-1, -1): res.append(matrix[bot][i])",
+                    "            bot -= 1",
+                    "        if left <= right:",
+                    "            for i in range(bot, top-1, -1): res.append(matrix[i][left])",
+                    "            left += 1",
+                    "    return res"
+                ],
+                indentation: [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 2, 3, 3, 1],
+                timeComplexity: "O(m × n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateSpiralMatrixHistory();
+                }
+            }
+        }
+    },
+    "38": {
+        name: "Rotate Grid 90°",
+        alias: "Rotate Image",
+        leetcodeNum: "48",
+        inspiredBy: "Inspired by LeetCode Problem #48",
+        sourceUrl: "https://leetcode.com/problems/rotate-image/",
+        difficulty: "medium",
+        topics: ["array", "matrix"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            transposeReverse: {
+                name: "Transpose + Reverse",
+                code: [
+                    "def rotate(matrix):",
+                    "    n = len(matrix)",
+                    "    for i in range(n):",
+                    "        for j in range(i + 1, n):",
+                    "            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]",
+                    "    for row in matrix:",
+                    "        row.reverse()"
+                ],
+                indentation: [0, 1, 1, 2, 3, 1, 2],
+                timeComplexity: "O(n²)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateRotateImageHistory();
+                }
+            }
+        }
+    },
+    "39": {
+        name: "Zero Row & Column Marker",
+        alias: "Set Matrix Zeroes",
+        leetcodeNum: "73",
+        inspiredBy: "Inspired by LeetCode Problem #73",
+        sourceUrl: "https://leetcode.com/problems/set-matrix-zeroes/",
+        difficulty: "medium",
+        topics: ["array", "matrix"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            inPlaceMarker: {
+                name: "In-Place Marker",
+                code: [
+                    "def setZeroes(matrix):",
+                    "    m, n = len(matrix), len(matrix[0])",
+                    "    firstRow = any(matrix[0][j]==0 for j in range(n))",
+                    "    firstCol = any(matrix[i][0]==0 for i in range(m))",
+                    "    for i in range(1, m):",
+                    "        for j in range(1, n):",
+                    "            if matrix[i][j] == 0:",
+                    "                matrix[i][0] = 0",
+                    "                matrix[0][j] = 0",
+                    "    for i in range(1, m):",
+                    "        for j in range(1, n):",
+                    "            if matrix[i][0]==0 or matrix[0][j]==0:",
+                    "                matrix[i][j] = 0",
+                    "    if firstRow: matrix[0] = [0]*n",
+                    "    if firstCol:",
+                    "        for i in range(m): matrix[i][0] = 0"
+                ],
+                indentation: [0, 1, 1, 1, 1, 2, 3, 4, 4, 1, 2, 3, 4, 1, 1, 2],
+                timeComplexity: "O(m × n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateSetMatrixZeroesHistory();
+                }
+            }
+        }
+    },
+    "40": {
+        name: "Game of Life Step",
+        alias: "Game of Life",
+        leetcodeNum: "289",
+        inspiredBy: "Inspired by LeetCode Problem #289",
+        sourceUrl: "https://leetcode.com/problems/game-of-life/",
+        difficulty: "medium",
+        topics: ["array", "matrix"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            inPlace: {
+                name: "In-Place State Encoding",
+                code: [
+                    "def gameOfLife(board):",
+                    "    m, n = len(board), len(board[0])",
+                    "    for i in range(m):",
+                    "        for j in range(n):",
+                    "            neighbors = countLiveNeighbors(i, j)",
+                    "            if board[i][j] == 1 and neighbors in (2,3):",
+                    "                board[i][j] = 3  # was 1, stays 1",
+                    "            if board[i][j] == 0 and neighbors == 3:",
+                    "                board[i][j] = 2  # was 0, becomes 1",
+                    "    for i in range(m):",
+                    "        for j in range(n):",
+                    "            board[i][j] >>= 1"
+                ],
+                indentation: [0, 1, 1, 2, 3, 3, 4, 3, 4, 1, 2, 3],
+                timeComplexity: "O(m × n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateGameOfLifeHistory();
+                }
+            }
+        }
+    },
+    "41": {
+        name: "Ransom Letter Builder",
+        alias: "Ransom Note",
+        leetcodeNum: "383",
+        inspiredBy: "Inspired by LeetCode Problem #383",
+        sourceUrl: "https://leetcode.com/problems/ransom-note/",
+        difficulty: "easy",
+        topics: ["string", "hash-table"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            hashCount: {
+                name: "Character Count",
+                code: [
+                    "def canConstruct(ransomNote, magazine):",
+                    "    count = {}",
+                    "    for c in magazine:",
+                    "        count[c] = count.get(c, 0) + 1",
+                    "    for c in ransomNote:",
+                    "        if count.get(c, 0) == 0:",
+                    "            return False",
+                    "        count[c] -= 1",
+                    "    return True"
+                ],
+                indentation: [0, 1, 1, 2, 1, 2, 3, 2, 1],
+                timeComplexity: "O(n + m)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateRansomNoteHistory();
+                }
+            }
+        }
+    },
+    "42": {
+        name: "Isomorphic String Check",
+        alias: "Isomorphic Strings",
+        leetcodeNum: "205",
+        inspiredBy: "Inspired by LeetCode Problem #205",
+        sourceUrl: "https://leetcode.com/problems/isomorphic-strings/",
+        difficulty: "easy",
+        topics: ["string", "hash-table"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            twoMaps: {
+                name: "Two HashMaps",
+                code: [
+                    "def isIsomorphic(s, t):",
+                    "    mapST, mapTS = {}, {}",
+                    "    for c1, c2 in zip(s, t):",
+                    "        if c1 in mapST and mapST[c1] != c2:",
+                    "            return False",
+                    "        if c2 in mapTS and mapTS[c2] != c1:",
+                    "            return False",
+                    "        mapST[c1] = c2",
+                    "        mapTS[c2] = c1",
+                    "    return True"
+                ],
+                indentation: [0, 1, 1, 2, 3, 2, 3, 2, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(n)",
+                generateHistory: function() {
+                    return generateIsomorphicHistory();
+                }
+            }
+        }
+    },
+    "43": {
+        name: "Word Pattern Matcher",
+        alias: "Word Pattern",
+        leetcodeNum: "290",
+        inspiredBy: "Inspired by LeetCode Problem #290",
+        sourceUrl: "https://leetcode.com/problems/word-pattern/",
+        difficulty: "easy",
+        topics: ["string", "hash-table"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            twoMaps: {
+                name: "Two HashMaps",
+                code: [
+                    "def wordPattern(pattern, s):",
+                    "    words = s.split()",
+                    "    if len(pattern) != len(words): return False",
+                    "    pToW, wToP = {}, {}",
+                    "    for p, w in zip(pattern, words):",
+                    "        if p in pToW and pToW[p] != w: return False",
+                    "        if w in wToP and wToP[w] != p: return False",
+                    "        pToW[p] = w",
+                    "        wToP[w] = p",
+                    "    return True"
+                ],
+                indentation: [0, 1, 1, 1, 1, 2, 2, 2, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(n)",
+                generateHistory: function() {
+                    return generateWordPatternHistory();
+                }
+            }
+        }
+    },
+    "44": {
+        name: "Anagram Checker",
+        alias: "Valid Anagram",
+        leetcodeNum: "242",
+        inspiredBy: "Inspired by LeetCode Problem #242",
+        sourceUrl: "https://leetcode.com/problems/valid-anagram/",
+        difficulty: "easy",
+        topics: ["string", "hash-table", "sorting"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            hashCount: {
+                name: "Character Count",
+                code: [
+                    "def isAnagram(s, t):",
+                    "    if len(s) != len(t): return False",
+                    "    count = {}",
+                    "    for c in s:",
+                    "        count[c] = count.get(c, 0) + 1",
+                    "    for c in t:",
+                    "        count[c] = count.get(c, 0) - 1",
+                    "        if count[c] < 0: return False",
+                    "    return True"
+                ],
+                indentation: [0, 1, 1, 1, 2, 1, 2, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)",
+                generateHistory: function() {
+                    return generateValidAnagramHistory();
+                }
+            }
+        }
+    },
+    "45": {
+        name: "Group Anagram Sets",
+        alias: "Group Anagrams",
+        leetcodeNum: "49",
+        inspiredBy: "Inspired by LeetCode Problem #49",
+        sourceUrl: "https://leetcode.com/problems/group-anagrams/",
+        difficulty: "medium",
+        topics: ["string", "hash-table", "sorting"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            sortedKey: {
+                name: "Sorted Key HashMap",
+                code: [
+                    "def groupAnagrams(strs):",
+                    "    groups = {}",
+                    "    for s in strs:",
+                    "        key = ''.join(sorted(s))",
+                    "        groups.setdefault(key, []).append(s)",
+                    "    return list(groups.values())"
+                ],
+                indentation: [0, 1, 1, 2, 2, 1],
+                timeComplexity: "O(n × k log k)",
+                spaceComplexity: "O(n × k)",
+                generateHistory: function() {
+                    return generateGroupAnagramsHistory();
+                }
+            }
+        }
+    },
+    "46": {
+        name: "Pair Sum Finder",
+        alias: "Two Sum",
+        leetcodeNum: "1",
+        inspiredBy: "Inspired by LeetCode Problem #1",
+        sourceUrl: "https://leetcode.com/problems/two-sum/",
+        difficulty: "easy",
+        topics: ["array", "hash-table"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            hashMap: {
+                name: "HashMap One Pass",
+                code: [
+                    "def twoSum(nums, target):",
+                    "    seen = {}",
+                    "    for i, num in enumerate(nums):",
+                    "        complement = target - num",
+                    "        if complement in seen:",
+                    "            return [seen[complement], i]",
+                    "        seen[num] = i",
+                    "    return []"
+                ],
+                indentation: [0, 1, 1, 2, 2, 3, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(n)",
+                generateHistory: function() {
+                    return generateTwoSumHistory();
+                }
+            }
+        }
+    },
+    "47": {
+        name: "Happy Number Cycle",
+        alias: "Happy Number",
+        leetcodeNum: "202",
+        inspiredBy: "Inspired by LeetCode Problem #202",
+        sourceUrl: "https://leetcode.com/problems/happy-number/",
+        difficulty: "easy",
+        topics: ["math", "hash-table"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            hashSet: {
+                name: "HashSet Cycle Detection",
+                code: [
+                    "def isHappy(n):",
+                    "    seen = set()",
+                    "    while n != 1:",
+                    "        if n in seen: return False",
+                    "        seen.add(n)",
+                    "        n = sum(int(d)**2 for d in str(n))",
+                    "    return True"
+                ],
+                indentation: [0, 1, 1, 2, 2, 2, 1],
+                timeComplexity: "O(log n)",
+                spaceComplexity: "O(log n)",
+                generateHistory: function() {
+                    return generateHappyNumberHistory();
+                }
+            }
+        }
+    },
+    "48": {
+        name: "Nearby Duplicate Finder",
+        alias: "Contains Duplicate II",
+        leetcodeNum: "219",
+        inspiredBy: "Inspired by LeetCode Problem #219",
+        sourceUrl: "https://leetcode.com/problems/contains-duplicate-ii/",
+        difficulty: "easy",
+        topics: ["array", "sliding-window", "hash-table"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            slidingSet: {
+                name: "Sliding Window Set",
+                code: [
+                    "def containsNearbyDuplicate(nums, k):",
+                    "    window = set()",
+                    "    for i in range(len(nums)):",
+                    "        if i > k:",
+                    "            window.remove(nums[i - k - 1])",
+                    "        if nums[i] in window:",
+                    "            return True",
+                    "        window.add(nums[i])",
+                    "    return False"
+                ],
+                indentation: [0, 1, 1, 2, 3, 2, 3, 2, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(min(n, k))",
+                generateHistory: function() {
+                    return generateContainsDupIIHistory();
+                }
+            }
+        }
+    },
+    "49": {
+        name: "Longest Run of Consecutive",
+        alias: "Longest Consecutive Sequence",
+        leetcodeNum: "128",
+        inspiredBy: "Inspired by LeetCode Problem #128",
+        sourceUrl: "https://leetcode.com/problems/longest-consecutive-sequence/",
+        difficulty: "medium",
+        topics: ["array", "hash-table"],
+        interview150: true,
+        tree: null,
+        algorithms: {
+            hashSet: {
+                name: "HashSet Sequence Build",
+                code: [
+                    "def longestConsecutive(nums):",
+                    "    numSet = set(nums)",
+                    "    longest = 0",
+                    "    for n in numSet:",
+                    "        if n - 1 not in numSet:",
+                    "            length = 1",
+                    "            while n + length in numSet:",
+                    "                length += 1",
+                    "            longest = max(longest, length)",
+                    "    return longest"
+                ],
+                indentation: [0, 1, 1, 1, 2, 3, 3, 4, 3, 1],
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(n)",
+                generateHistory: function() {
+                    return generateLongestConsecutiveHistory();
+                }
+            }
+        }
     }
 };
 
@@ -3215,11 +3835,12 @@ function generateIsSubsequenceHistory() {
 
 // Two Sum II (LC #167) — Two Pointers
 function generateTwoSumIIHistory() {
-    const numbers = [2, 7, 11, 15];
-    const target = 9;
+    const numbers = [1, 3, 5, 8, 11, 15];
+    const target = 13;
     const h = [];
     let l = 0;
     let r = numbers.length - 1;
+    let sumDir = '';  // '', 'low', 'high', 'match'
 
     function record(line, msg, pointers = {}, extra = {}) {
         h.push({
@@ -3227,7 +3848,13 @@ function generateTwoSumIIHistory() {
             pointers: { ...pointers },
             nums1: [...numbers],
             nums2: [],
-            arrayMeta: { target, curSum: (pointers.l != null && pointers.r != null) ? numbers[pointers.l] + numbers[pointers.r] : 0 },
+            arrayMeta: {
+                target,
+                curSum: (pointers.l != null && pointers.r != null) ? numbers[pointers.l] + numbers[pointers.r] : 0,
+                sumDirection: sumDir,
+                lVal: pointers.l != null ? numbers[pointers.l] : null,
+                rVal: pointers.r != null ? numbers[pointers.r] : null
+            },
             step: h.length,
             ...extra
         });
@@ -3238,20 +3865,25 @@ function generateTwoSumIIHistory() {
 
     while (l < r) {
         const curSum = numbers[l] + numbers[r];
+        sumDir = '';
         record(2, `l = ${l}, r = ${r}: check.`, { l, r });
+        sumDir = curSum < target ? 'low' : curSum > target ? 'high' : 'match';
         record(3, `curSum = numbers[${l}] + numbers[${r}] = ${numbers[l]} + ${numbers[r]} = ${curSum}.`, { l, r });
 
         if (curSum === target) {
             record(4, `${curSum} == ${target} ✓ → found!`, { l, r }, { isComparison: true });
+            sumDir = 'match';
             record(5, `✓ Done! Return [${l + 1}, ${r + 1}] (1-indexed).`, {}, { isComplete: true });
             return h;
         } else if (curSum < target) {
             record(6, `${curSum} < ${target} → too small. l += 1.`, { l, r }, { isComparison: true });
             l++;
+            sumDir = '';
             record(7, `l = ${l}.`, { l, r });
         } else {
             record(8, `${curSum} > ${target} → too big. r -= 1.`, { l, r }, { isComparison: true });
             r--;
+            sumDir = '';
             record(9, `r = ${r}.`, { l, r });
         }
     }
@@ -3479,6 +4111,714 @@ function generateMergeSortedArrayHistory() {
         step: h.length
     });
     
+    return h;
+}
+
+// ─── Problem 32: Minimum Size Subarray Sum (LC #209) ───
+function generateMinSubArrayLenHistory() {
+    const nums = [2, 3, 1, 2, 4, 3];
+    const target = 7;
+    const h = [];
+    let l = 0, total = 0, res = Infinity;
+
+    function record(line, msg, extra = {}) {
+        const r = extra.r ?? -1;
+        const windowItems = (l >= 0 && r >= 0) ? nums.slice(l, r + 1) : [];
+        const action = extra.action || '';
+        h.push({ msg, line, pointers: { l, r }, nums1: [...nums], nums2: [], arrayMeta: { target, total, res: res === Infinity ? '∞' : res, windowLen: extra.wLen ?? 0, windowItems, action, addedVal: extra.addedVal, removedVal: extra.removedVal }, step: h.length, ...extra });
+    }
+
+    record(0, `Call minSubArrayLen(target=${target}, nums=[${nums}]).`);
+    record(1, `l=0, total=0, res=∞. Expand R to grow window until sum ≥ target, then shrink L to minimize.`);
+
+    for (let r = 0; r < nums.length; r++) {
+        total += nums[r];
+        record(3, `R expands → add nums[${r}]=${nums[r]}. Window sum: ${total - nums[r]} + ${nums[r]} = ${total}.`, { r, action: 'expand', addedVal: nums[r] });
+        while (total >= target) {
+            const wLen = r - l + 1;
+            res = Math.min(res, wLen);
+            record(5, `sum ${total} ≥ ${target} ✓ Window [${l}..${r}] length=${wLen}. Best so far: ${res}.`, { r, wLen, isComparison: true, action: 'hit' });
+            const removed = nums[l];
+            total -= nums[l];
+            l++;
+            record(7, `L shrinks → remove ${removed}. Window sum: ${total + removed} − ${removed} = ${total}.`, { r, action: 'shrink', removedVal: removed });
+        }
+    }
+
+    h.push({ msg: `✓ Done! Minimum subarray length = ${res === Infinity ? 0 : res}.`, line: 8, pointers: { l, r: nums.length - 1 }, nums1: [...nums], nums2: [], arrayMeta: { target, total, res, action: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 33: Longest Substring Without Repeating Characters (LC #3) ───
+function generateLongestSubstringHistory() {
+    const s = "abcabcbb";
+    const chars = s.split('');
+    const h = [];
+    let l = 0, res = 0;
+    const charSet = new Set();
+
+    function record(line, msg, r, extra = {}) {
+        const windowStr = r >= l && l >= 0 ? s.substring(l, r + 1) : '';
+        h.push({ msg, line, pointers: { l, r }, nums1: [...chars], nums2: [], arrayMeta: { res, windowChars: [...charSet].join(''), window: windowStr, action: extra.action || '', dupChar: extra.dupChar || '', removedChar: extra.removedChar || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call lengthOfLongestSubstring("${s}").`, -1);
+    record(2, `l=0, charSet={}. Expand R — if char already in set, shrink L until it's removed.`, -1);
+
+    for (let r = 0; r < chars.length; r++) {
+        if (charSet.has(chars[r])) {
+            record(4, `R→ s[${r}]='${chars[r]}' — DUPLICATE! '${chars[r]}' already in window. Must shrink L.`, r, { action: 'duplicate', dupChar: chars[r] });
+        } else {
+            record(4, `R→ s[${r}]='${chars[r]}' — unique, safe to add.`, r, { action: 'expand' });
+        }
+        while (charSet.has(chars[r])) {
+            const removed = chars[l];
+            charSet.delete(chars[l]);
+            l++;
+            record(5, `L shrinks → remove '${removed}'. ${removed === chars[r] ? 'Duplicate cleared!' : `Still looking for '${chars[r]}'...`}`, r, { action: 'shrink', removedChar: removed, dupChar: chars[r] });
+        }
+        charSet.add(chars[r]);
+        const wLen = r - l + 1;
+        res = Math.max(res, wLen);
+        record(8, `Window "${s.substring(l, r + 1)}" has ${wLen} unique chars. Best: ${res}.`, r, { action: wLen >= res ? 'newbest' : 'ok' });
+    }
+
+    h.push({ msg: `✓ Done! Longest substring without repeating = ${res}.`, line: 9, pointers: { l, r: chars.length - 1 }, nums1: [...chars], nums2: [], arrayMeta: { res, windowChars: [...charSet].join(''), action: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 34: Longest Repeating Character Replacement (LC #424) ───
+function generateCharReplacementHistory() {
+    const s = "AABABBA";
+    const k = 1;
+    const chars = s.split('');
+    const h = [];
+    let l = 0, maxf = 0, res = 0;
+    const count = {};
+
+    function record(line, msg, r, extra = {}) {
+        const wLen = r >= l && r >= 0 ? r - l + 1 : 0;
+        const replacements = wLen - maxf;
+        const dominantChar = Object.entries(count).sort((a, b) => b[1] - a[1])[0]?.[0] || '?';
+        h.push({ msg, line, pointers: { l, r }, nums1: [...chars], nums2: [], arrayMeta: { k, maxf, res, counts: { ...count }, window: r >= l ? s.substring(l, r + 1) : '', replacements, dominantChar, action: extra.action || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call characterReplacement("${s}", k=${k}).`, -1);
+    record(2, `Key insight: window is valid when (window_length − most_frequent_char_count) ≤ k.`, -1);
+    record(2, `This means: "chars we'd need to REPLACE" ≤ k replacements allowed.`, -1);
+
+    for (let r = 0; r < chars.length; r++) {
+        count[chars[r]] = (count[chars[r]] || 0) + 1;
+        maxf = Math.max(maxf, count[chars[r]]);
+        const wLen = r - l + 1;
+        const replacements = wLen - maxf;
+        const dominantChar = Object.entries(count).sort((a, b) => b[1] - a[1])[0]?.[0] || '?';
+        record(5, `R→ s[${r}]='${chars[r]}'. Window "${s.substring(l, r + 1)}": ${wLen} chars, most frequent='${dominantChar}'×${maxf}. Replacements needed: ${wLen}−${maxf}=${replacements}.`, r, { action: replacements <= k ? 'valid' : 'invalid' });
+
+        while ((r - l + 1) - maxf > k) {
+            record(6, `${r - l + 1} − ${maxf} = ${(r - l + 1) - maxf} > ${k} → too many replacements! Shrink L.`, r, { action: 'shrink' });
+            count[chars[l]]--;
+            l++;
+        }
+        res = Math.max(res, r - l + 1);
+        record(9, `Window "${s.substring(l, r + 1)}" valid (≤${k} replacements). Best: ${res}.`, r, { action: 'ok' });
+    }
+
+    h.push({ msg: `✓ Done! Longest repeating after ≤${k} replacements = ${res}.`, line: 10, pointers: { l, r: chars.length - 1 }, nums1: [...chars], nums2: [], arrayMeta: { k, maxf, res, action: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 35: Minimum Window Substring (LC #76) ───
+function generateMinWindowHistory() {
+    const s = "ADOBECODEBANC";
+    const t = "ABC";
+    const chars = s.split('');
+    const h = [];
+    const need = {};
+    for (const c of t) need[c] = (need[c] || 0) + 1;
+    const total = Object.keys(need).length;
+    let have = 0, l = 0, resLen = Infinity, resStr = '';
+    const window = {};
+
+    function record(line, msg, r, extra = {}) {
+        const needStatus = Object.entries(need).map(([ch, cnt]) => {
+            const got = window[ch] || 0;
+            return `${ch}:${got}/${cnt}${got >= cnt ? '✓' : ''}`;
+        }).join(' ');
+        h.push({ msg, line, pointers: { l, r }, nums1: [...chars], nums2: [], arrayMeta: { t, have, total, res: resLen === Infinity ? '∞' : resLen, resStr, window: r >= l ? s.substring(l, r + 1) : '', needStatus, action: extra.action || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call minWindow("${s}", "${t}"). Need all chars of "${t}" in a window.`, -1);
+    record(4, `Track: ${Object.entries(need).map(([c,n]) => `need '${c}'×${n}`).join(', ')}. Expand R to collect, shrink L to minimize.`, -1);
+
+    for (let r = 0; r < chars.length; r++) {
+        window[chars[r]] = (window[chars[r]] || 0) + 1;
+        const isNeeded = !!need[chars[r]];
+        if (isNeeded && window[chars[r]] === need[chars[r]]) have++;
+        record(8, `R→ '${chars[r]}' ${isNeeded ? '(NEEDED!)' : '(not needed)'}. have=${have}/${total} unique chars matched.`, r, { action: have === total ? 'allmatched' : 'expand' });
+
+        while (have === total) {
+            const wLen = r - l + 1;
+            if (wLen < resLen) {
+                resLen = wLen;
+                resStr = s.substring(l, r + 1);
+            }
+            record(12, `✓ ALL ${total} chars matched! Window "${s.substring(l, r + 1)}" len=${wLen}. Best: "${resStr}"(${resLen}).`, r, { action: 'hit' });
+            const removing = chars[l];
+            window[chars[l]]--;
+            if (need[chars[l]] && window[chars[l]] < need[chars[l]]) have--;
+            l++;
+            record(16, `L shrinks → remove '${removing}'. ${need[removing] ? `Lost a needed char! have=${have}/${total}.` : 'Not needed, keep shrinking.'}`, r, { action: have < total ? 'lost' : 'shrink' });
+        }
+    }
+
+    h.push({ msg: `✓ Done! Minimum window = "${resStr}" (length ${resLen}).`, line: 17, pointers: { l, r: chars.length - 1 }, nums1: [...chars], nums2: [], arrayMeta: { t, have, total, res: resLen, resStr, action: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 36: Valid Parentheses (LC #20) ───
+function generateValidParenthesesHistory() {
+    const s = "({[]})";
+    const chars = s.split('');
+    const h = [];
+    const stack = [];
+    const pairs = { ')': '(', '}': '{', ']': '[' };
+    const openBrackets = new Set(['(', '{', '[']);
+
+    function record(line, msg, idx, extra = {}) {
+        h.push({ msg, line, pointers: { i: idx }, nums1: [...chars], nums2: [], arrayMeta: { stack: [...stack], stackStr: stack.join(''), action: extra.action || '', matchPair: extra.matchPair || '', currentChar: extra.currentChar || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call isValid("${s}"). Opening brackets push onto stack; closing brackets must match stack top.`, -1);
+    record(2, `pairs: ) matches (, } matches {, ] matches [.`, -1);
+
+    let valid = true;
+    for (let i = 0; i < chars.length; i++) {
+        const c = chars[i];
+        if (openBrackets.has(c)) {
+            stack.push(c);
+            record(9, `i=${i}: '${c}' is OPENING → push onto stack. Stack: [${stack.join(' ')}].`, i, { action: 'push', currentChar: c });
+        } else {
+            // closing bracket
+            if (stack.length === 0 || stack[stack.length - 1] !== pairs[c]) {
+                const expected = pairs[c];
+                const got = stack.length === 0 ? 'empty' : stack[stack.length - 1];
+                record(6, `i=${i}: '${c}' is CLOSING → needs '${expected}' on top, but got '${got}' → MISMATCH!`, i, { action: 'mismatch', currentChar: c, matchPair: expected });
+                valid = false;
+                break;
+            }
+            const popped = stack.pop();
+            record(7, `i=${i}: '${c}' is CLOSING → matches '${popped}' on top ✓ Pop! Stack: [${stack.join(' ')}].`, i, { action: 'pop', currentChar: c, matchPair: `${popped}${c}` });
+        }
+    }
+
+    if (valid && stack.length === 0) {
+        h.push({ msg: `✓ Done! Stack empty → ALL brackets matched. Valid = True.`, line: 10, pointers: {}, nums1: [...chars], nums2: [], arrayMeta: { stack: [], stackStr: '', action: 'valid' }, step: h.length, isComplete: true });
+    } else if (valid) {
+        h.push({ msg: `✗ Done! Stack still has [${stack.join(' ')}] → unmatched openers. Valid = False.`, line: 10, pointers: {}, nums1: [...chars], nums2: [], arrayMeta: { stack: [...stack], stackStr: stack.join(''), action: 'invalid' }, step: h.length, isComplete: true });
+    } else {
+        h.push({ msg: `✗ Done! Mismatch found → Valid = False.`, line: 6, pointers: {}, nums1: [...chars], nums2: [], arrayMeta: { stack: [...stack], stackStr: stack.join(''), action: 'invalid' }, step: h.length, isComplete: true });
+    }
+    return h;
+}
+
+// ─── Problem 37: Spiral Matrix (LC #54) ───
+function generateSpiralMatrixHistory() {
+    const matrix = [[1,2,3],[4,5,6],[7,8,9]];
+    const m = matrix.length, n = matrix[0].length;
+    const h = [];
+    const res = [];
+    let top = 0, bot = m - 1, left = 0, right = n - 1;
+    const flat = matrix.flat();
+    const visited = new Array(m * n).fill(false);
+
+    function record(line, msg, row, col, extra = {}) {
+        h.push({ msg, line, pointers: { row, col }, nums1: [...flat], nums2: [], arrayMeta: { matrix: matrix.map(r => [...r]), m, n, res: [...res], visited: [...visited], top, bot, left, right, direction: extra.direction || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call spiralOrder(3×3 matrix). Peel layers: top→right→bottom→left.`, -1, -1);
+    record(2, `top=0, bot=2, left=0, right=2.`, -1, -1);
+
+    while (top <= bot && left <= right) {
+        // Right
+        for (let i = left; i <= right; i++) { res.push(matrix[top][i]); visited[top * n + i] = true; record(5, `→ Right: matrix[${top}][${i}]=${matrix[top][i]}. res=[${res}].`, top, i, { direction: 'right' }); }
+        top++;
+        // Down
+        for (let i = top; i <= bot; i++) { res.push(matrix[i][right]); visited[i * n + right] = true; record(7, `↓ Down: matrix[${i}][${right}]=${matrix[i][right]}. res=[${res}].`, i, right, { direction: 'down' }); }
+        right--;
+        if (top <= bot) {
+            // Left
+            for (let i = right; i >= left; i--) { res.push(matrix[bot][i]); visited[bot * n + i] = true; record(10, `← Left: matrix[${bot}][${i}]=${matrix[bot][i]}. res=[${res}].`, bot, i, { direction: 'left' }); }
+            bot--;
+        }
+        if (left <= right) {
+            // Up
+            for (let i = bot; i >= top; i--) { res.push(matrix[i][left]); visited[i * n + left] = true; record(13, `↑ Up: matrix[${i}][${left}]=${matrix[i][left]}. res=[${res}].`, i, left, { direction: 'up' }); }
+            left++;
+        }
+    }
+
+    h.push({ msg: `✓ Done! Spiral order = [${res}].`, line: 15, pointers: {}, nums1: [...flat], nums2: [], arrayMeta: { matrix: matrix.map(r => [...r]), m, n, res: [...res], visited: [...visited] }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 38: Rotate Image (LC #48) ───
+function generateRotateImageHistory() {
+    const matrix = [[1,2,3],[4,5,6],[7,8,9]];
+    const n = matrix.length;
+    const h = [];
+    const flat = () => matrix.flat();
+
+    function record(line, msg, r, c, extra = {}) {
+        h.push({ msg, line, pointers: { row: r, col: c }, nums1: flat(), nums2: [], arrayMeta: { matrix: matrix.map(r => [...r]), n, phase: extra.phase || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call rotate(3×3 matrix). Strategy: transpose then reverse each row.`, -1, -1);
+
+    // Transpose
+    record(2, `Phase 1: Transpose (swap matrix[i][j] with matrix[j][i]).`, -1, -1, { phase: 'transpose' });
+    for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+            record(4, `Swap matrix[${i}][${j}]=${matrix[i][j]} ↔ matrix[${j}][${i}]=${matrix[j][i]}.`, i, j, { phase: 'transpose' });
+            [matrix[i][j], matrix[j][i]] = [matrix[j][i], matrix[i][j]];
+            record(4, `After swap: [${i}][${j}]=${matrix[i][j]}, [${j}][${i}]=${matrix[j][i]}.`, i, j, { phase: 'transpose' });
+        }
+    }
+
+    // Reverse each row
+    record(5, `Phase 2: Reverse each row.`, -1, -1, { phase: 'reverse' });
+    for (let i = 0; i < n; i++) {
+        record(6, `Reverse row ${i}: [${matrix[i]}] → [${[...matrix[i]].reverse()}].`, i, -1, { phase: 'reverse' });
+        matrix[i].reverse();
+    }
+
+    h.push({ msg: `✓ Done! Matrix rotated 90° clockwise.`, line: 6, pointers: {}, nums1: flat(), nums2: [], arrayMeta: { matrix: matrix.map(r => [...r]), n, phase: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 39: Set Matrix Zeroes (LC #73) ───
+function generateSetMatrixZeroesHistory() {
+    const matrix = [[1,1,1],[1,0,1],[1,1,1]];
+    const m = matrix.length, n = matrix[0].length;
+    const h = [];
+    const flat = () => matrix.flat();
+
+    function record(line, msg, r, c, extra = {}) {
+        h.push({ msg, line, pointers: { row: r, col: c }, nums1: flat(), nums2: [], arrayMeta: { matrix: matrix.map(r => [...r]), m, n, phase: extra.phase || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call setZeroes(3×3 matrix). Found 0 at [1][1].`, -1, -1);
+
+    // Check first row/col
+    let firstRow = matrix[0].includes(0);
+    let firstCol = matrix.some(r => r[0] === 0);
+    record(2, `firstRow has zero? ${firstRow}. firstCol has zero? ${firstCol}.`, -1, -1, { phase: 'scan' });
+
+    // Mark phase
+    record(4, `Phase 1: Scan interior, mark zeros in first row/col.`, -1, -1, { phase: 'mark' });
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            if (matrix[i][j] === 0) {
+                matrix[i][0] = 0;
+                matrix[0][j] = 0;
+                record(8, `matrix[${i}][${j}]=0 → mark row ${i} (matrix[${i}][0]=0) & col ${j} (matrix[0][${j}]=0).`, i, j, { phase: 'mark', isComparison: true });
+            }
+        }
+    }
+
+    // Zero phase
+    record(9, `Phase 2: Zero out cells based on markers.`, -1, -1, { phase: 'zero' });
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            if (matrix[i][0] === 0 || matrix[0][j] === 0) {
+                matrix[i][j] = 0;
+                record(12, `matrix[${i}][0]=${matrix[i][0]} or matrix[0][${j}]=${matrix[0][j]} → zero matrix[${i}][${j}].`, i, j, { phase: 'zero' });
+            }
+        }
+    }
+
+    if (firstRow) { matrix[0] = new Array(n).fill(0); record(13, `firstRow was zero → zero entire row 0.`, 0, -1, { phase: 'zero' }); }
+    if (firstCol) { for (let i = 0; i < m; i++) matrix[i][0] = 0; record(15, `firstCol was zero → zero entire col 0.`, -1, 0, { phase: 'zero' }); }
+
+    h.push({ msg: `✓ Done! Matrix zeroed in-place.`, line: 15, pointers: {}, nums1: flat(), nums2: [], arrayMeta: { matrix: matrix.map(r => [...r]), m, n, phase: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 40: Game of Life (LC #289) ───
+function generateGameOfLifeHistory() {
+    const board = [[0,1,0],[0,0,1],[1,1,1],[0,0,0]];
+    const m = board.length, n = board[0].length;
+    const h = [];
+    const flat = () => board.flat();
+    const dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+
+    function countNeighbors(r, c) {
+        let cnt = 0;
+        for (const [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < m && nc >= 0 && nc < n && (board[nr][nc] & 1)) cnt++;
+        }
+        return cnt;
+    }
+
+    function record(line, msg, r, c, extra = {}) {
+        h.push({ msg, line, pointers: { row: r, col: c }, nums1: flat(), nums2: [], arrayMeta: { matrix: board.map(r => [...r]), m, n, phase: extra.phase || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call gameOfLife(4×3 board). Rules: live cell with 2-3 neighbors survives; dead cell with 3 neighbors becomes alive.`, -1, -1);
+    record(1, `Phase 1: Encode next state in 2nd bit. 2=was dead→alive, 3=was alive→stays alive.`, -1, -1, { phase: 'encode' });
+
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            const nb = countNeighbors(i, j);
+            const alive = board[i][j] & 1;
+            if (alive && (nb === 2 || nb === 3)) {
+                board[i][j] = 3;
+                record(6, `[${i}][${j}] alive, ${nb} neighbors → survives (3).`, i, j, { phase: 'encode', isComparison: true });
+            } else if (!alive && nb === 3) {
+                board[i][j] = 2;
+                record(8, `[${i}][${j}] dead, ${nb} neighbors → born (2).`, i, j, { phase: 'encode', isComparison: true });
+            } else {
+                record(4, `[${i}][${j}] ${alive ? 'alive' : 'dead'}, ${nb} neighbors → ${alive ? 'dies' : 'stays dead'}.`, i, j, { phase: 'encode' });
+            }
+        }
+    }
+
+    // Decode
+    record(9, `Phase 2: Decode — right shift each cell to get final state.`, -1, -1, { phase: 'decode' });
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            const old = board[i][j];
+            board[i][j] >>= 1;
+            record(11, `[${i}][${j}]: ${old} >> 1 = ${board[i][j]}.`, i, j, { phase: 'decode' });
+        }
+    }
+
+    h.push({ msg: `✓ Done! Next generation computed in-place.`, line: 11, pointers: {}, nums1: flat(), nums2: [], arrayMeta: { matrix: board.map(r => [...r]), m, n, phase: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 41: Ransom Note (LC #383) ───
+function generateRansomNoteHistory() {
+    const ransomNote = "aab";
+    const magazine = "aabcc";
+    const h = [];
+    const count = {};
+
+    function record(line, msg, src, idx, extra = {}) {
+        h.push({ msg, line, pointers: { i: idx }, nums1: src === 'mag' ? magazine.split('') : ransomNote.split(''), nums2: [], arrayMeta: { count: { ...count }, source: src, ransomNote, magazine, action: extra.action || '', currentChar: extra.currentChar || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call canConstruct("${ransomNote}", "${magazine}"). Can we spell "${ransomNote}" using letters from "${magazine}"?`, 'mag', -1);
+    record(2, `Phase 1: Count every letter available in magazine.`, 'mag', -1);
+
+    // Count magazine chars
+    for (let i = 0; i < magazine.length; i++) {
+        count[magazine[i]] = (count[magazine[i]] || 0) + 1;
+        const countStr = Object.entries(count).map(([k, v]) => `${k}:${v}`).join(', ');
+        record(3, `magazine[${i}]='${magazine[i]}' → count['${magazine[i]}']+1 = ${count[magazine[i]]}. Available: {${countStr}}.`, 'mag', i, { action: 'count', currentChar: magazine[i] });
+    }
+
+    // Check ransom note
+    record(4, `Phase 2: For each letter in "${ransomNote}", consume from available counts.`, 'note', -1);
+    let possible = true;
+    for (let i = 0; i < ransomNote.length; i++) {
+        const c = ransomNote[i];
+        if ((count[c] || 0) === 0) {
+            record(6, `Need '${c}' but count['${c}']=${count[c] || 0} → NONE LEFT! Cannot build note.`, 'note', i, { action: 'fail', currentChar: c });
+            possible = false;
+            break;
+        }
+        count[c]--;
+        const countStr = Object.entries(count).map(([k, v]) => `${k}:${v}`).join(', ');
+        record(7, `Need '${c}' → count['${c}']-1 = ${count[c]} ✓ Still available: {${countStr}}.`, 'note', i, { action: 'consume', currentChar: c });
+    }
+
+    h.push({ msg: `✓ Done! canConstruct = ${possible}. ${possible ? 'All letters found!' : 'Missing letters.'}`, line: 8, pointers: {}, nums1: ransomNote.split(''), nums2: [], arrayMeta: { count: { ...count }, result: possible, action: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 42: Isomorphic Strings (LC #205) ───
+function generateIsomorphicHistory() {
+    const s = "paper";
+    const t = "title";
+    const h = [];
+    const mapST = {}, mapTS = {};
+
+    function record(line, msg, idx, extra = {}) {
+        h.push({ msg, line, pointers: { i: idx }, nums1: s.split(''), nums2: t.split(''), arrayMeta: { mapST: { ...mapST }, mapTS: { ...mapTS }, s, t, action: extra.action || '', charS: extra.charS || '', charT: extra.charT || '', conflictWith: extra.conflictWith || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call isIsomorphic("${s}", "${t}"). Check 1-to-1 character mapping.`, -1);
+    record(1, `mapST={}, mapTS={}. Each char must map consistently both ways.`, -1);
+
+    let iso = true;
+    for (let i = 0; i < s.length; i++) {
+        const c1 = s[i], c2 = t[i];
+        if (mapST[c1] && mapST[c1] !== c2) {
+            record(3, `i=${i}: '${c1}'→'${c2}' but mapST['${c1}']='${mapST[c1]}' ≠ '${c2}' → NOT isomorphic!`, i, { isComparison: true, action: 'conflict', charS: c1, charT: c2, conflictWith: mapST[c1] });
+            iso = false; break;
+        }
+        if (mapTS[c2] && mapTS[c2] !== c1) {
+            record(5, `i=${i}: '${c2}'→'${c1}' but mapTS['${c2}']='${mapTS[c2]}' ≠ '${c1}' → NOT isomorphic!`, i, { isComparison: true, action: 'conflict', charS: c1, charT: c2, conflictWith: mapTS[c2] });
+            iso = false; break;
+        }
+        mapST[c1] = c2;
+        mapTS[c2] = c1;
+        record(8, `i=${i}: '${c1}' ↔ '${c2}' ✓ mapST=${JSON.stringify(mapST)}.`, i, { action: 'map', charS: c1, charT: c2 });
+    }
+
+    h.push({ msg: `✓ Done! isIsomorphic = ${iso}.`, line: 9, pointers: {}, nums1: s.split(''), nums2: t.split(''), arrayMeta: { mapST: { ...mapST }, mapTS: { ...mapTS }, result: iso, action: 'done', s, t }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 43: Word Pattern (LC #290) ───
+function generateWordPatternHistory() {
+    const pattern = "abba";
+    const str = "dog cat cat dog";
+    const words = str.split(' ');
+    const h = [];
+    const pToW = {}, wToP = {};
+
+    function record(line, msg, idx, extra = {}) {
+        h.push({ msg, line, pointers: { i: idx }, nums1: pattern.split(''), nums2: [], arrayMeta: { words: [...words], pToW: { ...pToW }, wToP: { ...wToP }, pattern, str, action: extra.action || '', patChar: extra.patChar || '', word: extra.word || '', conflictWith: extra.conflictWith || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call wordPattern("${pattern}", "${str}"). words=[${words.map(w => '"' + w + '"')}].`, -1);
+    record(2, `len(pattern)=${pattern.length} == len(words)=${words.length} ✓.`, -1);
+
+    let match = true;
+    for (let i = 0; i < pattern.length; i++) {
+        const p = pattern[i], w = words[i];
+        if (pToW[p] && pToW[p] !== w) {
+            record(5, `i=${i}: '${p}'→"${w}" but pToW['${p}']="${pToW[p]}" ≠ "${w}" → FALSE!`, i, { isComparison: true, action: 'conflict', patChar: p, word: w, conflictWith: pToW[p] });
+            match = false; break;
+        }
+        if (wToP[w] && wToP[w] !== p) {
+            record(6, `i=${i}: "${w}"→'${p}' but wToP["${w}"]='${wToP[w]}' ≠ '${p}' → FALSE!`, i, { isComparison: true, action: 'conflict', patChar: p, word: w, conflictWith: wToP[w] });
+            match = false; break;
+        }
+        pToW[p] = w;
+        wToP[w] = p;
+        record(8, `i=${i}: '${p}' ↔ "${w}" ✓. pToW=${JSON.stringify(pToW)}.`, i, { action: 'map', patChar: p, word: w });
+    }
+
+    h.push({ msg: `✓ Done! wordPattern = ${match}.`, line: 9, pointers: {}, nums1: pattern.split(''), nums2: [], arrayMeta: { words, pToW: { ...pToW }, wToP: { ...wToP }, result: match, action: 'done', pattern, str }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 44: Valid Anagram (LC #242) ───
+function generateValidAnagramHistory() {
+    const s = "anagram";
+    const t = "nagaram";
+    const h = [];
+    const count = {};
+
+    function record(line, msg, src, idx, extra = {}) {
+        h.push({ msg, line, pointers: { i: idx }, nums1: src === 's' ? s.split('') : t.split(''), nums2: [], arrayMeta: { count: { ...count }, source: src, s, t, action: extra.action || '', currentChar: extra.currentChar || '', delta: extra.delta || 0 }, step: h.length, ...extra });
+    }
+
+    record(0, `Call isAnagram("${s}", "${t}").`, 's', -1);
+    record(1, `len("${s}")=${s.length} == len("${t}")=${t.length} ✓. Count chars.`, 's', -1);
+
+    // Count s
+    for (let i = 0; i < s.length; i++) {
+        count[s[i]] = (count[s[i]] || 0) + 1;
+        record(4, `s[${i}]='${s[i]}' → count['${s[i]}']=+1 → ${count[s[i]]}.`, 's', i, { action: 'add', currentChar: s[i], delta: 1 });
+    }
+
+    // Subtract t
+    record(5, `Now subtract counts for t.`, 't', -1);
+    let valid = true;
+    for (let i = 0; i < t.length; i++) {
+        count[t[i]] = (count[t[i]] || 0) - 1;
+        if (count[t[i]] < 0) {
+            record(7, `t[${i}]='${t[i]}' → count['${t[i]}']=−1 → ${count[t[i]]} < 0 → NOT anagram!`, 't', i, { isComparison: true, action: 'fail', currentChar: t[i], delta: -1 });
+            valid = false; break;
+        }
+        record(6, `t[${i}]='${t[i]}' → count['${t[i]}']=−1 → ${count[t[i]]}.`, 't', i, { action: 'subtract', currentChar: t[i], delta: -1 });
+    }
+
+    h.push({ msg: `✓ Done! isAnagram = ${valid}.`, line: 8, pointers: {}, nums1: s.split(''), nums2: [], arrayMeta: { count: { ...count }, result: valid, action: 'done', s, t }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 45: Group Anagrams (LC #49) ───
+function generateGroupAnagramsHistory() {
+    const strs = ["eat", "tea", "tan", "ate", "nat", "bat"];
+    const h = [];
+    const groups = {};
+    const wordToKey = {};
+
+    function record(line, msg, idx, extra = {}) {
+        h.push({ msg, line, pointers: { i: idx }, nums1: [...strs], nums2: [], arrayMeta: { groups: JSON.parse(JSON.stringify(groups)), wordToKey: { ...wordToKey }, currentWord: idx >= 0 ? strs[idx] : '', currentKey: extra.currentKey || '', action: extra.action || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call groupAnagrams([${strs.map(s => '"' + s + '"')}]).`, -1);
+    record(1, `Insight: Anagrams have the same sorted characters. "eat" → "aet", "tea" → "aet". Same key → same group!`, -1);
+
+    for (let i = 0; i < strs.length; i++) {
+        const key = strs[i].split('').sort().join('');
+        wordToKey[strs[i]] = key;
+        const isNew = !groups[key];
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(strs[i]);
+        record(4, `"${strs[i]}" → sort → "${key}". ${isNew ? 'NEW group' : `Add to existing group`} "${key}": [${groups[key].map(s => '"' + s + '"').join(', ')}].`, i, { currentKey: key, action: isNew ? 'newgroup' : 'addtogroup' });
+    }
+
+    const result = Object.values(groups);
+    h.push({ msg: `✓ Done! ${result.length} anagram groups: ${result.map(g => '[' + g.map(s => '"' + s + '"').join(', ') + ']').join(', ')}.`, line: 5, pointers: {}, nums1: [...strs], nums2: [], arrayMeta: { groups: JSON.parse(JSON.stringify(groups)), wordToKey: { ...wordToKey }, action: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 46: Two Sum (LC #1) ───
+function generateTwoSumHistory() {
+    const nums = [2, 7, 11, 15];
+    const target = 9;
+    const h = [];
+    const seen = {};
+
+    function record(line, msg, idx, extra = {}) {
+        h.push({ msg, line, pointers: { i: idx }, nums1: [...nums], nums2: [], arrayMeta: { target, seen: { ...seen }, complement: extra.complement ?? null, currentVal: idx >= 0 ? nums[idx] : null, action: extra.action || '', foundIdx: extra.foundIdx ?? null, result: extra.result || null }, step: h.length, ...extra });
+    }
+
+    record(0, `Call twoSum([${nums}], target=${target}).`, -1);
+    record(1, `Strategy: For each num, compute complement = target − num. If complement is in our hash map → found! Otherwise, store num → index.`, -1);
+
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+
+        if (seen[complement] !== undefined) {
+            record(5, `nums[${i}]=${nums[i]}. complement = ${target} − ${nums[i]} = ${complement}. Check map → seen[${complement}] = index ${seen[complement]} ✓ FOUND!`, i, { complement, action: 'found', foundIdx: seen[complement], result: [seen[complement], i] });
+            h.push({ msg: `✓ Done! nums[${seen[complement]}] + nums[${i}] = ${nums[seen[complement]]} + ${nums[i]} = ${target}. Return [${seen[complement]}, ${i}].`, line: 5, pointers: {}, nums1: [...nums], nums2: [], arrayMeta: { target, seen: { ...seen }, result: [seen[complement], i], action: 'done' }, step: h.length, isComplete: true });
+            return h;
+        }
+
+        record(6, `nums[${i}]=${nums[i]}. complement = ${target} − ${nums[i]} = ${complement}. Check map → NOT found. Store seen[${nums[i]}] = ${i}.`, i, { complement, action: 'store' });
+        seen[nums[i]] = i;
+    }
+
+    h.push({ msg: `✓ Done! No pair found.`, line: 7, pointers: {}, nums1: [...nums], nums2: [], arrayMeta: { target, seen: { ...seen }, action: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 47: Happy Number (LC #202) ───
+function generateHappyNumberHistory() {
+    const startN = 19;
+    const h = [];
+    const seen = new Set();
+    let n = startN;
+
+    function digitSquareSum(num) {
+        let sum = 0;
+        while (num > 0) { sum += (num % 10) ** 2; num = Math.floor(num / 10); }
+        return sum;
+    }
+
+    function record(line, msg, extra = {}) {
+        const digits = String(n).split('').map(Number);
+        const squares = digits.map(d => d * d);
+        const squareSum = squares.reduce((a, b) => a + b, 0);
+        h.push({ msg, line, pointers: {}, nums1: [], nums2: [], arrayMeta: { n, seen: [...seen], startN, digits, squares, squareSum, chain: [...seen, n], action: extra.action || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call isHappy(${startN}). Split number into digits, square each, sum them. Repeat until 1 or cycle.`);
+    record(1, `Track seen numbers — if we see one again, it's a cycle (not happy).`);
+
+    while (n !== 1) {
+        if (seen.has(n)) {
+            record(3, `${n} already seen → CYCLE! Not a happy number.`, { action: 'cycle' });
+            h.push({ msg: `✗ Done! ${startN} is NOT a happy number (cycle detected).`, line: 3, pointers: {}, nums1: [], nums2: [], arrayMeta: { n, seen: [...seen], startN, action: 'done' }, step: h.length, isComplete: true });
+            return h;
+        }
+        seen.add(n);
+        const digits = String(n).split('').map(Number);
+        const squares = digits.map(d => d * d);
+        const expr = digits.map(d => `${d}²=${d * d}`).join(' + ');
+        const next = digitSquareSum(n);
+        record(5, `${n} → ${expr} → sum = ${next}.`, { action: 'compute' });
+        n = next;
+    }
+
+    record(6, `Reached 1! 🎉 Happy number!`, { action: 'happy' });
+    h.push({ msg: `✓ Done! ${startN} IS a happy number!`, line: 6, pointers: {}, nums1: [], nums2: [], arrayMeta: { n, seen: [...seen], startN, action: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 48: Contains Duplicate II (LC #219) ───
+function generateContainsDupIIHistory() {
+    const nums = [1, 2, 3, 1, 2, 3];
+    const k = 2;
+    const h = [];
+    const windowSet = new Set();
+
+    function record(line, msg, idx, extra = {}) {
+        const winStart = Math.max(0, idx - k);
+        h.push({ msg, line, pointers: { i: idx }, nums1: [...nums], nums2: [], arrayMeta: { k, windowSet: [...windowSet], windowStr: [...windowSet].join(', '), action: extra.action || '', checkedVal: extra.checkedVal ?? null, removedVal: extra.removedVal ?? null, winStart, winEnd: idx }, step: h.length, ...extra });
+    }
+
+    record(0, `Call containsNearbyDuplicate([${nums}], k=${k}).`, -1);
+    record(1, `Use a sliding window set of size k=${k}. For each num: if already in set → duplicate within distance k!`, -1);
+
+    let found = false;
+    for (let i = 0; i < nums.length; i++) {
+        if (i > k) {
+            const removed = nums[i - k - 1];
+            windowSet.delete(removed);
+            record(4, `Window full → evict nums[${i - k - 1}]=${removed} (too far away, distance > k=${k}).`, i, { action: 'evict', removedVal: removed });
+        }
+        if (windowSet.has(nums[i])) {
+            record(5, `nums[${i}]=${nums[i]} IS in window set {${[...windowSet].join(',')}} → DUPLICATE within k=${k}! ✓`, i, { action: 'found', checkedVal: nums[i] });
+            found = true;
+            break;
+        }
+        record(7, `nums[${i}]=${nums[i]} NOT in window set → add it. Window: {${[...windowSet, nums[i]].join(', ')}}.`, i, { action: 'add', checkedVal: nums[i] });
+        windowSet.add(nums[i]);
+    }
+
+    h.push({ msg: `✓ Done! containsNearbyDuplicate = ${found}. ${found ? 'Found a duplicate within k=' + k + '!' : 'No nearby duplicates.'}`, line: 8, pointers: {}, nums1: [...nums], nums2: [], arrayMeta: { k, windowSet: [...windowSet], result: found, action: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ─── Problem 49: Longest Consecutive Sequence (LC #128) ───
+function generateLongestConsecutiveHistory() {
+    const nums = [100, 4, 200, 1, 3, 2];
+    const h = [];
+    const numSet = new Set(nums);
+    let longest = 0;
+
+    function record(line, msg, idx, extra = {}) {
+        h.push({ msg, line, pointers: { i: idx }, nums1: [...nums], nums2: [], arrayMeta: { numSet: [...numSet].sort((a, b) => a - b), longest, currentSeq: extra.seq || [], currentNum: extra.currentNum ?? null, action: extra.action || '', checkingNum: extra.checkingNum ?? null, isStart: extra.isStart ?? null }, step: h.length, ...extra });
+    }
+
+    record(0, `Call longestConsecutive([${nums}]).`, -1);
+    record(1, `Step 1: Put all nums in a HashSet = {${[...numSet].sort((a,b)=>a-b).join(', ')}}.`, -1);
+    record(1, `Step 2: For each num, check if num−1 is in set. If NOT → it's a SEQUENCE START. Then count forward.`, -1);
+
+    let idx = 0;
+    for (const n of nums) {
+        const hasPrec = numSet.has(n - 1);
+        if (!hasPrec) {
+            // Start of a sequence
+            let length = 1;
+            const seq = [n];
+            record(4, `num=${n}: Is ${n - 1} in set? NO → ${n} is a SEQUENCE START! Begin counting forward.`, idx, { seq: [...seq], currentNum: n, action: 'start', isStart: true });
+
+            while (numSet.has(n + length)) {
+                seq.push(n + length);
+                record(7, `Is ${n + length} in set? YES → extend chain! seq=[${seq.join(' → ')}] length=${seq.length}.`, idx, { seq: [...seq], currentNum: n, checkingNum: n + length, action: 'extend' });
+                length++;
+            }
+            record(7, `Is ${n + length} in set? NO → chain ends.`, idx, { seq: [...seq], currentNum: n, checkingNum: n + length, action: 'chainend' });
+            longest = Math.max(longest, length);
+            record(8, `Sequence [${seq.join(' → ')}] has length ${length}. Longest so far: ${longest}.`, idx, { seq: [...seq], currentNum: n, action: 'compare', isComparison: true });
+        } else {
+            record(4, `num=${n}: Is ${n - 1}=${n - 1} in set? YES → ${n} is NOT a start (${n - 1} comes before it). Skip.`, idx, { currentNum: n, action: 'skip', isStart: false });
+        }
+        idx++;
+    }
+
+    h.push({ msg: `✓ Done! Longest consecutive sequence = ${longest}.`, line: 9, pointers: {}, nums1: [...nums], nums2: [], arrayMeta: { numSet: [...numSet].sort((a, b) => a - b), longest, action: 'done' }, step: h.length, isComplete: true });
     return h;
 }
 
@@ -4019,6 +5359,132 @@ async function getYouTubeRecommendations() {
                 }
             ];
         }
+        // Problem 32 - Smallest Subarray Sum (Minimum Size Subarray Sum)
+        else if (currentProbId === '32') {
+            videos = [
+                { title: "Minimum Size Subarray Sum — LeetCode 209 — NeetCode", url: "https://www.youtube.com/watch?v=aYqYMIqZx5s", reason: "Sliding window: grow right, shrink left when sum ≥ target" },
+                { title: "Sliding Window Technique — Complete Guide", url: "https://www.youtube.com/watch?v=MK-NZ4hN7rs", reason: "Master the sliding window pattern used in dozens of problems" }
+            ];
+        }
+        // Problem 33 - Longest Unique Substring
+        else if (currentProbId === '33') {
+            videos = [
+                { title: "Longest Substring Without Repeating Characters — NeetCode", url: "https://www.youtube.com/watch?v=wiGpQwVHdE0", reason: "Sliding window with HashSet to track unique characters" },
+                { title: "Sliding Window + HashSet Pattern", url: "https://www.youtube.com/watch?v=MK-NZ4hN7rs", reason: "Foundation for all sliding window + set problems" }
+            ];
+        }
+        // Problem 34 - Longest Repeating After Replace
+        else if (currentProbId === '34') {
+            videos = [
+                { title: "Longest Repeating Character Replacement — NeetCode", url: "https://www.youtube.com/watch?v=gqXU1UyA8pk", reason: "Key insight: window valid when (length - maxFreq) ≤ k" },
+                { title: "Sliding Window with Frequency Count", url: "https://www.youtube.com/watch?v=MK-NZ4hN7rs", reason: "Pattern for frequency-based sliding window problems" }
+            ];
+        }
+        // Problem 35 - Minimum Window Match (Minimum Window Substring)
+        else if (currentProbId === '35') {
+            videos = [
+                { title: "Minimum Window Substring — LeetCode 76 — NeetCode", url: "https://www.youtube.com/watch?v=jSto0O4AJbM", reason: "Hardest sliding window: have/need counters with shrink phase" },
+                { title: "Minimum Window Substring — Step by Step", url: "https://www.youtube.com/watch?v=U1q16AFcjKs", reason: "Detailed walkthrough of the have/total counting technique" }
+            ];
+        }
+        // Problem 36 - Valid Bracket Sequence (Valid Parentheses)
+        else if (currentProbId === '36') {
+            videos = [
+                { title: "Valid Parentheses — LeetCode 20 — NeetCode", url: "https://www.youtube.com/watch?v=WTzjTskDFMg", reason: "Classic stack problem: push opens, pop and match closes" },
+                { title: "Stack Data Structure — Full Course", url: "https://www.youtube.com/watch?v=I37kGX-nZEI", reason: "Deep dive into stack operations and bracket matching" }
+            ];
+        }
+        // Problem 37 - Spiral Matrix Reader
+        else if (currentProbId === '37') {
+            videos = [
+                { title: "Spiral Matrix — LeetCode 54 — NeetCode", url: "https://www.youtube.com/watch?v=BJnMZNwUk1M", reason: "Boundary peeling: move top/bot/left/right inward each layer" },
+                { title: "Spiral Matrix — Visual Walkthrough", url: "https://www.youtube.com/watch?v=TmweBVEL0I0", reason: "Step-by-step animation of the spiral traversal pattern" }
+            ];
+        }
+        // Problem 38 - Rotate Grid 90°
+        else if (currentProbId === '38') {
+            videos = [
+                { title: "Rotate Image — LeetCode 48 — NeetCode", url: "https://www.youtube.com/watch?v=fMSJSS7eO1w", reason: "Transpose + reverse = 90° clockwise rotation in-place" },
+                { title: "Matrix Rotation — Why Transpose Works", url: "https://www.youtube.com/watch?v=SA867FvqHrM", reason: "Mathematical proof of the transpose + reverse technique" }
+            ];
+        }
+        // Problem 39 - Zero Row & Column Marker
+        else if (currentProbId === '39') {
+            videos = [
+                { title: "Set Matrix Zeroes — LeetCode 73 — NeetCode", url: "https://www.youtube.com/watch?v=T41rL0L3Pnw", reason: "Use first row/col as markers for O(1) space solution" },
+                { title: "Set Matrix Zeroes — All Three Approaches", url: "https://www.youtube.com/watch?v=M65xBewcqcI", reason: "Compare O(mn), O(m+n), and O(1) space approaches" }
+            ];
+        }
+        // Problem 40 - Game of Life Step
+        else if (currentProbId === '40') {
+            videos = [
+                { title: "Game of Life — LeetCode 289 — NeetCode", url: "https://www.youtube.com/watch?v=fei4bJQdBUQ", reason: "In-place state encoding: use 2nd bit to store next state" },
+                { title: "Conway's Game of Life Explained", url: "https://www.youtube.com/watch?v=ouipbDkwHWA", reason: "The cellular automaton rules and why they create complexity" }
+            ];
+        }
+        // Problem 41 - Ransom Letter Builder
+        else if (currentProbId === '41') {
+            videos = [
+                { title: "Ransom Note — LeetCode 383 — NeetCode", url: "https://www.youtube.com/watch?v=iTbBbfkMnnI", reason: "HashMap character counting: build from magazine, consume for note" },
+                { title: "Character Frequency Problems — Pattern", url: "https://www.youtube.com/watch?v=WpYhLikralU", reason: "Foundation pattern for all character counting problems" }
+            ];
+        }
+        // Problem 42 - Isomorphic String Check
+        else if (currentProbId === '42') {
+            videos = [
+                { title: "Isomorphic Strings — LeetCode 205 — NeetCode", url: "https://www.youtube.com/watch?v=7yF-U1hLEqQ", reason: "Two-way mapping: each char must map consistently both directions" },
+                { title: "String Mapping Problems — Pattern Guide", url: "https://www.youtube.com/watch?v=WpYhLikralU", reason: "Bidirectional mapping pattern used in multiple problems" }
+            ];
+        }
+        // Problem 43 - Word Pattern Matcher
+        else if (currentProbId === '43') {
+            videos = [
+                { title: "Word Pattern — LeetCode 290 — NeetCode", url: "https://www.youtube.com/watch?v=W_akoecmCbM", reason: "Same bidirectional mapping as isomorphic, but pattern↔word" },
+                { title: "HashMap Bijection Pattern", url: "https://www.youtube.com/watch?v=7yF-U1hLEqQ", reason: "Understanding 1-to-1 mappings in string problems" }
+            ];
+        }
+        // Problem 44 - Anagram Checker
+        else if (currentProbId === '44') {
+            videos = [
+                { title: "Valid Anagram — LeetCode 242 — NeetCode", url: "https://www.youtube.com/watch?v=9UtInBqnCgA", reason: "Count chars in s, decrement for t — if any negative, not anagram" },
+                { title: "Anagram & Character Count Techniques", url: "https://www.youtube.com/watch?v=WpYhLikralU", reason: "Foundation for all anagram-related problems" }
+            ];
+        }
+        // Problem 45 - Group Anagram Sets
+        else if (currentProbId === '45') {
+            videos = [
+                { title: "Group Anagrams — LeetCode 49 — NeetCode", url: "https://www.youtube.com/watch?v=vzdNOK2oB2E", reason: "Sort each word as key → group by sorted key in HashMap" },
+                { title: "Group Anagrams — Optimal with Count Key", url: "https://www.youtube.com/watch?v=6kkmFlTRO1k", reason: "Character count array as key instead of sorting for O(n·k)" }
+            ];
+        }
+        // Problem 46 - Pair Sum Finder (Two Sum)
+        else if (currentProbId === '46') {
+            videos = [
+                { title: "Two Sum — LeetCode 1 — NeetCode", url: "https://www.youtube.com/watch?v=KLlXCFG5TnA", reason: "THE classic: HashMap one-pass — check complement, then store" },
+                { title: "Two Sum — Every Approach Explained", url: "https://www.youtube.com/watch?v=Ivyh3V4QolA", reason: "Brute force vs sort+two-pointer vs HashMap comparison" }
+            ];
+        }
+        // Problem 47 - Happy Number Cycle
+        else if (currentProbId === '47') {
+            videos = [
+                { title: "Happy Number — LeetCode 202 — NeetCode", url: "https://www.youtube.com/watch?v=ljz85bxOYJ0", reason: "HashSet cycle detection: sum of digit squares until 1 or loop" },
+                { title: "Happy Number — Floyd's Cycle Detection", url: "https://www.youtube.com/watch?v=gW3P9tcNjx4", reason: "Alternative O(1) space approach using slow/fast pointers" }
+            ];
+        }
+        // Problem 48 - Nearby Duplicate Finder
+        else if (currentProbId === '48') {
+            videos = [
+                { title: "Contains Duplicate II — LeetCode 219 — NeetCode", url: "https://www.youtube.com/watch?v=ypn0aZ0nrL4", reason: "Sliding window HashSet of size k: check before insert" },
+                { title: "Sliding Window Set Pattern", url: "https://www.youtube.com/watch?v=MK-NZ4hN7rs", reason: "Foundation for fixed-size window with set membership checks" }
+            ];
+        }
+        // Problem 49 - Longest Run of Consecutive
+        else if (currentProbId === '49') {
+            videos = [
+                { title: "Longest Consecutive Sequence — LeetCode 128 — NeetCode", url: "https://www.youtube.com/watch?v=P6RZZMu_maU", reason: "HashSet: only start counting from sequence starts (n-1 not in set)" },
+                { title: "Longest Consecutive — Why O(n)?", url: "https://www.youtube.com/watch?v=rc2QdQ7U78I", reason: "Proof that each element is visited at most twice" }
+            ];
+        }
         // Fallback for unknown problems
         else {
             videos = [
@@ -4480,6 +5946,33 @@ function render() {
             });
             
             html += `</div>`;
+
+            // Bridge: explain the voting logic
+            if (iPtr >= 0 && iPtr < state.nums1.length) {
+                const val = state.nums1[iPtr];
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (count === 0) {
+                    html += `<span style="color:var(--accent-red);font-weight:600">count = 0</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">→ pick new candidate =</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">${candidate}</span>`;
+                } else if (val === candidate) {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${val}</span>`;
+                    html += `<span style="color:var(--accent-green);margin:0 4px">== candidate ${candidate}</span>`;
+                    html += `<span style="color:var(--text-muted)">→</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700;margin-left:4px">count++ = ${count}</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${val}</span>`;
+                    html += `<span style="color:var(--accent-red);margin:0 4px">≠ candidate ${candidate}</span>`;
+                    html += `<span style="color:var(--text-muted)">→</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:700;margin-left:4px">count-- = ${count}</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ ${candidate} is the dominant element (appears > ⌊n/2⌋ times)</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -4594,6 +6087,35 @@ function render() {
             });
             
             html += `</div>`;
+
+            // Bridge: profit calculation
+            if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
+                const price = state.nums1[iPtr];
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (price < minPrice) {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">prices[${iPtr}]=${price}</span>`;
+                    html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">< minPrice ${minPrice}</span>`;
+                    html += `<span style="color:var(--text-muted)">→ new low! minPrice = ${price}</span>`;
+                } else {
+                    const profit = price - minPrice;
+                    html += `<span style="color:var(--accent-green);font-weight:600">${price}</span>`;
+                    html += `<span class="sum-bridge-op">−</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:600">${minPrice}</span>`;
+                    html += `<span class="sum-bridge-eq">=</span>`;
+                    html += `<span style="color:var(--accent-purple);font-weight:700">${profit} profit</span>`;
+                    if (profit > maxProfit) {
+                        html += `<span style="color:var(--accent-green);margin-left:8px;font-weight:700">NEW BEST! 🎯</span>`;
+                    } else {
+                        html += `<span style="color:var(--text-muted);margin-left:8px">≤ best ${maxProfit}</span>`;
+                    }
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Max profit = ${maxProfit} (buy at ${minPrice})</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -4650,6 +6172,32 @@ function render() {
             });
             
             html += `</div>`;
+
+            // Bridge: gain calculation
+            if (iPtr >= 1 && iPtr < state.nums1.length && !isComplete) {
+                const price = state.nums1[iPtr];
+                const prev = state.nums1[iPtr - 1];
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (price > prev) {
+                    const gain = price - prev;
+                    html += `<span style="color:var(--accent-green);font-weight:600">${price}</span>`;
+                    html += `<span class="sum-bridge-op">−</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:600">${prev}</span>`;
+                    html += `<span class="sum-bridge-eq">=</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">+${gain}</span>`;
+                    html += `<span style="color:var(--text-muted);margin-left:6px">→ collect gain! total = ${totalProfit}</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">${price}</span>`;
+                    html += `<span style="color:var(--accent-red);margin:0 6px">≤ ${prev}</span>`;
+                    html += `<span style="color:var(--text-muted)">→ no gain, skip</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Total profit from all trades = ${totalProfit}</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -4701,6 +6249,30 @@ function render() {
             });
             
             html += `</div>`;
+
+            // Bridge: farthest reach calculation
+            if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
+                const val = state.nums1[iPtr];
+                const reach = iPtr + val;
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (iPtr > farthest) {
+                    html += `<span style="color:var(--accent-red);font-weight:700">i=${iPtr} > farthest=${farthest} — CAN'T REACH HERE!</span>`;
+                } else {
+                    html += `<span style="color:var(--text-muted)">farthest = max(${farthest},</span>`;
+                    html += `<span style="color:var(--accent-blue);font-weight:600;margin:0 4px">${iPtr} + ${val}</span>`;
+                    html += `<span style="color:var(--text-muted)">) = max(${farthest}, ${reach}) =</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700;margin-left:4px">${Math.max(farthest, reach)}</span>`;
+                    if (reach >= state.nums1.length - 1) {
+                        html += `<span style="color:var(--accent-green);margin-left:6px">≥ last index! ✓</span>`;
+                    }
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ farthest=${farthest} ≥ last index ${state.nums1.length - 1} — can reach the end!</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -4713,8 +6285,6 @@ function render() {
                     </div>
                 </div>
             `;
-            html += `</div>`;
-            arrayContainer.innerHTML = html;
         }
         
         // Problem 12: Fewest Jumps to End (Jump Game II) — jumps/curEnd/farthest
@@ -4758,6 +6328,28 @@ function render() {
             });
             
             html += `</div>`;
+
+            // Bridge: BFS level boundary
+            if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
+                const val = state.nums1[iPtr];
+                const reach = iPtr + val;
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--text-muted)">farthest = max(${farthest},</span>`;
+                html += `<span style="color:var(--accent-blue);font-weight:600;margin:0 4px">${iPtr}+${val}=${reach}</span>`;
+                html += `<span style="color:var(--text-muted)">) =</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:700;margin-left:4px">${Math.max(farthest, reach)}</span>`;
+                if (iPtr === curEnd) {
+                    html += `<span style="color:var(--accent-green);margin-left:8px;font-weight:700">i == curEnd → JUMP! (jump #${jumps})</span>`;
+                } else {
+                    html += `<span style="color:var(--text-muted);margin-left:6px">exploring level ${jumps}…</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Minimum jumps = ${jumps}</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -4862,17 +6454,27 @@ function render() {
             }
             
             html += `</div>`;
-            // Show idx_map
-            const mapEntries = Object.entries(idxMap).map(([k, v]) => `${k}→${v}`).join(', ');
+
+            // HashMap bucket for idx_map
+            const mapEntries = Object.entries(idxMap);
+            html += `<div class="ds-container">`;
+            html += `<div class="ds-bucket ds-map">`;
+            html += `<div class="ds-bucket-label"><span class="ds-brace">{</span> idx_map <span class="ds-brace">}</span></div>`;
+            html += `<div class="ds-bucket-items">`;
+            if (mapEntries.length === 0) {
+                html += `<span style="color:var(--text-muted);font-size:11px;">empty</span>`;
+            } else {
+                mapEntries.forEach(([k, v]) => {
+                    html += `<span class="ds-item ds-map-item">${k}→${v}</span>`;
+                });
+            }
+            html += `</div></div></div>`;
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">vals.length</div>
                         <div class="pointer-detail-value p1">${state.nums1.length}</div>
-                    </div>
-                    <div class="pointer-detail">
-                        <div class="pointer-detail-label">idx_map</div>
-                        <div class="pointer-detail-value p2">{${mapEntries || '∅'}}</div>
                     </div>
                 </div>
             `;
@@ -5627,20 +7229,24 @@ function render() {
             arrayContainer.innerHTML = html;
         }
 
-        // Problem 29: Sorted Pair Sum — array with L/R two pointers
+        // Problem 29: Sorted Pair Sum — array with L/R two pointers + sum bridge + move hints
         if (currentProbId === '29' && state.nums1) {
             const lPtr = state.pointers?.l ?? -1;
             const rPtr = state.pointers?.r ?? -1;
             const meta = state.arrayMeta || {};
             const target = meta.target ?? 0;
             const curSum = meta.curSum ?? 0;
+            const sumDir = meta.sumDirection || '';   // 'low' | 'high' | 'match' | ''
+            const lVal = meta.lVal;
+            const rVal = meta.rVal;
             const isComplete = state.isComplete || false;
+            const showBridge = lPtr >= 0 && rPtr >= 0 && lPtr !== rPtr && curSum > 0;
 
             const sItemCount = state.nums1.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
             html += `<div class="array-label">numbers (sorted) — find two that sum to ${target}</div>`;
-            html += `<div class="array-visualization">`;
+            html += `<div class="array-visualization sum-pair-viz">`;
 
             state.nums1.forEach((val, idx) => {
                 let classes = 'array-item';
@@ -5659,10 +7265,34 @@ function render() {
                     pointerLabels = `<div class="pointer-label p2">R</div>`;
                 }
 
-                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+                // Bridge anchor data attributes for L and R
+                const anchorAttr = (idx === lPtr) ? ' data-bridge="L"' : (idx === rPtr) ? ' data-bridge="R"' : '';
+
+                html += `<div class="${classes}"${anchorAttr}>${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
             });
 
             html += `</div>`;
+
+            // Sum bridge between L and R — with inline move hint
+            if (showBridge) {
+                const bridgeClass = sumDir === 'match' ? 'sum-bridge-match' : sumDir === 'low' ? 'sum-bridge-low' : sumDir === 'high' ? 'sum-bridge-high' : '';
+                html += `<div class="sum-bridge ${bridgeClass}">`;
+                html += `<div class="sum-bridge-label">`;
+                html += `<span class="sum-bridge-val sum-bridge-lval">${lVal ?? '?'}</span>`;
+                html += `<span class="sum-bridge-op">+</span>`;
+                html += `<span class="sum-bridge-val sum-bridge-rval">${rVal ?? '?'}</span>`;
+                html += `<span class="sum-bridge-eq">=</span>`;
+                html += `<span class="sum-bridge-result">${curSum}</span>`;
+                if (sumDir === 'low') html += `<span class="sum-bridge-cmp">&lt;</span><span class="sum-bridge-target">${target}</span>`;
+                else if (sumDir === 'high') html += `<span class="sum-bridge-cmp">&gt;</span><span class="sum-bridge-target">${target}</span>`;
+                else if (sumDir === 'match') html += `<span class="sum-bridge-cmp sum-bridge-cmp-match">=</span><span class="sum-bridge-target">${target}</span><span class="sum-bridge-cmp sum-bridge-cmp-match">✓</span>`;
+                // Inline move hint next to the addition
+                if (sumDir === 'low') html += `<span class="move-hint move-hint-right">→ L++</span>`;
+                else if (sumDir === 'high') html += `<span class="move-hint move-hint-left">R-- ←</span>`;
+                html += `</div>`;
+                html += `</div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -5675,11 +7305,11 @@ function render() {
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">target</div>
-                        <div class="pointer-detail-value">${target}</div>
+                        <div class="pointer-detail-value p-green">${target}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">curSum</div>
-                        <div class="pointer-detail-value p-merge">${curSum}</div>
+                        <div class="pointer-detail-value p-purple">${curSum}</div>
                     </div>
                 </div>
             `;
@@ -5722,6 +7352,45 @@ function render() {
             });
 
             html += `</div>`;
+
+            // Bridge: area calculation
+            if (lPtr >= 0 && rPtr >= 0 && lPtr < rPtr && !isComplete) {
+                const hL = state.nums1[lPtr];
+                const hR = state.nums1[rPtr];
+                const minH = Math.min(hL, hR);
+                const width = rPtr - lPtr;
+                const area = minH * width;
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--text-muted)">area = min(</span>`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">${hL}</span>`;
+                html += `<span style="color:var(--text-muted)">,</span>`;
+                html += `<span style="color:var(--accent-orange);font-weight:600">${hR}</span>`;
+                html += `<span style="color:var(--text-muted)">) × (${rPtr}−${lPtr}) =</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:700;margin:0 4px">${minH} × ${width} = ${area}</span>`;
+                if (area >= maxWater) {
+                    html += `<span style="color:var(--accent-green);font-weight:700">NEW BEST! 🎯</span>`;
+                }
+                html += `</div></div>`;
+                // Move hint
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (hL < hR) {
+                    html += `<span style="color:var(--accent-blue)">h[L]=${hL}</span>`;
+                    html += `<span style="color:var(--accent-red);margin:0 4px">&lt;</span>`;
+                    html += `<span style="color:var(--accent-orange)">h[R]=${hR}</span>`;
+                    html += `<span class="move-hint" style="color:var(--accent-blue)">→ move L right (shorter side)</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-blue)">h[L]=${hL}</span>`;
+                    html += `<span style="color:var(--accent-green);margin:0 4px">≥</span>`;
+                    html += `<span style="color:var(--accent-orange)">h[R]=${hR}</span>`;
+                    html += `<span class="move-hint" style="color:var(--accent-orange)">→ move R left (shorter side)</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Maximum water = ${maxWater}</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -5781,6 +7450,35 @@ function render() {
             });
 
             html += `</div>`;
+
+            // Bridge: sum calculation
+            if (iPtr >= 0 && lPtr >= 0 && rPtr >= 0 && !isComplete) {
+                const valI = state.nums1[iPtr];
+                const valL = state.nums1[lPtr];
+                const valR = state.nums1[rPtr];
+                const sum = valI + valL + valR;
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-orange);font-weight:600">${valI}</span>`;
+                html += `<span class="sum-bridge-op">+</span>`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">${valL}</span>`;
+                html += `<span class="sum-bridge-op">+</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:600">${valR}</span>`;
+                html += `<span class="sum-bridge-eq">=</span>`;
+                html += `<span style="color:${sum === 0 ? 'var(--accent-green)' : sum < 0 ? 'var(--accent-blue)' : 'var(--accent-red)'};font-weight:700">${sum}</span>`;
+                if (sum === 0) {
+                    html += `<span style="color:var(--accent-green);margin-left:8px;font-weight:700">TRIPLET FOUND! 🎯</span>`;
+                } else if (sum < 0) {
+                    html += `<span class="move-hint" style="color:var(--accent-blue)">→ too small, move L right</span>`;
+                } else {
+                    html += `<span class="move-hint" style="color:var(--accent-orange)">→ too big, move R left</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Found ${triplets} triplet${triplets !== 1 ? 's' : ''}: ${resultStr || 'none'}</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -5801,6 +7499,1304 @@ function render() {
                     </div>
                 </div>
             `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 32: Smallest Subarray Sum — sliding window with L/R
+        if (currentProbId === '32' && state.nums1) {
+            const lPtr = state.pointers?.l ?? -1;
+            const rPtr = state.pointers?.r ?? -1;
+            const meta = state.arrayMeta || {};
+            const target = meta.target ?? 0;
+            const total = meta.total ?? 0;
+            const res = meta.res ?? '∞';
+            const action = meta.action || '';
+            const windowItems = meta.windowItems || [];
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">nums — find smallest subarray with sum ≥ <span style="color:var(--accent-green);font-weight:700">${target}</span></div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (isComplete && idx >= lPtr && idx <= rPtr) classes += ' pointer-merge';
+                if (idx >= lPtr && idx <= rPtr && lPtr >= 0 && rPtr >= 0 && !isComplete) classes += ' active-window';
+                if (idx === lPtr) { classes += ' pointer-1'; pointerLabels += `<div class="pointer-label p1">L</div>`; }
+                if (idx === rPtr) { classes += ' pointer-2'; pointerLabels += `<div class="pointer-label p2">R</div>`; }
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            // Visual bridge showing sum comparison — the WHY
+            if (lPtr >= 0 && rPtr >= 0) {
+                const sumStr = windowItems.join(' + ');
+                if (total >= target) {
+                    html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                    html += `<span style="color:var(--text-muted);font-size:11px">${sumStr} =</span> `;
+                    html += `<span class="sum-bridge-result" style="color:var(--accent-purple);font-weight:700">${total}</span>`;
+                    html += `<span class="sum-bridge-cmp" style="color:var(--accent-green)"> ≥ ${target} ✓</span>`;
+                    html += `<span class="move-hint" style="color:var(--accent-blue)">→ shrink L to minimize</span>`;
+                    html += `</div></div>`;
+                } else {
+                    html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                    html += `<span style="color:var(--text-muted);font-size:11px">${sumStr} =</span> `;
+                    html += `<span class="sum-bridge-result" style="color:var(--accent-purple);font-weight:700">${total}</span>`;
+                    html += `<span class="sum-bridge-cmp" style="color:var(--accent-red)"> &lt; ${target}</span>`;
+                    html += `<span class="move-hint" style="color:var(--accent-orange)">→ expand R to grow sum</span>`;
+                    html += `</div></div>`;
+                }
+            }
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">window sum</div><div class="pointer-detail-value p-purple">${total}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">target</div><div class="pointer-detail-value p-green">${target}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">best len</div><div class="pointer-detail-value p-merge">${res}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 33: Longest Unique Substring — sliding window on chars
+        if (currentProbId === '33' && state.nums1) {
+            const lPtr = state.pointers?.l ?? -1;
+            const rPtr = state.pointers?.r ?? -1;
+            const meta = state.arrayMeta || {};
+            const res = meta.res ?? 0;
+            const windowChars = meta.windowChars ?? '';
+            const action = meta.action || '';
+            const dupChar = meta.dupChar || '';
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">s — find longest substring without repeating characters</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (isComplete && idx >= lPtr && idx <= rPtr) classes += ' pointer-merge';
+                if (idx >= lPtr && idx <= rPtr && lPtr >= 0 && rPtr >= 0 && !isComplete) classes += ' active-window';
+                // Highlight the duplicate char in red
+                if (dupChar && ch === dupChar && idx >= lPtr && idx <= rPtr && !isComplete && action === 'duplicate') classes += ' pointer-merge-alt';
+                if (idx === lPtr) { classes += ' pointer-1'; pointerLabels += `<div class="pointer-label p1">L</div>`; }
+                if (idx === rPtr) { classes += ' pointer-2'; pointerLabels += `<div class="pointer-label p2">R</div>`; }
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            // Visual bridge showing window uniqueness check
+            if (lPtr >= 0 && rPtr >= 0) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (action === 'duplicate' || action === 'shrink') {
+                    html += `<span style="color:var(--accent-red);font-weight:700">'${dupChar}' duplicate!</span>`;
+                    html += `<span class="move-hint" style="color:var(--accent-blue)">→ shrink L until removed</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-green)">all unique ✓</span>`;
+                    html += `<span style="color:var(--text-muted);margin-left:6px">window len = ${rPtr - lPtr + 1}</span>`;
+                }
+                html += `</div></div>`;
+            }
+
+            // HashSet bucket for window chars
+            html += `<div class="ds-container">`;
+            html += `<div class="ds-bucket ds-set">`;
+            html += `<div class="ds-bucket-label"><span class="ds-brace">{</span> charSet <span class="ds-brace">}</span></div>`;
+            html += `<div class="ds-bucket-items">`;
+            if (!windowChars || windowChars.length === 0) {
+                html += `<span style="color:var(--text-muted);font-size:11px;">empty</span>`;
+            } else {
+                windowChars.split('').forEach(ch => {
+                    let cls = 'ds-item ds-set-item';
+                    if (ch === dupChar && (action === 'duplicate' || action === 'shrink')) cls += ' ds-miss';
+                    html += `<span class="${cls}">${ch}</span>`;
+                });
+            }
+            html += `</div></div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">best</div><div class="pointer-detail-value p-green">${res}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 34: Longest Repeating After Replace — sliding window
+        if (currentProbId === '34' && state.nums1) {
+            const lPtr = state.pointers?.l ?? -1;
+            const rPtr = state.pointers?.r ?? -1;
+            const meta = state.arrayMeta || {};
+            const res = meta.res ?? 0;
+            const maxf = meta.maxf ?? 0;
+            const k = meta.k ?? 0;
+            const counts = meta.counts || {};
+            const dominantChar = meta.dominantChar || '?';
+            const replacements = meta.replacements ?? 0;
+            const action = meta.action || '';
+            const isComplete = state.isComplete || false;
+            const wLen = (lPtr >= 0 && rPtr >= 0) ? rPtr - lPtr + 1 : 0;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">s — longest substring of same char with ≤ <span style="color:var(--accent-green);font-weight:700">${k}</span> replacement(s)</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (isComplete && idx >= lPtr && idx <= rPtr) classes += ' pointer-merge';
+                if (idx >= lPtr && idx <= rPtr && lPtr >= 0 && rPtr >= 0 && !isComplete) {
+                    classes += ' active-window';
+                    // Highlight non-dominant chars (these are the "replacements")
+                    if (ch !== dominantChar && wLen > 0) classes += ' highlight-char';
+                }
+                if (idx === lPtr) { classes += ' pointer-1'; pointerLabels += `<div class="pointer-label p1">L</div>`; }
+                if (idx === rPtr) { classes += ' pointer-2'; pointerLabels += `<div class="pointer-label p2">R</div>`; }
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            // Visual bridge — the key equation
+            if (lPtr >= 0 && rPtr >= 0 && wLen > 0) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--text-muted);font-size:11px">window ${wLen} − freq('${dominantChar}')×${maxf} =</span> `;
+                html += `<span style="color:var(--accent-purple);font-weight:700">${replacements} replacements</span>`;
+                if (replacements <= k) {
+                    html += `<span style="color:var(--accent-green)"> ≤ ${k} ✓ valid</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-red)"> > ${k} ✗</span>`;
+                    html += `<span class="move-hint" style="color:var(--accent-blue)">→ shrink L</span>`;
+                }
+                html += `</div></div>`;
+            }
+
+            // HashMap bucket for character counts
+            const countEntries = Object.entries(counts);
+            html += `<div class="ds-container">`;
+            html += `<div class="ds-bucket ds-map">`;
+            html += `<div class="ds-bucket-label"><span class="ds-brace">{</span> counts <span class="ds-brace">}</span></div>`;
+            html += `<div class="ds-bucket-items">`;
+            if (countEntries.length === 0) {
+                html += `<span style="color:var(--text-muted);font-size:11px;">empty</span>`;
+            } else {
+                countEntries.forEach(([ch, v]) => {
+                    let cls = 'ds-item ds-map-item';
+                    if (ch === dominantChar) cls += ' ds-active';
+                    html += `<span class="${cls}">${ch}→${v}</span>`;
+                });
+            }
+            html += `</div></div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">most freq</div><div class="pointer-detail-value p-purple">'${dominantChar}'×${maxf}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">replacements</div><div class="pointer-detail-value ${replacements <= k ? 'p-green' : 'p-merge'}">${replacements}/${k}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">best</div><div class="pointer-detail-value p-merge">${res}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 35: Minimum Window Match — sliding window
+        if (currentProbId === '35' && state.nums1) {
+            const lPtr = state.pointers?.l ?? -1;
+            const rPtr = state.pointers?.r ?? -1;
+            const meta = state.arrayMeta || {};
+            const have = meta.have ?? 0;
+            const total = meta.total ?? 0;
+            const res = meta.res ?? '∞';
+            const resStr = meta.resStr ?? '';
+            const t = meta.t ?? '';
+            const needStatus = meta.needStatus || '';
+            const action = meta.action || '';
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">s — find smallest window containing all of "<span style="color:var(--accent-green);font-weight:700">${t}</span>"</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (isComplete && resStr && idx >= lPtr && idx <= rPtr) classes += ' pointer-merge';
+                if (idx >= lPtr && idx <= rPtr && lPtr >= 0 && rPtr >= 0 && !isComplete) classes += ' active-window';
+                if (t.includes(ch)) classes += ' highlight-char';
+                if (idx === lPtr) { classes += ' pointer-1'; pointerLabels += `<div class="pointer-label p1">L</div>`; }
+                if (idx === rPtr) { classes += ' pointer-2'; pointerLabels += `<div class="pointer-label p2">R</div>`; }
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            // Scoreboard showing which needed chars we have
+            if (needStatus) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--text-muted);font-size:11px">need:</span> `;
+                needStatus.split(' ').forEach(part => {
+                    const hasCheck = part.includes('✓');
+                    html += `<span style="color:${hasCheck ? 'var(--accent-green)' : 'var(--accent-red)'};margin:0 3px;font-size:12px;font-weight:600">${part}</span>`;
+                });
+                if (have === total && lPtr >= 0) {
+                    html += `<span class="move-hint" style="color:var(--accent-blue)">→ shrink L to minimize</span>`;
+                } else {
+                    html += `<span class="move-hint" style="color:var(--accent-orange)">→ expand R to collect</span>`;
+                }
+                html += `</div></div>`;
+            }
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">matched</div><div class="pointer-detail-value p-purple">${have}/${total}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">best window</div><div class="pointer-detail-value p-green">${resStr ? `"${resStr}" (${res})` : '—'}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 36: Valid Parentheses — chars with visual stack
+        if (currentProbId === '36' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const stack = meta.stack || [];
+            const action = meta.action || '';
+            const matchPair = meta.matchPair || '';
+            const currentChar = meta.currentChar || '';
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">s — validate brackets using a stack</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (isComplete && action === 'valid') classes += ' pointer-merge';
+                if (isComplete && action === 'invalid') classes += ' pointer-merge-alt';
+                if (idx === iPtr) {
+                    if (action === 'push') classes += ' pointer-1';
+                    else if (action === 'pop') classes += ' pointer-merge';
+                    else if (action === 'mismatch') classes += ' pointer-merge-alt';
+                    else classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                }
+                if (idx < iPtr) classes += ' visited';
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+
+            // Visual stack — render as horizontal boxes growing right (like a visual stack)
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            html += `<span style="color:var(--text-muted);font-size:11px;margin-right:6px">stack:</span>`;
+            if (stack.length === 0) {
+                html += `<span style="color:var(--text-muted);font-style:italic">empty</span>`;
+            } else {
+                stack.forEach((ch, si) => {
+                    const isTop = si === stack.length - 1;
+                    html += `<span style="display:inline-block;padding:2px 8px;margin:0 2px;border-radius:4px;font-weight:700;font-size:14px;border:1px solid ${isTop ? 'var(--accent-purple)' : 'var(--border-subtle)'};color:${isTop ? 'var(--accent-purple)' : 'var(--text-muted)'};background:${isTop ? 'rgba(139,92,246,0.1)' : 'transparent'}">${ch}</span>`;
+                });
+            }
+            if (action === 'push') {
+                html += `<span style="color:var(--accent-green);margin-left:8px;font-size:12px">← pushed '${currentChar}'</span>`;
+            } else if (action === 'pop') {
+                html += `<span style="color:var(--accent-green);margin-left:8px;font-size:12px">✓ matched ${matchPair}</span>`;
+            } else if (action === 'mismatch') {
+                html += `<span style="color:var(--accent-red);margin-left:8px;font-size:12px">✗ mismatch!</span>`;
+            }
+            html += `</div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">action</div><div class="pointer-detail-value ${action === 'push' ? 'p1' : action === 'pop' ? 'p-green' : action === 'mismatch' ? 'p-merge' : ''}">${action || '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">stack size</div><div class="pointer-detail-value p-purple">${stack.length}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 37: Spiral Matrix — grid with direction bridge
+        if (currentProbId === '37' && state.nums1) {
+            const meta = state.arrayMeta || {};
+            const matrix = meta.matrix || [];
+            const m = meta.m || 0, n = meta.n || 0;
+            const res = meta.res || [];
+            const visited = meta.visited || [];
+            const row = state.pointers?.row ?? -1;
+            const col = state.pointers?.col ?? -1;
+            const direction = meta.direction || '';
+            const isComplete = state.isComplete || false;
+
+            const dirArrow = { right: '→', down: '↓', left: '←', up: '↑' };
+            const dirColor = { right: 'var(--accent-blue)', down: 'var(--accent-orange)', left: 'var(--accent-purple)', up: 'var(--accent-green)' };
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">matrix ${m}×${n} — peel layers in spiral: → ↓ ← ↑ repeat</div>`;
+            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:4px;max-width:${n * 52}px;margin:0 auto;">`;
+
+            for (let i = 0; i < m; i++) {
+                for (let j = 0; j < n; j++) {
+                    const idx = i * n + j;
+                    let classes = 'array-item';
+                    if (visited[idx]) classes += ' visited';
+                    if (i === row && j === col) classes += ' pointer-1';
+                    if (isComplete) classes += ' pointer-merge';
+                    html += `<div class="${classes}" style="margin:0;min-width:36px;">${matrix[i]?.[j] ?? ''}<div class="array-index">[${i}][${j}]</div></div>`;
+                }
+            }
+
+            html += `</div>`;
+
+            // Bridge: direction and current value
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (direction && row >= 0) {
+                const dc = dirColor[direction] || 'var(--text-muted)';
+                html += `<span style="color:${dc};font-weight:700;font-size:18px;">${dirArrow[direction] || ''}</span>`;
+                html += `<span style="color:${dc};font-weight:600;margin-left:6px;">moving ${direction}</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">→ collect</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">${matrix[row]?.[col] ?? '?'}</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:6px">(${res.length}/${m * n})</span>`;
+            } else if (isComplete) {
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Spiral complete: [${res.join(', ')}]</span>`;
+            }
+            html += `</div></div>`;
+
+            // Result bar
+            if (res.length > 0 && !isComplete) {
+                html += `<div style="display:flex;gap:3px;align-items:center;justify-content:center;margin:6px 0;flex-wrap:wrap;">`;
+                html += `<span style="color:var(--text-muted);font-size:11px;font-weight:600;">result:</span>`;
+                res.forEach((v, ri) => {
+                    const isLast = ri === res.length - 1;
+                    html += `<span style="background:${isLast ? 'var(--accent-green)' : 'var(--surface-2)'};color:${isLast ? '#fff' : 'var(--text-primary)'};padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;">${v}</span>`;
+                });
+                html += `</div>`;
+            }
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">direction</div><div class="pointer-detail-value p1">${direction ? `${dirArrow[direction]} ${direction}` : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">collected</div><div class="pointer-detail-value p-purple">${res.length}/${m * n}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 38: Rotate Image — grid with phase bridge
+        if (currentProbId === '38' && state.nums1) {
+            const meta = state.arrayMeta || {};
+            const matrix = meta.matrix || [];
+            const n = meta.n || 0;
+            const phase = meta.phase || '';
+            const row = state.pointers?.row ?? -1;
+            const col = state.pointers?.col ?? -1;
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">matrix ${n}×${n} — rotate 90° CW = transpose + reverse rows</div>`;
+            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:4px;max-width:${n * 52}px;margin:0 auto;">`;
+
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    let classes = 'array-item';
+                    if (isComplete) classes += ' pointer-merge';
+                    if (i === row && j === col) classes += ' pointer-1';
+                    if (phase === 'transpose' && i === col && j === row && row >= 0) classes += ' pointer-2';
+                    html += `<div class="${classes}" style="margin:0;min-width:36px;">${matrix[i]?.[j] ?? ''}<div class="array-index">[${i}][${j}]</div></div>`;
+                }
+            }
+
+            html += `</div>`;
+
+            // Bridge: phase explanation
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (phase === 'transpose' && row >= 0) {
+                html += `<span style="color:var(--accent-blue);font-weight:700">Step 1: Transpose</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">— swap [${row}][${col}] ↔ [${col}][${row}]</span>`;
+                html += `<span style="color:var(--accent-purple)">(mirror across diagonal)</span>`;
+            } else if (phase === 'transpose') {
+                html += `<span style="color:var(--accent-blue);font-weight:700">Step 1: Transpose</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:6px">— swap matrix[i][j] ↔ matrix[j][i]</span>`;
+            } else if (phase === 'reverse' && row >= 0) {
+                html += `<span style="color:var(--accent-orange);font-weight:700">Step 2: Reverse row ${row}</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:6px">— flip left↔right to complete rotation</span>`;
+            } else if (phase === 'reverse') {
+                html += `<span style="color:var(--accent-orange);font-weight:700">Step 2: Reverse each row</span>`;
+            } else if (isComplete) {
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Matrix rotated 90° clockwise!</span>`;
+            }
+            html += `</div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">phase</div><div class="pointer-detail-value p1">${phase === 'transpose' ? '1. Transpose' : phase === 'reverse' ? '2. Reverse rows' : phase || '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">cell</div><div class="pointer-detail-value p-purple">${row >= 0 ? `[${row}][${col}]` : '—'}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 39: Set Matrix Zeroes — grid with phase bridge
+        if (currentProbId === '39' && state.nums1) {
+            const meta = state.arrayMeta || {};
+            const matrix = meta.matrix || [];
+            const m = meta.m || 0, n = meta.n || 0;
+            const phase = meta.phase || '';
+            const row = state.pointers?.row ?? -1;
+            const col = state.pointers?.col ?? -1;
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">matrix ${m}×${n} — use first row/col as markers, then zero in-place</div>`;
+            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:4px;max-width:${n * 52}px;margin:0 auto;">`;
+
+            for (let i = 0; i < m; i++) {
+                for (let j = 0; j < n; j++) {
+                    let classes = 'array-item';
+                    const val = matrix[i]?.[j] ?? '';
+                    if (val === 0) classes += ' pointer-merge';
+                    // Highlight marker row/col
+                    if ((i === 0 || j === 0) && phase === 'mark') classes += ' active-window';
+                    if (i === row && j === col) classes += ' pointer-1';
+                    html += `<div class="${classes}" style="margin:0;min-width:36px;">${val}<div class="array-index">[${i}][${j}]</div></div>`;
+                }
+            }
+
+            html += `</div>`;
+
+            // Bridge
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (phase === 'scan') {
+                html += `<span style="color:var(--accent-blue);font-weight:700">Scan:</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:6px">check if first row/col already contain zeros</span>`;
+            } else if (phase === 'mark' && row >= 0) {
+                html += `<span style="color:var(--accent-orange);font-weight:700">Mark:</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">[${row}][${col}] = 0 → set</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:600">row ${row} marker</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">&</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:600">col ${col} marker</span>`;
+            } else if (phase === 'mark') {
+                html += `<span style="color:var(--accent-orange);font-weight:700">Phase 1: Mark</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:6px">— record zeros in first row/col as markers</span>`;
+            } else if (phase === 'zero' && row >= 0) {
+                html += `<span style="color:var(--accent-red);font-weight:700">Zero:</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">[${row}][${col}] → 0 (marker says this row or col has a zero)</span>`;
+            } else if (phase === 'zero') {
+                html += `<span style="color:var(--accent-red);font-weight:700">Phase 2: Zero out</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:6px">— set cells to 0 based on markers</span>`;
+            } else if (isComplete) {
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Matrix zeroed in-place using O(1) extra space!</span>`;
+            }
+            html += `</div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">phase</div><div class="pointer-detail-value p1">${phase === 'scan' ? 'Scan' : phase === 'mark' ? 'Mark' : phase === 'zero' ? 'Zero' : phase || '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">cell</div><div class="pointer-detail-value p-purple">${row >= 0 ? `[${row}][${col}]` : '—'}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 40: Game of Life — grid with rules bridge
+        if (currentProbId === '40' && state.nums1) {
+            const meta = state.arrayMeta || {};
+            const matrix = meta.matrix || [];
+            const m = meta.m || 0, n = meta.n || 0;
+            const phase = meta.phase || '';
+            const row = state.pointers?.row ?? -1;
+            const col = state.pointers?.col ?? -1;
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">board ${m}×${n} — Game of Life: encode next state in-place, then decode</div>`;
+            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:4px;max-width:${n * 52}px;margin:0 auto;">`;
+
+            for (let i = 0; i < m; i++) {
+                for (let j = 0; j < n; j++) {
+                    let classes = 'array-item';
+                    const val = matrix[i]?.[j] ?? 0;
+                    // Color coding: 0=dead, 1=alive, 2=born(was dead→alive), 3=survives(was alive→alive)
+                    if (val === 1 || val === 3) classes += ' pointer-merge';
+                    if (val === 2) classes += ' highlight-char';
+                    if (i === row && j === col) classes += ' pointer-1';
+                    const display = phase === 'decode' || phase === 'done' ? (val > 0 ? val : '·') : (val === 0 ? '·' : val === 1 ? '■' : val === 2 ? '★' : '■');
+                    html += `<div class="${classes}" style="margin:0;min-width:36px;">${display}<div class="array-index">[${i}][${j}]</div></div>`;
+                }
+            }
+
+            html += `</div>`;
+
+            // Bridge: explain rules
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (phase === 'encode' && row >= 0 && col >= 0) {
+                const val = matrix[row]?.[col] ?? 0;
+                const wasAlive = (val & 1) === 1 || val === 3;
+                // Extract from step message if possible
+                if (val === 3) {
+                    html += `<span style="color:var(--accent-green);font-weight:700">[${row}][${col}] ■ alive</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">with 2–3 neighbors →</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">SURVIVES (3)</span>`;
+                } else if (val === 2) {
+                    html += `<span style="color:var(--accent-blue);font-weight:700">[${row}][${col}] · dead</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">with exactly 3 neighbors →</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">BORN! (2) ★</span>`;
+                } else if (wasAlive) {
+                    html += `<span style="color:var(--accent-red);font-weight:700">[${row}][${col}] ■ alive</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">under/overpopulated →</span>`;
+                    html += `<span style="color:var(--accent-red);font-weight:700">DIES</span>`;
+                } else {
+                    html += `<span style="color:var(--text-muted)">[${row}][${col}] · dead</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">stays dead (not exactly 3 neighbors)</span>`;
+                }
+            } else if (phase === 'encode') {
+                html += `<span style="color:var(--accent-orange);font-weight:700">Phase 1: Encode</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:6px">— 2=born, 3=survives (store next state in 2nd bit)</span>`;
+            } else if (phase === 'decode' && row >= 0) {
+                html += `<span style="color:var(--accent-purple);font-weight:700">Phase 2: Decode</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">[${row}][${col}]: ${matrix[row]?.[col]} >> 1 = final state</span>`;
+            } else if (phase === 'decode') {
+                html += `<span style="color:var(--accent-purple);font-weight:700">Phase 2: Decode</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:6px">— right shift each cell to get final state</span>`;
+            } else if (isComplete) {
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Next generation computed in-place!</span>`;
+            }
+            html += `</div></div>`;
+
+            // Legend
+            html += `<div style="display:flex;gap:12px;align-items:center;justify-content:center;margin:6px 0;flex-wrap:wrap;font-size:11px;">`;
+            html += `<span style="color:var(--text-muted);">· dead</span>`;
+            html += `<span style="color:var(--accent-green);">■ alive</span>`;
+            html += `<span style="color:var(--accent-blue);">★ born</span>`;
+            html += `<span style="color:var(--accent-red);">💀 dies</span>`;
+            html += `</div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">phase</div><div class="pointer-detail-value p1">${phase === 'encode' ? '1. Encode' : phase === 'decode' ? '2. Decode' : phase || '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">cell</div><div class="pointer-detail-value p-purple">${row >= 0 ? `[${row}][${col}]` : '—'}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 41: Ransom Note — visual frequency counter with consume bridge
+        if (currentProbId === '41' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const count = meta.count || {};
+            const source = meta.source || '';
+            const action = meta.action || '';
+            const currentChar = meta.currentChar || '';
+            const isComplete = state.isComplete || false;
+            const displayArr = source === 'note' ? (meta.ransomNote || '').split('') : (meta.magazine || '').split('');
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">${source === 'note' ? 'ransomNote' : 'magazine'} — ${source === 'note' ? 'consume letters from available counts' : 'count available letters'}</div>`;
+            html += `<div class="array-visualization">`;
+
+            displayArr.forEach((ch, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (isComplete) classes += meta.result ? ' pointer-merge' : ' pointer-merge-alt';
+                if (idx === iPtr) { classes += ' pointer-1'; pointerLabels = `<div class="pointer-label p1">i</div>`; }
+                if (idx < iPtr) classes += ' visited';
+                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+
+            // Bridge: what's happening
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (action === 'count') {
+                html += `<span style="color:var(--accent-blue);font-weight:600">'${currentChar}'</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">→ count['${currentChar}'] + 1 =</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">${count[currentChar] ?? 0}</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:4px">(building inventory)</span>`;
+            } else if (action === 'consume') {
+                html += `<span style="color:var(--accent-orange);font-weight:600">Need '${currentChar}'</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">→ count['${currentChar}'] − 1 =</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">${count[currentChar] ?? 0} ✓</span>`;
+            } else if (action === 'fail') {
+                html += `<span style="color:var(--accent-red);font-weight:600">Need '${currentChar}'</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">but count['${currentChar}'] =</span>`;
+                html += `<span style="color:var(--accent-red);font-weight:700">0 — NONE LEFT!</span>`;
+            } else if (isComplete) {
+                html += meta.result
+                    ? `<span style="color:var(--accent-green);font-weight:700">✓ All letters consumed — can construct!</span>`
+                    : `<span style="color:var(--accent-red);font-weight:700">✗ Missing letters — cannot construct</span>`;
+            }
+            html += `</div></div>`;
+
+            // HashMap bucket visual for frequency counter
+            const entries = Object.entries(count);
+            html += `<div class="ds-container">`;
+            html += `<div class="ds-bucket ds-map">`;
+            html += `<div class="ds-bucket-label"><span class="ds-brace">{</span> count <span class="ds-brace">}</span></div>`;
+            html += `<div class="ds-bucket-items">`;
+            if (entries.length === 0) {
+                html += `<span style="color:var(--text-muted);font-size:11px;">empty</span>`;
+            } else {
+                entries.forEach(([ch, v]) => {
+                    let cls = 'ds-item ds-map-item';
+                    if (ch === currentChar) cls += v <= 0 ? ' ds-miss' : ' ds-active';
+                    html += `<span class="${cls}">${ch}→${v}</span>`;
+                });
+            }
+            html += `</div></div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">phase</div><div class="pointer-detail-value p-green">${source === 'mag' ? 'counting magazine' : 'consuming for note'}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 42: Isomorphic Strings — dual array with mapping bridge
+        if (currentProbId === '42' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const mapST = meta.mapST || {};
+            const action = meta.action || '';
+            const charS = meta.charS || '';
+            const charT = meta.charT || '';
+            const conflictWith = meta.conflictWith || '';
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">s → t — each char in s must map to exactly one char in t (and vice versa)</div>`;
+
+            // Show s
+            html += `<div class="array-visualization">`;
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                if (isComplete && meta.result) classes += ' pointer-merge';
+                if (idx === iPtr) classes += ' pointer-1';
+                if (idx < iPtr) classes += ' visited';
+                // Highlight mapped chars
+                if (ch === charS && idx === iPtr) classes += ' highlight-char';
+                html += `<div class="${classes}">${ch}<div class="array-index">s[${idx}]</div></div>`;
+            });
+            html += `</div>`;
+
+            // Show t
+            html += `<div class="array-visualization" style="margin-top:4px;">`;
+            state.nums2.forEach((ch, idx) => {
+                let classes = 'array-item';
+                if (isComplete && meta.result) classes += ' pointer-merge';
+                if (idx === iPtr) classes += ' pointer-2';
+                if (idx < iPtr) classes += ' visited';
+                if (ch === charT && idx === iPtr) classes += ' highlight-char';
+                html += `<div class="${classes}">${ch}<div class="array-index">t[${idx}]</div></div>`;
+            });
+            html += `</div>`;
+
+            // Bridge: mapping explanation
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (action === 'map') {
+                html += `<span style="color:var(--accent-blue);font-weight:600">'${charS}'</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">↔</span>`;
+                html += `<span style="color:var(--accent-orange);font-weight:600">'${charT}'</span>`;
+                html += `<span style="color:var(--accent-green);margin-left:6px;font-weight:600">✓ consistent mapping</span>`;
+            } else if (action === 'conflict') {
+                html += `<span style="color:var(--accent-blue);font-weight:600">'${charS}'</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">→</span>`;
+                html += `<span style="color:var(--accent-orange);font-weight:600">'${charT}'</span>`;
+                html += `<span style="color:var(--accent-red);margin:0 6px;font-weight:700">CONFLICT!</span>`;
+                html += `<span style="color:var(--text-muted)">already mapped to '${conflictWith}'</span>`;
+            } else if (isComplete) {
+                html += meta.result
+                    ? `<span style="color:var(--accent-green);font-weight:700">✓ All mappings consistent — isomorphic!</span>`
+                    : `<span style="color:var(--accent-red);font-weight:700">✗ Mapping conflict — not isomorphic</span>`;
+            }
+            html += `</div></div>`;
+
+            // HashMap bucket visual for s→t mapping
+            const mapEntries = Object.entries(mapST);
+            html += `<div class="ds-container">`;
+            html += `<div class="ds-bucket ds-map">`;
+            html += `<div class="ds-bucket-label"><span class="ds-brace">{</span> s→t map <span class="ds-brace">}</span></div>`;
+            html += `<div class="ds-bucket-items">`;
+            if (mapEntries.length === 0) {
+                html += `<span style="color:var(--text-muted);font-size:11px;">empty</span>`;
+            } else {
+                mapEntries.forEach(([k, v]) => {
+                    let cls = 'ds-item ds-map-item';
+                    if (k === charS) cls += action === 'conflict' ? ' ds-miss' : ' ds-active';
+                    html += `<span class="${cls}">${k}→${v}</span>`;
+                });
+            }
+            html += `</div></div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">checking</div><div class="pointer-detail-value p-purple">${charS ? `'${charS}' ↔ '${charT}'` : '—'}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 43: Word Pattern — pattern + words with mapping bridge
+        if (currentProbId === '43' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const words = meta.words || [];
+            const pToW = meta.pToW || {};
+            const action = meta.action || '';
+            const patChar = meta.patChar || '';
+            const word = meta.word || '';
+            const conflictWith = meta.conflictWith || '';
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">pattern → words — each pattern char maps to exactly one word (and vice versa)</div>`;
+
+            // Show pattern
+            html += `<div class="array-visualization">`;
+            state.nums1.forEach((ch, idx) => {
+                let classes = 'array-item';
+                if (isComplete && meta.result) classes += ' pointer-merge';
+                if (idx === iPtr) classes += ' pointer-1';
+                if (idx < iPtr) classes += ' visited';
+                html += `<div class="${classes}">${ch}<div class="array-index">p[${idx}]</div></div>`;
+            });
+            html += `</div>`;
+
+            // Show words
+            html += `<div class="array-visualization" style="margin-top:4px;">`;
+            words.forEach((w, idx) => {
+                let classes = 'array-item';
+                if (isComplete && meta.result) classes += ' pointer-merge';
+                if (idx === iPtr) classes += ' pointer-2';
+                if (idx < iPtr) classes += ' visited';
+                html += `<div class="${classes}" style="min-width:${Math.max(36, w.length * 10)}px;font-size:11px;">${w}<div class="array-index">w[${idx}]</div></div>`;
+            });
+            html += `</div>`;
+
+            // Bridge
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (action === 'map') {
+                html += `<span style="color:var(--accent-blue);font-weight:600">'${patChar}'</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">↔</span>`;
+                html += `<span style="color:var(--accent-orange);font-weight:600">"${word}"</span>`;
+                html += `<span style="color:var(--accent-green);margin-left:6px;font-weight:600">✓ consistent</span>`;
+            } else if (action === 'conflict') {
+                html += `<span style="color:var(--accent-blue);font-weight:600">'${patChar}'</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">→</span>`;
+                html += `<span style="color:var(--accent-orange);font-weight:600">"${word}"</span>`;
+                html += `<span style="color:var(--accent-red);margin:0 6px;font-weight:700">CONFLICT!</span>`;
+                html += `<span style="color:var(--text-muted)">already mapped to "${conflictWith}"</span>`;
+            } else if (isComplete) {
+                html += meta.result
+                    ? `<span style="color:var(--accent-green);font-weight:700">✓ All pattern↔word mappings consistent!</span>`
+                    : `<span style="color:var(--accent-red);font-weight:700">✗ Pattern mapping conflict</span>`;
+            }
+            html += `</div></div>`;
+
+            // HashMap bucket visual for pattern→word mapping
+            const mapEntries = Object.entries(pToW);
+            html += `<div class="ds-container">`;
+            html += `<div class="ds-bucket ds-map">`;
+            html += `<div class="ds-bucket-label"><span class="ds-brace">{</span> pattern→word <span class="ds-brace">}</span></div>`;
+            html += `<div class="ds-bucket-items">`;
+            if (mapEntries.length === 0) {
+                html += `<span style="color:var(--text-muted);font-size:11px;">empty</span>`;
+            } else {
+                mapEntries.forEach(([k, v]) => {
+                    let cls = 'ds-item ds-map-item';
+                    if (k === patChar) cls += action === 'conflict' ? ' ds-miss' : ' ds-active';
+                    html += `<span class="${cls}">${k}→"${v}"</span>`;
+                });
+            }
+            html += `</div></div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">checking</div><div class="pointer-detail-value p-purple">${patChar ? `'${patChar}' ↔ "${word}"` : '—'}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 44: Valid Anagram — char frequency with visual bars
+        if (currentProbId === '44' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const count = meta.count || {};
+            const source = meta.source || 's';
+            const action = meta.action || '';
+            const currentChar = meta.currentChar || '';
+            const isComplete = state.isComplete || false;
+            const displayArr = source === 's' ? (meta.s || '').split('') : (meta.t || '').split('');
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">${source === 's' ? `s="${meta.s}"` : `t="${meta.t}"`} — ${source === 's' ? 'count chars (+1)' : 'subtract chars (−1)'}</div>`;
+            html += `<div class="array-visualization">`;
+
+            displayArr.forEach((ch, idx) => {
+                let classes = 'array-item';
+                if (isComplete) classes += meta.result ? ' pointer-merge' : '';
+                if (idx === iPtr) classes += ' pointer-1';
+                if (idx < iPtr) classes += ' visited';
+                html += `<div class="${classes}">${ch}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+
+            // Bridge
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (action === 'add') {
+                html += `<span style="color:var(--accent-blue);font-weight:600">'${currentChar}'</span>`;
+                html += `<span style="color:var(--accent-green);margin:0 4px;font-weight:700">+1</span>`;
+                html += `<span style="color:var(--text-muted)">→ count['${currentChar}'] = ${count[currentChar] ?? 0}</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:6px">(building frequency from s)</span>`;
+            } else if (action === 'subtract') {
+                html += `<span style="color:var(--accent-orange);font-weight:600">'${currentChar}'</span>`;
+                html += `<span style="color:var(--accent-red);margin:0 4px;font-weight:700">−1</span>`;
+                html += `<span style="color:var(--text-muted)">→ count['${currentChar}'] = ${count[currentChar] ?? 0}</span>`;
+                html += `<span style="color:var(--accent-green);margin-left:6px">✓ still ≥ 0</span>`;
+            } else if (action === 'fail') {
+                html += `<span style="color:var(--accent-red);font-weight:600">'${currentChar}' −1 → ${count[currentChar] ?? 0}</span>`;
+                html += `<span style="color:var(--accent-red);margin-left:6px;font-weight:700">< 0 — MORE in t than s! NOT anagram</span>`;
+            } else if (isComplete) {
+                html += meta.result
+                    ? `<span style="color:var(--accent-green);font-weight:700">✓ All counts balanced to 0 — valid anagram!</span>`
+                    : `<span style="color:var(--accent-red);font-weight:700">✗ Counts don't balance — not an anagram</span>`;
+            }
+            html += `</div></div>`;
+
+            // HashMap bucket visual for frequency counter
+            const entries = Object.entries(count);
+            html += `<div class="ds-container">`;
+            html += `<div class="ds-bucket ds-map">`;
+            html += `<div class="ds-bucket-label"><span class="ds-brace">{</span> count <span class="ds-brace">}</span></div>`;
+            html += `<div class="ds-bucket-items">`;
+            if (entries.length === 0) {
+                html += `<span style="color:var(--text-muted);font-size:11px;">empty</span>`;
+            } else {
+                entries.forEach(([ch, v]) => {
+                    let cls = 'ds-item ds-map-item';
+                    if (ch === currentChar) cls += ' ds-active';
+                    if (v < 0) cls += ' ds-miss';
+                    else if (v === 0) cls = 'ds-item ds-map-item ds-active';
+                    html += `<span class="${cls}">${ch}→${v}</span>`;
+                });
+            }
+            html += `</div></div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">phase</div><div class="pointer-detail-value p-green">${source === 's' ? 'counting s (+1)' : 'verifying t (−1)'}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 45: Group Anagrams — words with visual grouping buckets
+        if (currentProbId === '45' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const groups = meta.groups || {};
+            const action = meta.action || '';
+            const currentKey = meta.currentKey || '';
+            const wordToKey = meta.wordToKey || {};
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">strs — sort each word to create key, group by matching keys</div>`;
+            html += `<div class="array-visualization">`;
+
+            // Color palette for groups
+            const groupColors = ['var(--accent-blue)', 'var(--accent-orange)', 'var(--accent-purple)', 'var(--accent-green)', 'var(--accent-red)', '#06b6d4'];
+            const groupKeys = Object.keys(groups);
+
+            state.nums1.forEach((word, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (idx === iPtr) { classes += ' pointer-1'; pointerLabels = `<div class="pointer-label p1">i</div>`; }
+                if (idx < iPtr) classes += ' visited';
+                // Color by group
+                const key = wordToKey[word];
+                const gIdx = groupKeys.indexOf(key);
+                const borderColor = gIdx >= 0 ? groupColors[gIdx % groupColors.length] : '';
+                const style = borderColor && idx <= iPtr ? `border-color:${borderColor};box-shadow:0 0 6px ${borderColor}40;` : '';
+                html += `<div class="${classes}" style="min-width:${Math.max(36, word.length * 10)}px;font-size:12px;${style}">${word}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+
+            // Bridge: sort key explanation
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
+                const word = state.nums1[iPtr];
+                html += `<span style="color:var(--accent-blue);font-weight:600">"${word}"</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">→ sort →</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:700">"${currentKey}"</span>`;
+                if (action === 'newgroup') {
+                    html += `<span style="color:var(--accent-green);margin-left:6px;font-weight:600">NEW GROUP!</span>`;
+                } else if (action === 'addtogroup') {
+                    html += `<span style="color:var(--accent-orange);margin-left:6px;font-weight:600">→ add to existing group</span>`;
+                }
+            } else if (isComplete) {
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ ${groupKeys.length} groups found</span>`;
+            }
+            html += `</div></div>`;
+
+            // Visual group buckets
+            if (groupKeys.length > 0) {
+                html += `<div style="display:flex;gap:10px;align-items:flex-start;justify-content:center;margin:8px 0;flex-wrap:wrap;">`;
+                groupKeys.forEach((key, gi) => {
+                    const color = groupColors[gi % groupColors.length];
+                    const words = groups[key] || [];
+                    html += `<div style="border:2px solid ${color};border-radius:8px;padding:6px 10px;background:${color}10;text-align:center;min-width:60px;">`;
+                    html += `<div style="color:${color};font-size:10px;font-weight:700;margin-bottom:4px;">"${key}"</div>`;
+                    words.forEach(w => {
+                        html += `<div style="color:var(--text-primary);font-size:12px;font-weight:600;">${w}</div>`;
+                    });
+                    html += `</div>`;
+                });
+                html += `</div>`;
+            }
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">sort key</div><div class="pointer-detail-value p-purple">"${currentKey || '—'}"</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">groups</div><div class="pointer-detail-value p-green">${groupKeys.length}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 46: Two Sum — array with hash map lookup
+        if (currentProbId === '46' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const target = meta.target ?? 0;
+            const seen = meta.seen || {};
+            const complement = meta.complement;
+            const currentVal = meta.currentVal;
+            const action = meta.action || '';
+            const foundIdx = meta.foundIdx;
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">nums — find two numbers that sum to <span style="color:var(--accent-green);font-weight:700">${target}</span></div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (isComplete && meta.result && (idx === meta.result[0] || idx === meta.result[1])) classes += ' pointer-merge';
+                if (action === 'found' && idx === foundIdx) classes += ' pointer-2';
+                if (idx === iPtr) { classes += ' pointer-1'; pointerLabels = `<div class="pointer-label p1">i</div>`; }
+                if (idx < iPtr && !(action === 'found' && idx === foundIdx)) classes += ' visited';
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+            // Visual bridge — the complement computation
+            if (iPtr >= 0 && complement !== null && complement !== undefined) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:600">${target}</span>`;
+                html += `<span class="sum-bridge-op">−</span>`;
+                html += `<span style="color:var(--accent-blue);font-weight:700">${currentVal}</span>`;
+                html += `<span class="sum-bridge-eq">=</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:700">${complement}</span>`;
+                if (action === 'found') {
+                    html += `<span style="color:var(--accent-green);margin-left:8px;font-weight:700">✓ found in map at index ${foundIdx}!</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-red);margin-left:8px">✗ not in map → store ${currentVal}</span>`;
+                }
+                html += `</div></div>`;
+            }
+
+            // HashMap bucket visual
+            const seenEntries = Object.entries(seen);
+            html += `<div class="ds-container">`;
+            html += `<div class="ds-bucket ds-map">`;
+            html += `<div class="ds-bucket-label"><span class="ds-brace">{</span> seen <span class="ds-brace">}</span></div>`;
+            html += `<div class="ds-bucket-items">`;
+            if (seenEntries.length === 0) {
+                html += `<span style="color:var(--text-muted);font-size:11px;">empty</span>`;
+            } else {
+                seenEntries.forEach(([val, idx]) => {
+                    let cls = 'ds-item ds-map-item';
+                    if (Number(val) === complement && action === 'found') cls += ' ds-active';
+                    if (Number(val) === currentVal && action === 'store') cls += ' ds-ping';
+                    html += `<span class="${cls}">${val}→i${idx}</span>`;
+                });
+            }
+            html += `</div></div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">target</div><div class="pointer-detail-value p-green">${target}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">complement</div><div class="pointer-detail-value p-purple">${complement ?? '—'}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 47: Happy Number — digit squares chain
+        if (currentProbId === '47') {
+            const meta = state.arrayMeta || {};
+            const n = meta.n ?? 0;
+            const seen = meta.seen || [];
+            const digits = meta.digits || [];
+            const squares = meta.squares || [];
+            const squareSum = meta.squareSum ?? 0;
+            const chain = meta.chain || [];
+            const action = meta.action || '';
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">n=${meta.startN} — repeatedly sum squares of digits until 1 (happy) or cycle (not)</div>`;
+
+            // Show current number being decomposed into digit squares
+            if (digits.length > 0) {
+                html += `<div class="array-visualization">`;
+                digits.forEach((d, idx) => {
+                    let classes = 'array-item';
+                    if (isComplete && n === 1) classes += ' pointer-merge';
+                    html += `<div class="${classes}"><div style="font-size:11px;color:var(--text-muted)">${d}²</div><div style="font-size:16px;font-weight:700;color:var(--accent-purple)">${squares[idx] ?? d * d}</div><div class="array-index">${d}</div></div>`;
+                });
+                // Show the sum
+                html += `<div class="array-item" style="border-color:var(--accent-green);color:var(--accent-green);font-weight:700">=<div style="font-size:16px">${squareSum}</div><div class="array-index">sum</div></div>`;
+                html += `</div>`;
+            }
+
+            // Chain visualization — shows the journey
+            if (chain.length > 0) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--text-muted);font-size:11px;margin-right:4px">journey:</span>`;
+                chain.forEach((num, ci) => {
+                    if (ci > 0) html += `<span style="color:var(--text-muted);margin:0 2px">→</span>`;
+                    const isCurrent = ci === chain.length - 1;
+                    const color = num === 1 ? 'var(--accent-green)' : isCurrent ? 'var(--accent-purple)' : 'var(--text-muted)';
+                    html += `<span style="color:${color};font-weight:${isCurrent ? '700' : '400'};font-size:${isCurrent ? '14px' : '12px'}">${num}</span>`;
+                });
+                if (n === 1) html += `<span style="color:var(--accent-green);margin-left:6px;font-weight:700">= 1 🎉 Happy!</span>`;
+                else if (action === 'cycle') html += `<span style="color:var(--accent-red);margin-left:6px">🔄 cycle!</span>`;
+                html += `</div></div>`;
+            }
+
+            // HashSet bucket for seen numbers
+            html += `<div class="ds-container">`;
+            html += `<div class="ds-bucket ds-set">`;
+            html += `<div class="ds-bucket-label"><span class="ds-brace">{</span> seen <span class="ds-brace">}</span></div>`;
+            html += `<div class="ds-bucket-items">`;
+            if (seen.length === 0) {
+                html += `<span style="color:var(--text-muted);font-size:11px;">empty</span>`;
+            } else {
+                seen.forEach(v => {
+                    let cls = 'ds-item ds-set-item';
+                    if (v === squareSum && action === 'cycle') cls += ' ds-miss';
+                    if (v === n) cls += ' ds-active';
+                    html += `<span class="${cls}">${v}</span>`;
+                });
+            }
+            html += `</div></div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">current n</div><div class="pointer-detail-value p-purple">${n}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">steps</div><div class="pointer-detail-value p-green">${seen.length}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 48: Contains Duplicate II — sliding window with HashSet bucket
+        if (currentProbId === '48' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const k = meta.k ?? 0;
+            const windowSet = meta.windowSet || [];
+            const action = meta.action || '';
+            const checkedVal = meta.checkedVal;
+            const removedVal = meta.removedVal;
+            const winStart = meta.winStart ?? 0;
+            const winEnd = meta.winEnd ?? -1;
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">nums — duplicate within distance <span style="color:var(--accent-green);font-weight:700">k=${k}</span>? Uses a <span style="color:var(--accent-purple);font-weight:700">HashSet</span> as sliding window</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (isComplete) classes += ' pointer-merge';
+                if (idx >= winStart && idx <= winEnd && !isComplete) classes += ' active-window';
+                if (idx === iPtr) { classes += ' pointer-1'; pointerLabels = `<div class="pointer-label p1">i</div>`; }
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+
+            // Bridge
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (action === 'found') {
+                html += `<span style="color:var(--accent-blue);font-weight:600">${checkedVal}</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">in</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:700">windowSet</span>`;
+                html += `<span style="color:var(--text-muted)">?</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700;margin-left:6px">YES → DUPLICATE FOUND! 🎯</span>`;
+            } else if (action === 'add') {
+                html += `<span style="color:var(--accent-blue);font-weight:600">${checkedVal}</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">in</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:700">windowSet</span>`;
+                html += `<span style="color:var(--text-muted)">?</span>`;
+                html += `<span style="color:var(--accent-red);font-weight:700;margin:0 6px">NO</span>`;
+                html += `<span style="color:var(--text-muted)">→ add to set</span>`;
+            } else if (action === 'evict') {
+                html += `<span style="color:var(--accent-orange);font-weight:600">window size > k=${k}</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">→ evict</span>`;
+                html += `<span style="color:var(--accent-red);font-weight:700">${removedVal}</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:4px">from set (oldest element)</span>`;
+            } else if (isComplete) {
+                html += `<span style="color:var(--accent-green);font-weight:700">No duplicates found within distance k=${k}</span>`;
+            }
+            html += `</div></div>`;
+
+            // HashSet bucket visual
+            html += `<div class="ds-container">`;
+            html += `<div class="ds-bucket ds-set">`;
+            html += `<div class="ds-bucket-label"><span class="ds-brace">{</span> windowSet <span class="ds-brace">}</span></div>`;
+            html += `<div class="ds-bucket-items">`;
+            if (windowSet.length === 0) {
+                html += `<span style="color:var(--text-muted);font-size:11px;">empty</span>`;
+            } else {
+                windowSet.forEach(v => {
+                    let cls = 'ds-item ds-set-item';
+                    if (v === checkedVal && action === 'found') cls += ' ds-active';
+                    if (v === removedVal && action === 'evict') cls += ' ds-miss';
+                    html += `<span class="${cls}">${v}</span>`;
+                });
+            }
+            html += `</div></div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">window</div><div class="pointer-detail-value p-purple">[${winStart}..${winEnd}]</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">k</div><div class="pointer-detail-value p-green">${k}</div></div>
+            </div>`;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
+        }
+
+        // Problem 49: Longest Consecutive Sequence — HashSet bucket + chain bar
+        if (currentProbId === '49' && state.nums1) {
+            const iPtr = state.pointers?.i ?? -1;
+            const meta = state.arrayMeta || {};
+            const longest = meta.longest ?? 0;
+            const currentSeq = meta.currentSeq || [];
+            const currentNum = meta.currentNum;
+            const action = meta.action || '';
+            const isStart = meta.isStart;
+            const checkingNum = meta.checkingNum;
+            const numSet = meta.numSet || [];
+            const isComplete = state.isComplete || false;
+
+            let html = `<div class="array-inner">`;
+            html += `<div class="array-label">nums — find longest consecutive sequence using a <span style="color:var(--accent-purple);font-weight:700">HashSet</span> (O(n))</div>`;
+            html += `<div class="array-visualization">`;
+
+            state.nums1.forEach((val, idx) => {
+                let classes = 'array-item';
+                let pointerLabels = '';
+                if (isComplete) classes += ' pointer-merge';
+                // Highlight current sequence members
+                if (currentSeq.includes(val) && !isComplete) classes += ' active-window';
+                // Highlight current number being examined
+                if (val === currentNum && action !== 'done' && !isComplete) {
+                    if (isStart === true) classes += ' highlight-char'; // green glow = START
+                    else if (isStart === false) classes += ' visited';
+                    pointerLabels = `<div class="pointer-label p1">n</div>`;
+                }
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+            });
+
+            html += `</div>`;
+
+            // ── "Is it a Start?" bridge ──
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (action === 'skip') {
+                html += `<span style="color:var(--accent-orange);font-weight:600">n = ${currentNum}:</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">Is <b>${currentNum - 1}</b> in</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:700">numSet</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">?</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700;margin:0 4px">YES ✓</span>`;
+                html += `<span style="color:var(--text-muted)">→ part of an existing chain.</span>`;
+                html += `<span style="color:var(--accent-red);font-weight:700;margin-left:4px">SKIP</span>`;
+            } else if (action === 'start') {
+                html += `<span style="color:var(--accent-blue);font-weight:600">n = ${currentNum}:</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">Is <b>${currentNum - 1}</b> in</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:700">numSet</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">?</span>`;
+                html += `<span style="color:var(--accent-red);font-weight:700;margin:0 4px">NO ✗</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700;margin-left:4px">→ SEQUENCE START! 🚀 Count forward.</span>`;
+            } else if (action === 'extend') {
+                html += `<span style="color:var(--text-muted)">checking:</span>`;
+                html += `<span style="color:var(--accent-purple);font-weight:700;margin:0 6px">${checkingNum}</span>`;
+                html += `<span style="color:var(--text-muted)">in numSet?</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700;margin-left:6px">YES → extend chain! ⚡</span>`;
+            } else if (action === 'chainend') {
+                html += `<span style="color:var(--text-muted)">checking:</span>`;
+                html += `<span style="color:var(--accent-red);font-weight:700;margin:0 6px">${checkingNum}</span>`;
+                html += `<span style="color:var(--text-muted)">in numSet?</span>`;
+                html += `<span style="color:var(--accent-red);font-weight:700;margin-left:6px">NO → chain ends here. 🛑</span>`;
+            } else if (action === 'compare') {
+                html += `<span style="color:var(--accent-green);font-weight:700">sequence length ${currentSeq.length} ${currentSeq.length >= longest ? '≥' : '<'} best ${longest}</span>`;
+                if (currentSeq.length >= longest) html += `<span style="color:var(--accent-green);margin-left:6px">→ NEW BEST! 🏆</span>`;
+            } else if (isComplete) {
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Longest consecutive run = ${longest}</span>`;
+            }
+            html += `</div></div>`;
+
+            // ── Chain Bar (the "explosion" / sequence building visual) ──
+            if (currentSeq.length > 0 || action === 'chainend') {
+                html += `<div class="chain-bar">`;
+                currentSeq.forEach((v, si) => {
+                    if (si > 0) html += `<span class="chain-arrow">→</span>`;
+                    html += `<span class="chain-num">${v}</span>`;
+                });
+                if (action === 'extend' && checkingNum !== null) {
+                    html += `<span class="chain-arrow">→</span>`;
+                    html += `<span class="chain-num chain-new">${checkingNum}</span>`;
+                }
+                if (action === 'chainend' && checkingNum !== null) {
+                    html += `<span class="chain-arrow">→</span>`;
+                    html += `<span class="chain-num chain-fail">${checkingNum}</span>`;
+                }
+                html += `</div>`;
+            }
+
+            // ── HashSet Bucket Visual ──
+            html += `<div class="ds-container">`;
+            html += `<div class="ds-bucket ds-set">`;
+            html += `<div class="ds-bucket-label"><span class="ds-brace">{</span> numSet <span class="ds-brace">}</span></div>`;
+            html += `<div class="ds-bucket-items">`;
+            if (numSet.length > 0) {
+                numSet.forEach(v => {
+                    let itemClass = 'ds-item ds-set-item';
+                    // Ping the item being looked up
+                    if (action === 'skip' && v === currentNum - 1) itemClass += ' ds-active';
+                    else if (action === 'start' && v === currentNum) itemClass += ' ds-active';
+                    else if (action === 'extend' && v === checkingNum) itemClass += ' ds-active';
+                    else if (action === 'chainend' && v === checkingNum) itemClass += ' ds-miss';
+                    // Highlight chain members
+                    else if (currentSeq.includes(v)) itemClass += ' ds-active';
+                    html += `<span class="${itemClass}">${v}</span>`;
+                });
+            } else {
+                html += `<span style="color:var(--text-muted);font-size:11px;">empty</span>`;
+            }
+            html += `</div></div></div>`;
+
+            html += `<div class="pointer-info">
+                <div class="pointer-detail"><div class="pointer-detail-label">checking</div><div class="pointer-detail-value p1">${currentNum ?? '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">chain</div><div class="pointer-detail-value p-purple">${currentSeq.length > 0 ? `len ${currentSeq.length}` : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">longest</div><div class="pointer-detail-value p-green">${longest}</div></div>
+            </div>`;
             html += `</div>`;
             arrayContainer.innerHTML = html;
         }

@@ -3754,6 +3754,166 @@ body.problem-page-active .action-bar {
     transform: scale(1.05);
 }
 
+.array-item.pointer-merge-alt {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: var(--accent-red);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
+    transform: scale(1.05);
+}
+
+/* ── Data Structure Visual Containers ── */
+.ds-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 6px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+}
+
+.ds-bucket {
+    border: 2px solid var(--accent-purple);
+    border-radius: 10px;
+    padding: 8px 12px 6px;
+    background: rgba(139, 92, 246, 0.06);
+    min-width: 80px;
+    text-align: center;
+    position: relative;
+}
+
+.ds-bucket.ds-set {
+    border-color: var(--accent-purple);
+    background: rgba(139, 92, 246, 0.06);
+}
+
+.ds-bucket.ds-map {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.06);
+}
+
+.ds-bucket-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.ds-bucket.ds-set .ds-bucket-label {
+    color: var(--accent-purple);
+}
+
+.ds-bucket.ds-map .ds-bucket-label {
+    color: var(--accent-blue);
+}
+
+.ds-bucket-items {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.ds-item {
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.2s ease;
+}
+
+.ds-item.ds-set-item {
+    background: var(--accent-purple);
+}
+
+.ds-item.ds-map-item {
+    background: var(--accent-blue);
+}
+
+.ds-item.ds-active {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+    background: var(--accent-green) !important;
+    transform: scale(1.1);
+}
+
+.ds-item.ds-ping {
+    animation: dsPing 0.4s ease;
+}
+
+.ds-item.ds-miss {
+    background: var(--accent-red) !important;
+    opacity: 0.7;
+}
+
+.ds-brace {
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1;
+}
+
+.ds-bucket.ds-set .ds-brace {
+    color: var(--accent-purple);
+}
+
+.ds-bucket.ds-map .ds-brace {
+    color: var(--accent-blue);
+}
+
+@keyframes dsPing {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.25); box-shadow: 0 0 16px rgba(16, 185, 129, 0.8); }
+    100% { transform: scale(1); }
+}
+
+/* Chain bar for sequence building */
+.chain-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 8px auto;
+    padding: 4px 8px;
+    background: rgba(139, 92, 246, 0.08);
+    border: 2px solid var(--accent-purple);
+    border-radius: 8px;
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.chain-bar .chain-num {
+    padding: 3px 10px;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--accent-purple);
+    background: rgba(139, 92, 246, 0.15);
+    border-radius: 4px;
+}
+
+.chain-bar .chain-num.chain-new {
+    color: #fff;
+    background: var(--accent-green);
+}
+
+.chain-bar .chain-num.chain-fail {
+    color: #fff;
+    background: var(--accent-red);
+    opacity: 0.7;
+}
+
+.chain-bar .chain-arrow {
+    color: var(--accent-purple);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 3px;
+}
+
 .array-item.empty {
     background: rgba(255, 255, 255, 0.02);
     border: 2px dashed var(--border);
@@ -3915,6 +4075,135 @@ body.problem-page-active .action-bar {
 .pointer-detail-value.p-merge {
     color: var(--accent-orange);
     border-color: var(--accent-orange);
+}
+
+.pointer-detail-value.p-purple {
+    color: var(--accent-purple);
+    border-color: var(--accent-purple);
+}
+
+.pointer-detail-value.p-green {
+    color: var(--accent-green);
+    border-color: var(--accent-green);
+}
+
+/* ─── New Problem Visualization Helpers ─── */
+
+/* Sliding window highlight — items inside the current window */
+.array-item.active-window {
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.45), inset 0 0 6px rgba(139, 92, 246, 0.1);
+    border-color: var(--accent-purple);
+    background: rgba(139, 92, 246, 0.08);
+}
+
+/* Already-processed items (dimmed) */
+.array-item.visited {
+    opacity: 0.35;
+}
+
+/* Highlight chars that belong to the target pattern */
+.array-item.highlight-char {
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.35);
+    border-color: var(--accent-green);
+}
+
+/* ─── Sum Bridge (Two Sum II visual connector) ─── */
+.sum-pair-viz {
+    overflow: visible;
+    padding-bottom: 6px;
+}
+
+.sum-bridge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin-top: -2px;
+    animation: bridgeFadeIn 0.35s ease;
+}
+
+@keyframes bridgeFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.sum-bridge-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.sum-bridge-val {
+    font-weight: 800;
+}
+.sum-bridge-lval {
+    color: var(--accent-blue);
+}
+.sum-bridge-rval {
+    color: var(--accent-orange);
+}
+.sum-bridge-op {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+.sum-bridge-eq {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+.sum-bridge-result {
+    color: var(--accent-purple);
+    font-weight: 800;
+    font-size: 16px;
+}
+.sum-bridge-cmp {
+    color: var(--accent-red);
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: 4px;
+}
+.sum-bridge-cmp-match {
+    color: var(--accent-green);
+}
+.sum-bridge-target {
+    color: var(--accent-green);
+    font-size: 14px;
+    font-weight: 800;
+    margin-left: 2px;
+}
+
+/* Sum bridge color variants */
+.sum-bridge-match .sum-bridge-lval,
+.sum-bridge-match .sum-bridge-rval {
+    color: var(--accent-green);
+}
+
+/* ─── Move Hints (directional feedback, inline next to bridge) ─── */
+.move-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 5px;
+    white-space: nowrap;
+    animation: hintPulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes hintPulse {
+    from { opacity: 0.7; }
+    to   { opacity: 1; }
+}
+
+.move-hint-right {
+    color: var(--accent-blue);
+}
+
+.move-hint-left {
+    color: var(--accent-orange);
 }
 
 /* Update the code-metrics section */
@@ -4505,6 +4794,11 @@ body > main > section.module.viz-module > div.module-header:empty {
     .array-dense .array-visualization { gap: 3px; padding: 6px; }
     .array-dense .pointer-label { font-size: 7px; padding: 1px 4px; top: -16px; }
     .array-dense .array-index { font-size: 6px; padding: 2px 3px; bottom: -14px; }
+
+    /* Sum bridge at 840px */
+    .sum-bridge-label { font-size: 11px; padding: 4px 10px; gap: 4px; }
+    .sum-bridge-result { font-size: 13px; }
+    .move-hint { font-size: 9px; padding: 2px 6px; }
 }
 
 /* ~200% zoom on 1440p — ultra-compact desktop, NOT mobile */
@@ -4801,6 +5095,12 @@ body > main > section.module.viz-module > div.module-header:empty {
     .array-dense .array-visualization { gap: 2px; padding: 5px; }
     .array-dense .pointer-label { font-size: 6px; padding: 1px 3px; top: -12px; border-width: 1px; }
     .array-dense .array-index { font-size: 5px; padding: 1px 3px; bottom: -12px; border-width: 1px; }
+
+    /* Sum bridge at 768px fine pointer */
+    .sum-bridge-label { font-size: 10px; padding: 3px 8px; gap: 3px; }
+    .sum-bridge-result { font-size: 12px; }
+    .sum-bridge-cmp { font-size: 10px; }
+    .move-hint { font-size: 8px; padding: 2px 5px; }
 }
 
 /* ===== RESPONSIVE LAYOUT – MOBILE ONLY (touch devices or truly small screens) ===== */
@@ -5268,6 +5568,13 @@ body > main > section.module.viz-module > div.module-header:empty {
         border-radius: 5px;
         border-width: 1px;
     }
+
+    /* Sum bridge on mobile */
+    .sum-bridge { margin-top: 0; }
+    .sum-bridge-label { font-size: 10px; padding: 4px 8px; gap: 4px; }
+    .sum-bridge-result { font-size: 12px; }
+    .sum-bridge-cmp { font-size: 9px; }
+    .move-hint { font-size: 8px; padding: 2px 5px; }
 
     /* ---- YouTube modal: full screen on mobile ---- */
     .youtube-modal-content {
