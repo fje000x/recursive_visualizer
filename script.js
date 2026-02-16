@@ -6051,68 +6051,93 @@ function render() {
             arrayContainer.innerHTML = html;
         }
         
-        // Problem 9: Best Moment to Trade (single pass) — single pointer, minPrice/maxProfit
+        // Problem 9: Best Moment to Trade (single pass) — price chart + buy/sell visual
         if (currentProbId === '9' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const minPrice = meta.minPrice;
             const maxProfit = meta.maxProfit ?? 0;
             const isComplete = state.isComplete || false;
-            
-            const sItemCount = state.nums1.length;
+            const prices = state.nums1;
+            const maxP = Math.max(...prices, 1);
+
+            // Find the buy/sell indices for highlighting
+            let buyIdx = -1, sellIdx = -1;
+            if (maxProfit > 0) {
+                let mp = prices[0];
+                for (let k = 1; k < prices.length; k++) {
+                    if (prices[k] - mp === maxProfit && buyIdx === -1) { sellIdx = k; }
+                    if (prices[k] < mp) { mp = prices[k]; buyIdx = -1; sellIdx = -1; }
+                    if (prices[k] === mp) buyIdx = k;
+                }
+                // re-derive properly
+                buyIdx = -1; sellIdx = -1;
+                let runMin = prices[0], runMinIdx = 0;
+                for (let k = 1; k < prices.length; k++) {
+                    if (prices[k] < runMin) { runMin = prices[k]; runMinIdx = k; }
+                    if (prices[k] - runMin === maxProfit) { buyIdx = runMinIdx; sellIdx = k; }
+                }
+            }
+
+            const sItemCount = prices.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
             html += `<div class="array-label">prices — find max profit (buy once, sell once)</div>`;
-            html += `<div class="array-visualization">`;
-            
-            state.nums1.forEach((val, idx) => {
-                let classes = 'array-item';
+
+            // Price chart with bars
+            html += `<div class="array-visualization price-chart-viz">`;
+            prices.forEach((val, idx) => {
+                let classes = 'array-item price-bar';
                 let pointerLabels = '';
-                
-                if (isComplete && val === minPrice) {
-                    classes += ' pointer-2'; // highlight min price
-                }
+                const barPct = (val / maxP) * 100;
+
+                // Color coding: green = minPrice so far, blue = current, orange = sell candidate
+                if (isComplete && idx === buyIdx) classes += ' price-buy';
+                if (isComplete && idx === sellIdx) classes += ' price-sell';
+                if (!isComplete && val === minPrice && idx <= iPtr) classes += ' price-low';
                 if (idx === iPtr) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
-                
-                html += `
-                    <div class="${classes}">
-                        ${val}
-                        ${pointerLabels}
-                        <div class="array-index">${idx}</div>
-                    </div>
-                `;
+
+                html += `<div class="${classes}" style="--bar-h:${barPct}%">`;
+                html += `<span class="price-val">$${val}</span>`;
+                html += `${pointerLabels}<div class="array-index">day ${idx}</div></div>`;
             });
-            
             html += `</div>`;
 
+            // MinPrice floor line indicator
+            if (!isComplete && minPrice != null) {
+                html += `<div class="price-floor-line"><span style="color:var(--accent-green);font-size:11px;font-weight:600">minPrice floor = $${minPrice}</span></div>`;
+            }
+
             // Bridge: profit calculation
-            if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
-                const price = state.nums1[iPtr];
+            if (iPtr >= 0 && iPtr < prices.length && !isComplete) {
+                const price = prices[iPtr];
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                if (price < minPrice) {
-                    html += `<span style="color:var(--accent-blue);font-weight:600">prices[${iPtr}]=${price}</span>`;
-                    html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">< minPrice ${minPrice}</span>`;
-                    html += `<span style="color:var(--text-muted)">→ new low! minPrice = ${price}</span>`;
+                if (price < minPrice || (price === minPrice && iPtr > 0)) {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">$${price}</span>`;
+                    html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">< minPrice $${meta.minPrice}</span>`;
+                    html += `<span style="color:var(--text-muted)">→ new low! Buy here 📉</span>`;
                 } else {
                     const profit = price - minPrice;
-                    html += `<span style="color:var(--accent-green);font-weight:600">${price}</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:600">sell $${price}</span>`;
                     html += `<span class="sum-bridge-op">−</span>`;
-                    html += `<span style="color:var(--accent-orange);font-weight:600">${minPrice}</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:600">buy $${minPrice}</span>`;
                     html += `<span class="sum-bridge-eq">=</span>`;
-                    html += `<span style="color:var(--accent-purple);font-weight:700">${profit} profit</span>`;
+                    html += `<span style="color:var(--accent-purple);font-weight:700">$${profit} profit</span>`;
                     if (profit > maxProfit) {
                         html += `<span style="color:var(--accent-green);margin-left:8px;font-weight:700">NEW BEST! 🎯</span>`;
+                    } else if (profit === maxProfit && profit > 0) {
+                        html += `<span style="color:var(--accent-green);margin-left:8px">= best $${maxProfit}</span>`;
                     } else {
-                        html += `<span style="color:var(--text-muted);margin-left:8px">≤ best ${maxProfit}</span>`;
+                        html += `<span style="color:var(--text-muted);margin-left:8px">≤ best $${maxProfit}</span>`;
                     }
                 }
                 html += `</div></div>`;
             } else if (isComplete) {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">✓ Max profit = ${maxProfit} (buy at ${minPrice})</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Buy at $${prices[buyIdx] ?? minPrice} (day ${buyIdx >= 0 ? buyIdx : '?'}) → Sell at $${prices[sellIdx] ?? '?'} (day ${sellIdx >= 0 ? sellIdx : '?'}) = $${maxProfit} profit</span>`;
                 html += `</div></div>`;
             }
 
@@ -6123,12 +6148,12 @@ function render() {
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">minPrice</div>
-                        <div class="pointer-detail-value p2">${minPrice ?? '—'}</div>
+                        <div class="pointer-detail-label">minPrice 📉</div>
+                        <div class="pointer-detail-value p2">${minPrice != null ? '$' + minPrice : '—'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">maxProfit</div>
-                        <div class="pointer-detail-value p-merge">${maxProfit}</div>
+                        <div class="pointer-detail-label">maxProfit 💰</div>
+                        <div class="pointer-detail-value p-merge">$${maxProfit}</div>
                     </div>
                 </div>
             `;
@@ -6136,65 +6161,82 @@ function render() {
             arrayContainer.innerHTML = html;
         }
         
-        // Problem 10: Best Moments to Trade (greedy) — single pointer, totalProfit
+        // Problem 10: Best Moments to Trade (greedy) — price chart with gain/loss coloring
         if (currentProbId === '10' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const totalProfit = meta.totalProfit ?? 0;
             const isComplete = state.isComplete || false;
+            const prices = state.nums1;
+            const maxP = Math.max(...prices, 1);
             
-            const sItemCount = state.nums1.length;
+            const sItemCount = prices.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">prices — maximize total profit (multiple trades allowed)</div>`;
-            html += `<div class="array-visualization">`;
-            
-            state.nums1.forEach((val, idx) => {
-                let classes = 'array-item';
+            html += `<div class="array-label">prices — collect every consecutive gain (greedy: buy low, sell high, repeat)</div>`;
+
+            // Price chart with gain-coloring
+            html += `<div class="array-visualization price-chart-viz">`;
+            prices.forEach((val, idx) => {
+                let classes = 'array-item price-bar';
                 let pointerLabels = '';
-                
-                // Highlight gains (where price went up from previous)
-                if (isComplete && idx > 0 && val > state.nums1[idx - 1]) {
-                    classes += ' pointer-merge';
-                }
+                const barPct = (val / maxP) * 100;
+
+                // Green if this day is part of an upswing (gain collected)
+                if (idx > 0 && val > prices[idx - 1]) classes += ' price-gain';
+                // Red if this day is a decline
+                if (idx > 0 && val < prices[idx - 1]) classes += ' price-drop';
+
                 if (idx === iPtr) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
-                
-                html += `
-                    <div class="${classes}">
-                        ${val}
-                        ${pointerLabels}
-                        <div class="array-index">${idx}</div>
-                    </div>
-                `;
+
+                html += `<div class="${classes}" style="--bar-h:${barPct}%">`;
+                html += `<span class="price-val">$${val}</span>`;
+                html += `${pointerLabels}<div class="array-index">day ${idx}</div></div>`;
             });
-            
+            html += `</div>`;
+
+            // Gain/loss indicator row
+            html += `<div class="array-visualization" style="margin-top:4px;">`;
+            prices.forEach((val, idx) => {
+                if (idx === 0) {
+                    html += `<div class="array-item" style="opacity:0.3;font-size:10px">—</div>`;
+                } else {
+                    const diff = val - prices[idx - 1];
+                    const color = diff > 0 ? 'var(--accent-green)' : diff < 0 ? 'var(--accent-red)' : 'var(--text-muted)';
+                    const sign = diff > 0 ? '+' : '';
+                    html += `<div class="array-item" style="color:${color};font-weight:${diff > 0 ? '700' : '400'};font-size:11px;border-color:${diff > 0 ? 'var(--accent-green)' : 'transparent'}">${sign}${diff}</div>`;
+                }
+            });
             html += `</div>`;
 
             // Bridge: gain calculation
-            if (iPtr >= 1 && iPtr < state.nums1.length && !isComplete) {
-                const price = state.nums1[iPtr];
-                const prev = state.nums1[iPtr - 1];
+            if (iPtr >= 1 && iPtr < prices.length && !isComplete) {
+                const price = prices[iPtr];
+                const prev = prices[iPtr - 1];
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
                 if (price > prev) {
                     const gain = price - prev;
-                    html += `<span style="color:var(--accent-green);font-weight:600">${price}</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:600">sell $${price}</span>`;
                     html += `<span class="sum-bridge-op">−</span>`;
-                    html += `<span style="color:var(--accent-orange);font-weight:600">${prev}</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:600">buy $${prev}</span>`;
                     html += `<span class="sum-bridge-eq">=</span>`;
-                    html += `<span style="color:var(--accent-green);font-weight:700">+${gain}</span>`;
-                    html += `<span style="color:var(--text-muted);margin-left:6px">→ collect gain! total = ${totalProfit}</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">+$${gain} 📈</span>`;
+                    html += `<span style="color:var(--text-muted);margin-left:6px">→ collect! total = $${totalProfit}</span>`;
                 } else {
-                    html += `<span style="color:var(--accent-blue);font-weight:600">${price}</span>`;
-                    html += `<span style="color:var(--accent-red);margin:0 6px">≤ ${prev}</span>`;
-                    html += `<span style="color:var(--text-muted)">→ no gain, skip</span>`;
+                    html += `<span style="color:var(--accent-red);font-weight:600">$${price}</span>`;
+                    html += `<span style="color:var(--accent-red);margin:0 6px">≤ $${prev}</span>`;
+                    html += `<span style="color:var(--text-muted)">→ no gain, skip 📉</span>`;
                 }
                 html += `</div></div>`;
             } else if (isComplete) {
+                // Count gains
+                let gainCount = 0;
+                for (let k = 1; k < prices.length; k++) { if (prices[k] > prices[k-1]) gainCount++; }
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">✓ Total profit from all trades = ${totalProfit}</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Collected ${gainCount} gains = $${totalProfit} total profit</span>`;
                 html += `</div></div>`;
             }
 
@@ -6205,8 +6247,8 @@ function render() {
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">totalProfit</div>
-                        <div class="pointer-detail-value p-merge">${totalProfit}</div>
+                        <div class="pointer-detail-label">totalProfit 💰</div>
+                        <div class="pointer-detail-value p-merge">$${totalProfit}</div>
                     </div>
                 </div>
             `;
@@ -6214,62 +6256,81 @@ function render() {
             arrayContainer.innerHTML = html;
         }
         
-        // Problem 11: Can You Reach the End? (Jump Game) — farthest tracker
+        // Problem 11: Can You Reach the End? (Jump Game) — reachable zone + jump arcs
         if (currentProbId === '11' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const farthest = meta.farthest ?? 0;
             const isComplete = state.isComplete || false;
+            const nums = state.nums1;
+            const lastIdx = nums.length - 1;
             
-            const sItemCount = state.nums1.length;
+            const sItemCount = nums.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">nums — can we jump from index 0 to the last index?</div>`;
-            html += `<div class="array-visualization">`;
+            html += `<div class="array-label">nums — can we jump from index 0 to the last index? (each value = max jump distance)</div>`;
+            html += `<div class="array-visualization jump-viz">`;
             
-            state.nums1.forEach((val, idx) => {
+            nums.forEach((val, idx) => {
                 let classes = 'array-item';
                 let pointerLabels = '';
                 
-                if (isComplete && idx <= farthest) {
-                    classes += ' pointer-merge';
+                // Reachable zone: green tint for everything within farthest
+                if (idx <= farthest) {
+                    classes += ' jump-reachable';
+                } else {
+                    classes += ' jump-unreachable';
                 }
+                // Goal index
+                if (idx === lastIdx) classes += ' jump-goal';
+                if (isComplete && idx <= farthest) classes += ' pointer-merge';
+
                 if (idx === iPtr) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
                 
-                html += `
-                    <div class="${classes}">
-                        ${val}
-                        ${pointerLabels}
-                        <div class="array-index">${idx}</div>
-                    </div>
-                `;
+                // Show jump reach arc: how far this index can reach
+                const reach = Math.min(idx + val, lastIdx);
+                const reachLabel = (idx === iPtr && val > 0 && !isComplete) ? 
+                    `<div class="jump-reach-label">→${reach}</div>` : '';
+
+                html += `<div class="${classes}">${val}${pointerLabels}${reachLabel}<div class="array-index">${idx}</div></div>`;
             });
             
             html += `</div>`;
 
+            // Farthest reach indicator bar
+            if (!isComplete) {
+                const pct = ((farthest + 1) / nums.length) * 100;
+                html += `<div class="reach-bar-container">`;
+                html += `<div class="reach-bar" style="width:${pct}%"></div>`;
+                html += `<span class="reach-bar-label">farthest reachable: index ${farthest}${farthest >= lastIdx ? ' ✓ GOAL!' : ''}</span>`;
+                html += `</div>`;
+            }
+
             // Bridge: farthest reach calculation
-            if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
-                const val = state.nums1[iPtr];
+            if (iPtr >= 0 && iPtr < nums.length && !isComplete) {
+                const val = nums[iPtr];
                 const reach = iPtr + val;
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
                 if (iPtr > farthest) {
-                    html += `<span style="color:var(--accent-red);font-weight:700">i=${iPtr} > farthest=${farthest} — CAN'T REACH HERE!</span>`;
+                    html += `<span style="color:var(--accent-red);font-weight:700">🚫 i=${iPtr} > farthest=${farthest} — CAN'T REACH HERE!</span>`;
                 } else {
-                    html += `<span style="color:var(--text-muted)">farthest = max(${farthest},</span>`;
-                    html += `<span style="color:var(--accent-blue);font-weight:600;margin:0 4px">${iPtr} + ${val}</span>`;
-                    html += `<span style="color:var(--text-muted)">) = max(${farthest}, ${reach}) =</span>`;
+                    html += `<span style="color:var(--text-muted)">farthest = max(</span>`;
+                    html += `<span style="color:var(--accent-purple);font-weight:600">${farthest}</span>`;
+                    html += `<span style="color:var(--text-muted)">,</span>`;
+                    html += `<span style="color:var(--accent-blue);font-weight:600;margin:0 4px">${iPtr}+${val}=${reach}</span>`;
+                    html += `<span style="color:var(--text-muted)">) =</span>`;
                     html += `<span style="color:var(--accent-green);font-weight:700;margin-left:4px">${Math.max(farthest, reach)}</span>`;
-                    if (reach >= state.nums1.length - 1) {
-                        html += `<span style="color:var(--accent-green);margin-left:6px">≥ last index! ✓</span>`;
+                    if (reach >= lastIdx) {
+                        html += `<span style="color:var(--accent-green);margin-left:6px;font-weight:700">≥ goal! ✅</span>`;
                     }
                 }
                 html += `</div></div>`;
             } else if (isComplete) {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">✓ farthest=${farthest} ≥ last index ${state.nums1.length - 1} — can reach the end!</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ farthest=${farthest} ≥ last index ${lastIdx} — can reach the end!</span>`;
                 html += `</div></div>`;
             }
 
@@ -6283,11 +6344,15 @@ function render() {
                         <div class="pointer-detail-label">farthest reachable</div>
                         <div class="pointer-detail-value p-merge">${farthest}</div>
                     </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">goal (last index)</div>
+                        <div class="pointer-detail-value">${lastIdx}</div>
+                    </div>
                 </div>
             `;
         }
         
-        // Problem 12: Fewest Jumps to End (Jump Game II) — jumps/curEnd/farthest
+        // Problem 12: Fewest Jumps to End (Jump Game II) — BFS level zones
         if (currentProbId === '12' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
@@ -6295,43 +6360,56 @@ function render() {
             const curEnd = meta.curEnd ?? 0;
             const farthest = meta.farthest ?? 0;
             const isComplete = state.isComplete || false;
+            const nums = state.nums1;
+            const lastIdx = nums.length - 1;
+
+            // Color palette for BFS levels
+            const levelColors = ['var(--accent-blue)', 'var(--accent-green)', 'var(--accent-purple)', 'var(--accent-orange)', 'var(--accent-red)'];
             
-            const sItemCount = state.nums1.length;
+            const sItemCount = nums.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">nums — find minimum jumps to reach last index</div>`;
-            html += `<div class="array-visualization">`;
+            html += `<div class="array-label">nums — find minimum jumps (BFS: each "level" = one jump)</div>`;
+            html += `<div class="array-visualization jump-viz">`;
             
-            state.nums1.forEach((val, idx) => {
+            nums.forEach((val, idx) => {
                 let classes = 'array-item';
                 let pointerLabels = '';
                 
-                if (isComplete) {
-                    classes += ' pointer-merge';
-                }
-                // Highlight curEnd boundary
+                if (isComplete) classes += ' pointer-merge';
+                // curEnd boundary marker
                 if (!isComplete && idx === curEnd) {
-                    classes += ' pointer-2';
+                    classes += ' jump-boundary';
                 }
+                // Within current level
+                if (!isComplete && idx <= curEnd) {
+                    classes += ' jump-reachable';
+                }
+                // Goal
+                if (idx === lastIdx) classes += ' jump-goal';
+
                 if (idx === iPtr) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
                 
-                html += `
-                    <div class="${classes}">
-                        ${val}
-                        ${pointerLabels}
-                        <div class="array-index">${idx}</div>
-                    </div>
-                `;
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
             });
             
             html += `</div>`;
 
+            // BFS level indicator
+            if (!isComplete) {
+                html += `<div class="bfs-level-bar">`;
+                html += `<span class="bfs-level-label">Level ${jumps}</span>`;
+                html += `<span style="color:var(--text-muted);font-size:11px;margin-left:8px">indices 0..${curEnd}</span>`;
+                html += `<span style="color:var(--accent-purple);font-size:11px;margin-left:8px">→ next level reaches up to index ${farthest}</span>`;
+                html += `</div>`;
+            }
+
             // Bridge: BFS level boundary
-            if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
-                const val = state.nums1[iPtr];
+            if (iPtr >= 0 && iPtr < nums.length && !isComplete) {
+                const val = nums[iPtr];
                 const reach = iPtr + val;
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
                 html += `<span style="color:var(--text-muted)">farthest = max(${farthest},</span>`;
@@ -6339,14 +6417,14 @@ function render() {
                 html += `<span style="color:var(--text-muted)">) =</span>`;
                 html += `<span style="color:var(--accent-purple);font-weight:700;margin-left:4px">${Math.max(farthest, reach)}</span>`;
                 if (iPtr === curEnd) {
-                    html += `<span style="color:var(--accent-green);margin-left:8px;font-weight:700">i == curEnd → JUMP! (jump #${jumps})</span>`;
+                    html += `<span style="color:var(--accent-green);margin-left:8px;font-weight:700">i == curEnd=${curEnd} → JUMP! 🦘 (jump #${jumps})</span>`;
                 } else {
                     html += `<span style="color:var(--text-muted);margin-left:6px">exploring level ${jumps}…</span>`;
                 }
                 html += `</div></div>`;
             } else if (isComplete) {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">✓ Minimum jumps = ${jumps}</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Minimum jumps = ${jumps} (BFS levels to reach end)</span>`;
                 html += `</div></div>`;
             }
 
@@ -6357,11 +6435,11 @@ function render() {
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">jumps</div>
+                        <div class="pointer-detail-label">jumps 🦘</div>
                         <div class="pointer-detail-value p-merge">${jumps}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">curEnd</div>
+                        <div class="pointer-detail-label">curEnd (level boundary)</div>
                         <div class="pointer-detail-value p2">${curEnd}</div>
                     </div>
                     <div class="pointer-detail">
@@ -6374,45 +6452,69 @@ function render() {
             arrayContainer.innerHTML = html;
         }
         
-        // Problem 13: H-Index — sorted descending, scan for h
+        // Problem 13: H-Index — threshold visual with citation bars
         if (currentProbId === '13' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const hVal = meta.h ?? 0;
             const isComplete = state.isComplete || false;
+            const citations = state.nums1;
+            const maxC = Math.max(...citations, 1);
             
-            const sItemCount = state.nums1.length;
+            const sItemCount = citations.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">citations (sorted desc) — find h such that h papers have ≥ h citations</div>`;
-            html += `<div class="array-visualization">`;
-            
-            state.nums1.forEach((val, idx) => {
-                let classes = 'array-item';
+            html += `<div class="array-label">citations (sorted desc) — find h: the largest h where h papers have ≥ h citations</div>`;
+
+            // Citation bars with threshold
+            html += `<div class="array-visualization price-chart-viz">`;
+            citations.forEach((val, idx) => {
+                let classes = 'array-item price-bar';
                 let pointerLabels = '';
-                
-                if (isComplete && idx < hVal) {
-                    classes += ' pointer-merge';
-                }
+                const barPct = (val / maxC) * 100;
+                const paperNum = idx + 1;
+
+                // Papers contributing to h-index (above threshold)
+                if (val >= paperNum) classes += ' hindex-pass';
+                else classes += ' hindex-fail';
+                if (isComplete && idx < hVal) classes += ' pointer-merge';
+
                 if (idx === iPtr) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
-                
-                html += `
-                    <div class="${classes}">
-                        ${val}
-                        ${pointerLabels}
-                        <div class="array-index">${idx}</div>
-                    </div>
-                `;
+
+                html += `<div class="${classes}" style="--bar-h:${barPct}%">`;
+                html += `<span class="price-val">${val}</span>`;
+                html += `${pointerLabels}<div class="array-index">#${paperNum}</div></div>`;
             });
-            
             html += `</div>`;
+
+            // Threshold bridge
+            if (iPtr >= 0 && iPtr < citations.length && !isComplete) {
+                const val = citations[iPtr];
+                const need = iPtr + 1;
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--text-muted)">Paper #${need}: </span>`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">${val} citations</span>`;
+                if (val >= need) {
+                    html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">≥ ${need}</span>`;
+                    html += `<span style="color:var(--accent-green)">✓ h can be ${need}! (${need} papers with ≥ ${need} citations)</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-red);margin:0 6px;font-weight:700">< ${need}</span>`;
+                    html += `<span style="color:var(--accent-red)">✗ Can't have ${need} papers with ≥ ${need} citations. Stop!</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ H-Index = ${hVal} — ${hVal} papers each have ≥ ${hVal} citations</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">i (scanner)</div>
+                        <div class="pointer-detail-label">i (paper)</div>
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
                     </div>
                     <div class="pointer-detail">
@@ -6482,21 +6584,23 @@ function render() {
             arrayContainer.innerHTML = html;
         }
         
-        // Problem 15: Product Without Self — two arrays (nums + answer)
+        // Problem 15: Product Without Self — prefix × suffix bridge visualization
         if (currentProbId === '15' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const prefix = meta.prefix ?? 1;
             const suffix = meta.suffix ?? 1;
             const isComplete = state.isComplete || false;
+            const nums = state.nums1;
+            const answer = state.nums2 || [];
             
-            const sItemCount = state.nums1.length;
+            const sItemCount = nums.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner array-dual${sDenseClass}">`;
             
             // nums row
             html += `<div class="array-section"><div class="array-label">nums (input)</div><div class="array-visualization">`;
-            state.nums1.forEach((val, idx) => {
+            nums.forEach((val, idx) => {
                 let classes = 'array-item';
                 if (idx === iPtr) classes += ' pointer-1';
                 let pointerLabels = idx === iPtr ? `<div class="pointer-label p1">i</div>` : '';
@@ -6504,16 +6608,53 @@ function render() {
             });
             html += `</div></div>`;
             
-            // answer row
-            html += `<div class="array-section"><div class="array-label">answer (output)</div><div class="array-visualization">`;
-            (state.nums2 || []).forEach((val, idx) => {
+            // answer row with prefix/suffix coloring
+            html += `<div class="array-section"><div class="array-label">answer (product of everything except nums[i])</div><div class="array-visualization">`;
+            answer.forEach((val, idx) => {
                 let classes = 'array-item';
                 if (isComplete) classes += ' pointer-merge';
                 if (idx === iPtr) classes += ' pointer-2';
                 html += `<div class="${classes}">${val}<div class="array-index">${idx}</div></div>`;
             });
             html += `</div></div>`;
-            
+
+            // Bridge: show prefix × suffix calculation
+            if (iPtr >= 0 && iPtr < nums.length && !isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                // Determine which pass we're on (prefix goes left→right, suffix goes right→left)
+                const isLeftPass = state.msg && state.msg.includes('Left pass');
+                const isRightPass = state.msg && state.msg.includes('Right pass');
+                if (isLeftPass) {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">answer[${iPtr}]</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 4px">= prefix =</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">${prefix}</span>`;
+                    html += `<span style="color:var(--text-muted);margin-left:8px;font-size:11px">(product of everything LEFT of index ${iPtr})</span>`;
+                    // Show what elements are left of i
+                    if (iPtr > 0) {
+                        const leftElems = nums.slice(0, iPtr).join(' × ');
+                        html += `<br><span style="color:var(--accent-purple);font-size:11px">${leftElems} = ${prefix}</span>`;
+                    }
+                } else if (isRightPass) {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">answer[${iPtr}]</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 4px">×= suffix (${suffix}) →</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:700">${answer[iPtr]}</span>`;
+                    html += `<span style="color:var(--text-muted);margin-left:8px;font-size:11px">(LEFT product × RIGHT product)</span>`;
+                    if (iPtr < nums.length - 1) {
+                        const rightElems = nums.slice(iPtr + 1).join(' × ');
+                        html += `<br><span style="color:var(--accent-purple);font-size:11px">right of [${iPtr}]: ${rightElems} = ${suffix}</span>`;
+                    }
+                } else {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">prefix=${prefix}</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 4px">|</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:600">suffix=${suffix}</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ answer[i] = (product of left) × (product of right) for each i</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -6521,11 +6662,11 @@ function render() {
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">prefix</div>
+                        <div class="pointer-detail-label">prefix ←</div>
                         <div class="pointer-detail-value p2">${prefix}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">suffix</div>
+                        <div class="pointer-detail-label">suffix →</div>
                         <div class="pointer-detail-value p-merge">${suffix}</div>
                     </div>
                 </div>
@@ -6534,7 +6675,7 @@ function render() {
             arrayContainer.innerHTML = html;
         }
         
-        // Problem 16: Circular Fuel Route — gas/cost arrays
+        // Problem 16: Circular Fuel Route — gas/cost with surplus bridge + tank visual
         if (currentProbId === '16' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
@@ -6542,14 +6683,16 @@ function render() {
             const currentSurplus = meta.currentSurplus ?? 0;
             const startStation = meta.start ?? 0;
             const isComplete = state.isComplete || false;
+            const gas = state.nums1;
+            const cost = state.nums2 || [];
             
-            const sItemCount = state.nums1.length;
+            const sItemCount = gas.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner array-dual${sDenseClass}">`;
             
             // gas row
-            html += `<div class="array-section"><div class="array-label">gas (fuel at station)</div><div class="array-visualization">`;
-            state.nums1.forEach((val, idx) => {
+            html += `<div class="array-section"><div class="array-label">gas ⛽ (fuel at station)</div><div class="array-visualization">`;
+            gas.forEach((val, idx) => {
                 let classes = 'array-item';
                 if (isComplete && idx === startStation) classes += ' pointer-merge';
                 if (idx === iPtr) classes += ' pointer-1';
@@ -6559,14 +6702,53 @@ function render() {
             html += `</div></div>`;
             
             // cost row
-            html += `<div class="array-section"><div class="array-label">cost (fuel to next station)</div><div class="array-visualization">`;
-            (state.nums2 || []).forEach((val, idx) => {
+            html += `<div class="array-section"><div class="array-label">cost 🚗 (fuel to next station)</div><div class="array-visualization">`;
+            cost.forEach((val, idx) => {
                 let classes = 'array-item';
                 if (idx === iPtr) classes += ' pointer-2';
                 html += `<div class="${classes}">${val}<div class="array-index">${idx}</div></div>`;
             });
             html += `</div></div>`;
-            
+
+            // Net surplus row (gas[i] - cost[i])
+            html += `<div class="array-section"><div class="array-label">net = gas − cost (surplus per station)</div><div class="array-visualization">`;
+            gas.forEach((val, idx) => {
+                const net = val - (cost[idx] || 0);
+                const color = net > 0 ? 'var(--accent-green)' : net < 0 ? 'var(--accent-red)' : 'var(--text-muted)';
+                const sign = net > 0 ? '+' : '';
+                let classes = 'array-item';
+                if (idx === iPtr) classes += ' pointer-1';
+                if (isComplete && idx === startStation) classes += ' pointer-merge';
+                html += `<div class="${classes}" style="color:${color};font-weight:${Math.abs(net) > 0 ? '700' : '400'}">${sign}${net}<div class="array-index">${idx}</div></div>`;
+            });
+            html += `</div></div>`;
+
+            // Bridge: surplus tracking
+            if (iPtr >= 0 && iPtr < gas.length && !isComplete) {
+                const net = gas[iPtr] - (cost[iPtr] || 0);
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">gas[${iPtr}]=${gas[iPtr]}</span>`;
+                html += `<span class="sum-bridge-op">−</span>`;
+                html += `<span style="color:var(--accent-orange);font-weight:600">cost[${iPtr}]=${cost[iPtr]}</span>`;
+                html += `<span class="sum-bridge-eq">=</span>`;
+                html += `<span style="color:${net >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};font-weight:700">${net >= 0 ? '+' : ''}${net}</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:8px">→ tank = ${currentSurplus}</span>`;
+                if (currentSurplus < 0) {
+                    html += `<span style="color:var(--accent-red);margin-left:6px;font-weight:700">🚫 EMPTY! Reset start = ${startStation}</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-green);margin-left:6px">✓ still rolling (start=${startStation})</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (totalSurplus >= 0) {
+                    html += `<span style="color:var(--accent-green);font-weight:700">✓ Start at station ${startStation} — total surplus = ${totalSurplus} ≥ 0, circuit possible!</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-red);font-weight:700">✗ Total surplus = ${totalSurplus} < 0 — circuit impossible!</span>`;
+                }
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -6574,11 +6756,11 @@ function render() {
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">start</div>
+                        <div class="pointer-detail-label">start ⛽</div>
                         <div class="pointer-detail-value p-merge">${startStation}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">currentSurplus</div>
+                        <div class="pointer-detail-label">tank (currentSurplus)</div>
                         <div class="pointer-detail-value p2">${currentSurplus}</div>
                     </div>
                     <div class="pointer-detail">
@@ -6591,34 +6773,59 @@ function render() {
             arrayContainer.innerHTML = html;
         }
         
-        // Problem 17: Fair Candy Distribution — ratings + candies
+        // Problem 17: Fair Candy Distribution — comparison arrows + candy bars
         if (currentProbId === '17' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const total = meta.total ?? 0;
             const isComplete = state.isComplete || false;
+            const ratings = state.nums1;
+            const candies = state.nums2 || [];
+            const maxCandy = Math.max(...candies, 1);
+            const isLeftPass = state.msg && state.msg.includes('Left pass');
+            const isRightPass = state.msg && state.msg.includes('Right pass');
             
-            const sItemCount = state.nums1.length;
+            const sItemCount = ratings.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner array-dual${sDenseClass}">`;
             
-            // ratings row
-            html += `<div class="array-section"><div class="array-label">ratings</div><div class="array-visualization">`;
-            state.nums1.forEach((val, idx) => {
+            // ratings row with comparison arrows
+            html += `<div class="array-section"><div class="array-label">ratings ⭐ (${isLeftPass ? '← LEFT PASS →' : isRightPass ? '← RIGHT PASS →' : 'compare neighbors'})</div><div class="array-visualization">`;
+            ratings.forEach((val, idx) => {
                 let classes = 'array-item';
                 if (idx === iPtr) classes += ' pointer-1';
                 let pointerLabels = idx === iPtr ? `<div class="pointer-label p1">i</div>` : '';
                 html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
             });
             html += `</div></div>`;
+
+            // Comparison arrow row
+            if (iPtr >= 0 && iPtr < ratings.length && !isComplete) {
+                html += `<div class="candy-compare-row">`;
+                if (isLeftPass && iPtr >= 1) {
+                    const cmp = ratings[iPtr] > ratings[iPtr - 1];
+                    html += `<span style="color:${cmp ? 'var(--accent-green)' : 'var(--accent-red)'};font-weight:600;font-size:12px;">`;
+                    html += `ratings[${iPtr}]=${ratings[iPtr]} ${cmp ? '>' : '≤'} ratings[${iPtr-1}]=${ratings[iPtr-1]}`;
+                    html += cmp ? ` → candies[${iPtr}] = candies[${iPtr-1}]+1` : ` → no change`;
+                    html += `</span>`;
+                } else if (isRightPass && iPtr < ratings.length - 1) {
+                    const cmp = ratings[iPtr] > ratings[iPtr + 1];
+                    html += `<span style="color:${cmp ? 'var(--accent-green)' : 'var(--accent-red)'};font-weight:600;font-size:12px;">`;
+                    html += `ratings[${iPtr}]=${ratings[iPtr]} ${cmp ? '>' : '≤'} ratings[${iPtr+1}]=${ratings[iPtr+1]}`;
+                    html += cmp ? ` → candies[${iPtr}] = max(cur, candies[${iPtr+1}]+1)` : ` → no change`;
+                    html += `</span>`;
+                }
+                html += `</div>`;
+            }
             
-            // candies row
-            html += `<div class="array-section"><div class="array-label">candies</div><div class="array-visualization">`;
-            (state.nums2 || []).forEach((val, idx) => {
-                let classes = 'array-item';
+            // candies row — show as candy bars proportional to their count
+            html += `<div class="array-section"><div class="array-label">candies 🍬 (assigned)</div><div class="array-visualization price-chart-viz">`;
+            candies.forEach((val, idx) => {
+                let classes = 'array-item price-bar';
+                const barPct = (val / maxCandy) * 100;
                 if (isComplete) classes += ' pointer-merge';
                 if (idx === iPtr) classes += ' pointer-2';
-                html += `<div class="${classes}">${val}<div class="array-index">${idx}</div></div>`;
+                html += `<div class="${classes}" style="--bar-h:${barPct}%"><span class="price-val">${val}</span><div class="array-index">${idx}</div></div>`;
             });
             html += `</div></div>`;
             
@@ -6629,7 +6836,11 @@ function render() {
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">total candies</div>
+                        <div class="pointer-detail-label">pass</div>
+                        <div class="pointer-detail-value p2">${isLeftPass ? 'Left →' : isRightPass ? '← Right' : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">total candies 🍬</div>
                         <div class="pointer-detail-value p-merge">${total}</div>
                     </div>
                 </div>
@@ -6715,23 +6926,26 @@ function render() {
             arrayContainer.innerHTML = html;
         }
 
-        // Problem 19: Decode Roman Numerals — char array scanned right-to-left
+        // Problem 19: Decode Roman Numerals — value lookup + add/subtract bridge
         if (currentProbId === '19' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const total = meta.total ?? 0;
+            const prev = meta.prev ?? 0;
             const prevSym = meta.prevSymbol ?? '—';
             const isComplete = state.isComplete || false;
+            const romanMap = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
 
             const sItemCount = state.nums1.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">Roman numeral — scan right to left</div>`;
+            html += `<div class="array-label">Roman numeral — scan right to left (← direction)</div>`;
             html += `<div class="array-visualization">`;
 
             state.nums1.forEach((ch, idx) => {
                 let classes = 'array-item roman-char';
                 let pointerLabels = '';
+                const val = romanMap[ch] || 0;
 
                 // Already processed (to the right of i) → dim
                 if (iPtr >= 0 && idx > iPtr) classes += ' visited-cell';
@@ -6741,19 +6955,54 @@ function render() {
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
 
-                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+                // Show value under each symbol
+                html += `<div class="${classes}">${ch}<div class="array-index" style="font-size:9px">${val}</div>${pointerLabels}</div>`;
             });
 
             html += `</div>`;
+
+            // Value lookup table (compact)
+            html += `<div style="display:flex;justify-content:center;gap:6px;margin:6px 0;flex-wrap:wrap;">`;
+            ['I','V','X','L','C','D','M'].forEach(sym => {
+                const v = romanMap[sym];
+                const isActive = iPtr >= 0 && state.nums1[iPtr] === sym;
+                html += `<span style="padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;${isActive ? 'background:var(--accent-blue);color:white;' : 'color:var(--text-muted);background:rgba(255,255,255,0.05);'}">${sym}=${v}</span>`;
+            });
+            html += `</div>`;
+
+            // Bridge: add/subtract decision
+            if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
+                const ch = state.nums1[iPtr];
+                const curr = romanMap[ch] || 0;
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">${ch}=${curr}</span>`;
+                if (curr < prev) {
+                    html += `<span style="color:var(--accent-red);margin:0 6px;font-weight:700">< prev ${prevSym}=${prev}</span>`;
+                    html += `<span style="color:var(--accent-red)">→ SUBTRACT! (like IV=4, XC=90)</span>`;
+                    html += `<br><span style="color:var(--text-muted)">total = ${total + curr} − ${curr} = </span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:700">${total}</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">≥ prev ${prevSym}=${prev}</span>`;
+                    html += `<span style="color:var(--accent-green)">→ ADD normally</span>`;
+                    html += `<br><span style="color:var(--text-muted)">total += ${curr} → </span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">${total}</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ "${state.nums1.join('')}" = ${total}</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">i (scanner)</div>
+                        <div class="pointer-detail-label">i (← scanner)</div>
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">prev</div>
-                        <div class="pointer-detail-value p2">${prevSym}</div>
+                        <div class="pointer-detail-value p2">${prevSym}=${prev}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">total</div>
@@ -6765,44 +7014,79 @@ function render() {
             arrayContainer.innerHTML = html;
         }
 
-        // Problem 20: Encode to Roman — value/symbol lookup table + building result
+        // Problem 20: Encode to Roman — greedy subtraction bridge + result building
         if (currentProbId === '20' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const num = meta.num ?? 0;
             const result = meta.result ?? '';
+            const original = meta.original ?? 0;
             const isComplete = state.isComplete || false;
 
             const sItemCount = state.nums1.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner array-dual${sDenseClass}">`;
 
-            // Values row
-            html += `<div class="array-section"><div class="array-label">values (greedy order)</div><div class="array-visualization">`;
+            // Combined value + symbol row (side by side)
+            html += `<div class="array-section"><div class="array-label">value → symbol lookup (greedy: pick largest that fits)</div><div class="array-visualization">`;
             state.nums1.forEach((val, idx) => {
                 let classes = 'array-item';
                 let pointerLabels = '';
+                const sym = (state.nums2 || [])[idx] || '';
                 if (idx === iPtr) {
                     classes += ' pointer-1';
-                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                    pointerLabels = `<div class="pointer-label p1">▼</div>`;
                 }
                 // Already exhausted values (before i)
                 if (iPtr >= 0 && idx < iPtr) classes += ' visited-cell';
+                // Highlight if this value fits the remaining num
+                if (idx === iPtr && num >= val) classes += ' pointer-merge';
                 if (isComplete) classes += ' pointer-merge';
-                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+                html += `<div class="${classes}" style="font-size:11px;"><span style="font-weight:700">${sym}</span><br><span style="font-size:10px;color:var(--text-muted)">${val}</span>${pointerLabels}</div>`;
             });
             html += `</div></div>`;
 
-            // Symbols row
-            html += `<div class="array-section"><div class="array-label">symbols</div><div class="array-visualization">`;
-            (state.nums2 || []).forEach((sym, idx) => {
-                let classes = 'array-item roman-char';
-                if (idx === iPtr) classes += ' pointer-2';
-                if (iPtr >= 0 && idx < iPtr) classes += ' visited-cell';
-                if (isComplete) classes += ' pointer-merge';
-                html += `<div class="${classes}">${sym}<div class="array-index">${idx}</div></div>`;
-            });
-            html += `</div></div>`;
+            // Result building visualization
+            html += `<div class="array-section"><div class="array-label">result being built: "<span style="color:var(--accent-green);font-weight:700">${result}</span>"</div>`;
+            if (result.length > 0) {
+                html += `<div class="array-visualization">`;
+                result.split('').forEach((ch, idx) => {
+                    html += `<div class="array-item pointer-merge roman-char" style="min-width:28px;">${ch}</div>`;
+                });
+                html += `</div>`;
+            }
+            html += `</div>`;
+
+            // Bridge: subtraction step
+            if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
+                const val = state.nums1[iPtr];
+                const sym = (state.nums2 || [])[iPtr] || '';
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (num >= val) {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">num=${num}</span>`;
+                    html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">≥ ${val}</span>`;
+                    html += `<span style="color:var(--text-muted)">→ append "${sym}", num -= ${val} → </span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:700">${num - val}</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">num=${num}</span>`;
+                    html += `<span style="color:var(--accent-red);margin:0 6px">< ${val}</span>`;
+                    html += `<span style="color:var(--text-muted)">→ skip "${sym}", too large</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ ${original} → "${result}"</span>`;
+                html += `</div></div>`;
+            }
+
+            // Progress bar showing remaining num
+            if (!isComplete) {
+                const pct = ((original - num) / original) * 100;
+                html += `<div class="reach-bar-container">`;
+                html += `<div class="reach-bar" style="width:${pct}%;background:var(--accent-green)"></div>`;
+                html += `<span class="reach-bar-label">converted: ${original - num}/${original} (remaining: ${num})</span>`;
+                html += `</div>`;
+            }
 
             html += `
                 <div class="pointer-info">
@@ -6824,17 +7108,19 @@ function render() {
             arrayContainer.innerHTML = html;
         }
 
-        // Problem 21: Length of Final Word — char array scanned from the right
+        // Problem 21: Length of Final Word — phase-based visualization with word boundary bridge
         if (currentProbId === '21' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const wordLen = meta.length ?? 0;
             const isComplete = state.isComplete || false;
+            const isSkipPhase = state.msg && (state.msg.includes('skip') || state.msg.includes('Trailing'));
+            const isCountPhase = state.msg && (state.msg.includes('letter') || state.msg.includes('Phase 2') || state.msg.includes('count'));
 
             const sItemCount = state.nums1.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">string — find the length of the last word</div>`;
+            html += `<div class="array-label">string — scan from end: skip spaces, then count word chars ← </div>`;
             html += `<div class="array-visualization">`;
 
             state.nums1.forEach((ch, idx) => {
@@ -6842,13 +7128,17 @@ function render() {
                 let pointerLabels = '';
 
                 // Highlight the counted word characters
-                if (isComplete && idx > iPtr && ch !== '␣') {
+                if (isComplete && wordLen > 0 && idx > iPtr && idx <= iPtr + wordLen) {
                     classes += ' pointer-merge';
                 }
-                // Spaces get a muted style
+                // Spaces: muted + strikethrough feel
                 if (ch === '␣') classes += ' space-char';
-                // Already scanned past (right of i)
-                if (iPtr >= 0 && idx > iPtr && !isComplete) classes += ' visited-cell';
+                // Already scanned past (right of i) but not part of word
+                if (iPtr >= 0 && idx > iPtr && !isComplete && ch === '␣') classes += ' visited-cell';
+                // Currently counting characters
+                if (isCountPhase && iPtr >= 0 && idx > iPtr && idx <= iPtr + wordLen + 1 && ch !== '␣') {
+                    classes += ' pointer-2';
+                }
 
                 if (idx === iPtr) {
                     classes += ' pointer-1';
@@ -6859,10 +7149,26 @@ function render() {
             });
 
             html += `</div>`;
+
+            // Phase indicator bridge
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (isSkipPhase) {
+                html += `<span style="color:var(--accent-orange);font-weight:600">Phase 1: Skip trailing spaces →→→</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:6px">(scanning right to left)</span>`;
+            } else if (isCountPhase && !isComplete) {
+                html += `<span style="color:var(--accent-green);font-weight:600">Phase 2: Count word characters ←←←</span>`;
+                html += `<span style="color:var(--accent-purple);margin-left:8px;font-weight:700">length = ${wordLen}</span>`;
+            } else if (isComplete) {
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Last word length = ${wordLen}</span>`;
+            } else {
+                html += `<span style="color:var(--text-muted)">Starting from end of string…</span>`;
+            }
+            html += `</div></div>`;
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">i (scanner)</div>
+                        <div class="pointer-detail-label">i (← scanner)</div>
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
                     </div>
                     <div class="pointer-detail">
@@ -6875,7 +7181,7 @@ function render() {
             arrayContainer.innerHTML = html;
         }
 
-        // Problem 22: Common Prefix Finder — vertical scan over strs[0] chars
+        // Problem 22: Common Prefix Finder — vertical scan with all strings aligned
         if (currentProbId === '22' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
@@ -6886,29 +7192,68 @@ function render() {
             const sItemCount = state.nums1.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">strs[0] — vertical scan column by column${strs.length > 1 ? ` (comparing ${strs.length} strings)` : ''}</div>`;
-            html += `<div class="array-visualization">`;
+            html += `<div class="array-label">Vertical scan — compare column by column across all strings</div>`;
 
-            state.nums1.forEach((ch, idx) => {
-                let classes = 'array-item';
-                let pointerLabels = '';
-
-                if (isComplete && idx < (prefix.length)) {
-                    classes += ' pointer-merge';
+            // Show ALL strings vertically aligned
+            strs.forEach((str, sIdx) => {
+                const chars = str.split('');
+                html += `<div class="array-visualization" style="margin-bottom:2px;">`;
+                html += `<div class="array-item" style="min-width:50px;font-size:10px;opacity:0.6;border:none;">strs[${sIdx}]</div>`;
+                chars.forEach((ch, cIdx) => {
+                    let classes = 'array-item';
+                    // Prefix region: green
+                    if (cIdx < prefix.length) classes += ' pointer-merge';
+                    // Current column being checked
+                    if (cIdx === iPtr && !isComplete) classes += ' pointer-1';
+                    // Mismatch column
+                    if (cIdx === iPtr && isComplete && cIdx >= prefix.length) classes += ' pointer-2';
+                    html += `<div class="${classes}">${ch}${cIdx === iPtr && sIdx === 0 ? '<div class="pointer-label p1">col</div>' : ''}</div>`;
+                });
+                // Pad shorter strings with empty
+                for (let k = chars.length; k < strs[0].length; k++) {
+                    let classes = 'array-item space-char';
+                    if (k === iPtr) classes += ' pointer-1';
+                    html += `<div class="${classes}">—</div>`;
                 }
-                if (idx === iPtr) {
-                    classes += ' pointer-1';
-                    pointerLabels = `<div class="pointer-label p1">i</div>`;
-                }
-
-                html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+                html += `</div>`;
             });
 
+            // Column index row
+            html += `<div class="array-visualization" style="margin-top:2px;">`;
+            html += `<div class="array-item" style="min-width:50px;border:none;opacity:0"></div>`;
+            for (let k = 0; k < strs[0].length; k++) {
+                const inPrefix = k < prefix.length;
+                html += `<div class="array-item" style="font-size:9px;color:${inPrefix ? 'var(--accent-green)' : 'var(--text-muted)'};border-color:${k === iPtr ? 'var(--accent-blue)' : 'transparent'}">${k}</div>`;
+            }
             html += `</div>`;
+
+            // Bridge: match/mismatch at current column
+            if (iPtr >= 0 && !isComplete) {
+                const ch = strs[0][iPtr];
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">Column ${iPtr}: char '${ch}'</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">→ check all strings at index ${iPtr}</span>`;
+                // Check for mismatch
+                let allMatch = true;
+                for (let j = 1; j < strs.length; j++) {
+                    if (iPtr >= strs[j].length || strs[j][iPtr] !== ch) { allMatch = false; break; }
+                }
+                if (allMatch) {
+                    html += `<span style="color:var(--accent-green);font-weight:700">✓ all match!</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-red);font-weight:700">✗ mismatch → stop</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Longest common prefix = "${prefix}" (${prefix.length} chars)</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">i (column)</div>
+                        <div class="pointer-detail-label">column</div>
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
                     </div>
                     <div class="pointer-detail">
@@ -6970,36 +7315,88 @@ function render() {
             arrayContainer.innerHTML = html;
         }
 
-        // Problem 24: Zigzag Text Encoder — char array with row assignment
+        // Problem 24: Zigzag Text Encoder — actual zigzag grid being built
         if (currentProbId === '24' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const curRow = meta.curRow ?? 0;
             const rows = meta.rows || [];
             const numRows = meta.numRows || 4;
+            const goingDown = meta.goingDown ?? false;
             const isComplete = state.isComplete || false;
+            const chars = state.nums1;
 
-            const sItemCount = state.nums1.length;
+            const sItemCount = chars.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">string — distribute chars into ${numRows} zigzag rows</div>`;
-            html += `<div class="array-visualization">`;
+            html += `<div class="array-label">string — distribute chars into ${numRows} zigzag rows (${goingDown ? '↓ going down' : '↑ going up'})</div>`;
 
-            state.nums1.forEach((ch, idx) => {
+            // Source string with pointer
+            html += `<div class="array-visualization">`;
+            chars.forEach((ch, idx) => {
                 let classes = 'array-item';
                 let pointerLabels = '';
-
-                if (isComplete) classes += ' pointer-merge';
                 if (iPtr >= 0 && idx < iPtr) classes += ' visited-cell';
+                if (isComplete) classes += ' pointer-merge';
                 if (idx === iPtr) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
-
                 html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
             });
-
             html += `</div>`;
+
+            // Build the actual zigzag grid
+            // First, compute which row each character was placed in
+            const charRows = [];
+            let r = 0, down = false;
+            for (let k = 0; k < chars.length; k++) {
+                charRows.push(r);
+                if (r === 0 || r === numRows - 1) down = !down;
+                r += down ? 1 : -1;
+            }
+
+            html += `<div style="margin-top:8px;">`;
+            for (let row = 0; row < numRows; row++) {
+                const isActiveRow = row === curRow && !isComplete;
+                html += `<div class="array-visualization" style="margin-bottom:1px;">`;
+                html += `<div class="array-item" style="min-width:32px;font-size:10px;opacity:0.5;border:none;color:${isActiveRow ? 'var(--accent-green)' : 'var(--text-muted)'}">R${row}</div>`;
+                
+                // Place chars in their zigzag positions
+                const processedUpTo = iPtr >= 0 ? iPtr : -1;
+                for (let k = 0; k < chars.length; k++) {
+                    if (charRows[k] === row && k <= processedUpTo) {
+                        let classes = 'array-item';
+                        if (k === iPtr) classes += ' pointer-1';
+                        if (isComplete) classes += ' pointer-merge';
+                        html += `<div class="${classes}" style="min-width:24px;font-size:12px;">${chars[k]}</div>`;
+                    } else if (charRows[k] === row) {
+                        // Future position
+                        html += `<div class="array-item" style="min-width:24px;opacity:0.15;font-size:12px;">·</div>`;
+                    } else {
+                        // Empty cell (char goes to a different row)
+                        html += `<div style="min-width:24px;height:28px;display:inline-block;"></div>`;
+                    }
+                }
+                html += `</div>`;
+            }
+            html += `</div>`;
+
+            // Row contents built so far
+            html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+            if (!isComplete && iPtr >= 0) {
+                html += `<span style="color:var(--accent-blue);font-weight:600">'${chars[iPtr]}' → row ${curRow}</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">|</span>`;
+                rows.forEach((r, rIdx) => {
+                    html += `<span style="color:${rIdx === curRow ? 'var(--accent-green)' : 'var(--text-muted)'};font-size:11px;margin-right:8px;">R${rIdx}: "${r}"</span>`;
+                });
+            } else if (isComplete) {
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Concatenate rows: "${rows.join('')}"</span>`;
+            } else {
+                html += `<span style="color:var(--text-muted)">Waiting to start…</span>`;
+            }
+            html += `</div></div>`;
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -7011,8 +7408,8 @@ function render() {
                         <div class="pointer-detail-value p2">${curRow}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">rows</div>
-                        <div class="pointer-detail-value p-merge">[${rows.map(r => `"${r}"`).join(', ')}]</div>
+                        <div class="pointer-detail-label">direction</div>
+                        <div class="pointer-detail-value">${goingDown ? '↓ down' : '↑ up'}</div>
                     </div>
                 </div>
             `;
@@ -7020,43 +7417,86 @@ function render() {
             arrayContainer.innerHTML = html;
         }
 
-        // Problem 25: Find Needle in Haystack — haystack chars + needle (dual row)
+        // Problem 25: Find Needle in Haystack — char comparison bridge with match/mismatch
         if (currentProbId === '25' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const endPtr = state.pointers?.end ?? -1;
             const meta = state.arrayMeta || {};
+            const needle = meta.needle || '';
+            const nLen = meta.nLen || 0;
             const isComplete = state.isComplete || false;
+            const hChars = state.nums1;
+            const nChars = state.nums2 || [];
 
-            const sItemCount = state.nums1.length;
+            const sItemCount = hChars.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner array-dual${sDenseClass}">`;
 
-            // Haystack row
-            html += `<div class="array-section"><div class="array-label">haystack</div><div class="array-visualization">`;
-            state.nums1.forEach((ch, idx) => {
+            // Haystack row with sliding window
+            html += `<div class="array-section"><div class="array-label">haystack — slide window of size ${nLen}</div><div class="array-visualization">`;
+            hChars.forEach((ch, idx) => {
                 let classes = 'array-item';
                 let pointerLabels = '';
-                if (isComplete && idx >= iPtr && idx <= iPtr + (meta.nLen || 0) - 1) classes += ' pointer-merge';
+                if (isComplete && idx >= iPtr && idx < iPtr + nLen) classes += ' pointer-merge';
                 if (idx === iPtr) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
-                // Highlight window
-                if (!isComplete && iPtr >= 0 && idx >= iPtr && idx < iPtr + (meta.nLen || 0)) {
+                // Current window highlight
+                if (!isComplete && iPtr >= 0 && idx >= iPtr && idx < iPtr + nLen) {
                     classes += ' pointer-2';
                 }
                 html += `<div class="${classes}">${ch}${pointerLabels}<div class="array-index">${idx}</div></div>`;
             });
             html += `</div></div>`;
 
-            // Needle row
-            html += `<div class="array-section"><div class="array-label">needle</div><div class="array-visualization">`;
-            (state.nums2 || []).forEach((ch, idx) => {
+            // Needle row (aligned under current window position)
+            html += `<div class="array-section"><div class="array-label">needle — match against window</div><div class="array-visualization">`;
+            // Spacer to align under window
+            if (iPtr > 0) {
+                for (let k = 0; k < iPtr; k++) {
+                    html += `<div style="min-width:36px;height:36px;display:inline-block;"></div>`;
+                }
+            }
+            nChars.forEach((ch, idx) => {
                 let classes = 'array-item';
                 if (isComplete) classes += ' pointer-merge';
+                // Char-by-char match indicator
+                if (!isComplete && iPtr >= 0) {
+                    const hChar = hChars[iPtr + idx];
+                    if (hChar === ch) classes += ' highlight-char';
+                }
                 html += `<div class="${classes}">${ch}<div class="array-index">${idx}</div></div>`;
             });
             html += `</div></div>`;
+
+            // Bridge: window comparison
+            if (iPtr >= 0 && !isComplete) {
+                const window = hChars.slice(iPtr, iPtr + nLen).join('');
+                const matches = window === needle;
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">"${window}"</span>`;
+                if (matches) {
+                    html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">===</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:600">"${needle}" ✓ FOUND!</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-red);margin:0 6px">≠</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:600">"${needle}"</span>`;
+                    // Show first mismatch position
+                    for (let k = 0; k < nLen; k++) {
+                        if (hChars[iPtr + k] !== nChars[k]) {
+                            html += `<span style="color:var(--text-muted);margin-left:6px;font-size:11px">(mismatch at pos ${k}: '${hChars[iPtr+k]}' vs '${nChars[k]}')</span>`;
+                            break;
+                        }
+                    }
+                    html += `<span style="color:var(--text-muted);margin-left:6px">→ slide window right</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Found "${needle}" at index ${iPtr}!</span>`;
+                html += `</div></div>`;
+            }
 
             html += `
                 <div class="pointer-info">
@@ -7066,7 +7506,7 @@ function render() {
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">needle length</div>
-                        <div class="pointer-detail-value p2">${meta.nLen || '—'}</div>
+                        <div class="pointer-detail-value p2">${nLen}</div>
                     </div>
                 </div>
             `;
@@ -7074,13 +7514,14 @@ function render() {
             arrayContainer.innerHTML = html;
         }
 
-        // Problem 26: Justified Text Formatter — words array with current line context
+        // Problem 26: Justified Text Formatter — line-building with character ruler
         if (currentProbId === '26' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const maxWidth = meta.maxWidth || 16;
             const currentLine = meta.currentLine || [];
             const lineLen = meta.lineLen ?? 0;
+            const result = meta.result || [];
             const resultStr = meta.resultStr || '';
             const isComplete = state.isComplete || false;
 
@@ -7105,6 +7546,51 @@ function render() {
             });
 
             html += `</div>`;
+
+            // Current line being built (with character width ruler)
+            if (currentLine.length > 0 && !isComplete) {
+                const spaceCount = currentLine.length - 1;
+                const totalWithSpaces = lineLen + spaceCount;
+                const remaining = maxWidth - totalWithSpaces;
+                html += `<div style="margin:8px 0;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border:1px solid rgba(255,255,255,0.08);">`;
+                html += `<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">📝 Current line being packed:</div>`;
+                html += `<div style="font-family:monospace;font-size:13px;color:var(--accent-green);font-weight:600;">[${currentLine.join(' | ')}]</div>`;
+                // Width bar
+                const usedPct = (totalWithSpaces / maxWidth) * 100;
+                html += `<div class="reach-bar-container" style="margin-top:4px;">`;
+                html += `<div class="reach-bar" style="width:${usedPct}%;background:${remaining >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}"></div>`;
+                html += `<span class="reach-bar-label">${totalWithSpaces}/${maxWidth} chars used${remaining > 0 ? ` (${remaining} remaining)` : remaining === 0 ? ' (FULL)' : ' (OVERFLOW)'}</span>`;
+                html += `</div>`;
+                html += `</div>`;
+            }
+
+            // Bridge: word fit check
+            if (iPtr >= 0 && !isComplete) {
+                const word = state.nums1[iPtr];
+                const wouldBe = lineLen + word.length + currentLine.length;
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (wouldBe > maxWidth && currentLine.length > 0) {
+                    html += `<span style="color:var(--accent-orange);font-weight:600">"${word}" (len ${word.length})</span>`;
+                    html += `<span style="color:var(--accent-red);margin:0 6px">→ ${wouldBe} > ${maxWidth}</span>`;
+                    html += `<span style="color:var(--accent-red);font-weight:700">overflow! → flush & justify line</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-green);font-weight:600">"${word}" (len ${word.length})</span>`;
+                    html += `<span style="color:var(--accent-green);margin:0 6px">→ ${lineLen + word.length + Math.max(0, currentLine.length)} ≤ ${maxWidth}</span>`;
+                    html += `<span style="color:var(--text-muted)">✓ fits! add to current line</span>`;
+                }
+                html += `</div></div>`;
+            }
+
+            // Already justified lines
+            if (result.length > 0) {
+                html += `<div style="margin-top:8px;">`;
+                html += `<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">✅ Justified output lines:</div>`;
+                result.forEach((line, idx) => {
+                    html += `<div style="font-family:monospace;font-size:12px;color:var(--accent-purple);padding:2px 8px;background:rgba(139,92,246,0.1);border-radius:4px;margin-bottom:2px;border:1px solid rgba(139,92,246,0.2);">"${line}" <span style="color:var(--text-muted);font-size:10px">(${line.length} chars)</span></div>`;
+                });
+                html += `</div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -7112,12 +7598,12 @@ function render() {
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">current line</div>
-                        <div class="pointer-detail-value p2">[${currentLine.join(', ')}]</div>
+                        <div class="pointer-detail-label">current line words</div>
+                        <div class="pointer-detail-value p2">${currentLine.length}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">lineLen</div>
-                        <div class="pointer-detail-value p-merge">${lineLen}</div>
+                        <div class="pointer-detail-value p-merge">${lineLen}/${maxWidth}</div>
                     </div>
                 </div>
             `;
@@ -7176,24 +7662,30 @@ function render() {
             arrayContainer.innerHTML = html;
         }
 
-        // Problem 28: Subsequence Checker — t array (row 1) + s array (row 2)
+        // Problem 28: Subsequence Checker — matching bridge between aligned chars
         if (currentProbId === '28' && state.nums1) {
-            const iPtr = state.pointers?.i ?? -1;
-            const jPtr = state.pointers?.j ?? -1;
+            const iPtr = state.pointers?.i ?? -1;  // s pointer
+            const jPtr = state.pointers?.j ?? -1;  // t pointer
             const meta = state.arrayMeta || {};
             const isComplete = state.isComplete || false;
+            const tChars = state.nums1;
+            const sChars = state.nums2 || [];
 
-            const sItemCount = state.nums1.length;
+            const sItemCount = tChars.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner array-dual${sDenseClass}">`;
 
             // t (main string) row
-            html += `<div class="array-section"><div class="array-label">t (main string)</div><div class="array-visualization">`;
-            state.nums1.forEach((ch, idx) => {
+            html += `<div class="array-section"><div class="array-label">t (main string) — scan with j pointer</div><div class="array-visualization">`;
+            tChars.forEach((ch, idx) => {
                 let classes = 'array-item';
                 let pointerLabels = '';
                 if (isComplete) classes += ' pointer-merge';
                 if (jPtr >= 0 && idx < jPtr) classes += ' visited-cell';
+                // Highlight matched characters in t
+                if (idx === jPtr && iPtr < sChars.length && sChars[iPtr] === ch) {
+                    classes += ' highlight-char';
+                }
                 if (idx === jPtr) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">j</div>`;
@@ -7203,21 +7695,49 @@ function render() {
             html += `</div></div>`;
 
             // s (subsequence) row
-            html += `<div class="array-section"><div class="array-label">s (subsequence)</div><div class="array-visualization">`;
-            (state.nums2 || []).forEach((ch, idx) => {
+            html += `<div class="array-section"><div class="array-label">s (subsequence) — advance i only on match</div><div class="array-visualization">`;
+            sChars.forEach((ch, idx) => {
                 let classes = 'array-item';
-                if (isComplete) classes += ' pointer-merge';
-                if (iPtr >= 0 && idx < iPtr) classes += ' visited-cell';
+                if (isComplete && iPtr >= sChars.length) classes += ' pointer-merge';
+                // Matched chars (before i) 
+                if (idx < iPtr) classes += ' pointer-merge';
+                // Current s char waiting to match
                 if (idx === iPtr) classes += ' pointer-2';
-                html += `<div class="${classes}">${ch}<div class="array-index">${idx}</div></div>`;
+                html += `<div class="${classes}">${ch}${idx === iPtr ? '<div class="pointer-label p2">i</div>' : ''}<div class="array-index">${idx}</div></div>`;
             });
             html += `</div></div>`;
+
+            // Bridge: match/skip decision
+            if (jPtr >= 0 && jPtr < tChars.length && iPtr < sChars.length && !isComplete) {
+                const tCh = tChars[jPtr];
+                const sCh = sChars[iPtr];
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">t[${jPtr}]='${tCh}'</span>`;
+                if (tCh === sCh) {
+                    html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">== s[${iPtr}]='${sCh}'</span>`;
+                    html += `<span style="color:var(--accent-green)">✓ MATCH! advance both i++ and j++</span>`;
+                    html += `<span style="color:var(--text-muted);margin-left:8px;font-size:11px">(${iPtr + 1}/${sChars.length} matched)</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-red);margin:0 6px">≠ s[${iPtr}]='${sCh}'</span>`;
+                    html += `<span style="color:var(--text-muted)">→ skip, advance j++ only (keep looking for '${sCh}')</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                const isSubseq = iPtr >= sChars.length;
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (isSubseq) {
+                    html += `<span style="color:var(--accent-green);font-weight:700">✓ All ${sChars.length} chars matched! "${sChars.join('')}" IS a subsequence of "${tChars.join('')}"</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-red);font-weight:700">✗ Only matched ${iPtr}/${sChars.length} chars — NOT a subsequence</span>`;
+                }
+                html += `</div></div>`;
+            }
 
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (s pointer)</div>
-                        <div class="pointer-detail-value p2">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p2">${iPtr >= 0 ? `${iPtr}/${sChars.length}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">j (t pointer)</div>

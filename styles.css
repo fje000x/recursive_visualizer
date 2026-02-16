@@ -3940,6 +3940,144 @@ body.problem-page-active .action-bar {
     letter-spacing: 0.5px;
 }
 
+/* ===== Price Chart / Bar Visualization (Stock, H-Index, Candy) ===== */
+.price-chart-viz {
+    align-items: flex-end !important;
+    min-height: 80px;
+}
+.price-chart-viz .price-bar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: calc(var(--bar-h, 50%) + 20px);
+    transition: min-height 0.3s ease, background 0.3s ease;
+}
+.price-chart-viz .price-bar::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 4px;
+    right: 4px;
+    height: var(--bar-h, 50%);
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px 4px 0 0;
+    z-index: 0;
+    transition: height 0.3s ease, background 0.3s ease;
+}
+.price-chart-viz .price-bar .price-val {
+    position: relative;
+    z-index: 1;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+/* Stock Buy/Sell highlights */
+.price-bar.price-buy::before { background: rgba(16, 185, 129, 0.35); }
+.price-bar.price-sell::before { background: rgba(139, 92, 246, 0.35); }
+.price-bar.price-low::before { background: rgba(16, 185, 129, 0.2); }
+.price-bar.price-gain::before { background: rgba(16, 185, 129, 0.25); }
+.price-bar.price-gain { color: var(--accent-green) !important; }
+.price-bar.price-drop::before { background: rgba(239, 68, 68, 0.15); }
+.price-bar.price-drop { color: var(--accent-red) !important; }
+.price-floor-line {
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-top: 2px dashed var(--accent-green);
+    margin-top: 2px;
+}
+/* H-Index pass/fail */
+.price-bar.hindex-pass::before { background: rgba(16, 185, 129, 0.3); }
+.price-bar.hindex-fail::before { background: rgba(239, 68, 68, 0.15); }
+
+/* ===== Jump Game Visualization ===== */
+.jump-viz .jump-reachable {
+    border-color: var(--accent-green) !important;
+    background: rgba(16, 185, 129, 0.1);
+}
+.jump-viz .jump-unreachable {
+    border-color: var(--accent-red) !important;
+    background: rgba(239, 68, 68, 0.05);
+    opacity: 0.5;
+}
+.jump-viz .jump-goal {
+    border-color: var(--accent-purple) !important;
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+}
+.jump-viz .jump-boundary {
+    border-color: var(--accent-orange) !important;
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
+}
+.jump-reach-label {
+    position: absolute;
+    top: -18px;
+    right: -4px;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--accent-blue);
+    white-space: nowrap;
+}
+/* Reach progress bar */
+.reach-bar-container {
+    position: relative;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 9px;
+    margin: 6px 0;
+    overflow: hidden;
+}
+.reach-bar {
+    height: 100%;
+    background: var(--accent-green);
+    border-radius: 9px;
+    transition: width 0.3s ease;
+    opacity: 0.35;
+}
+.reach-bar-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+/* BFS level bar */
+.bfs-level-bar {
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    background: rgba(139, 92, 246, 0.08);
+    border-radius: 6px;
+    margin: 4px 0;
+    border-left: 3px solid var(--accent-purple);
+}
+.bfs-level-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-purple);
+}
+
+/* ===== Candy Comparison Row ===== */
+.candy-compare-row {
+    display: flex;
+    justify-content: center;
+    padding: 4px 0;
+    margin: 4px 0;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* ===== Highlight Char (for matched characters in string problems) ===== */
+.array-item.highlight-char {
+    border-color: var(--accent-green) !important;
+    background: rgba(16, 185, 129, 0.15);
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.3);
+}
+
 /* Rainwater — water cell highlight */
 .array-item.water-cell {
     box-shadow: 0 0 12px rgba(59, 130, 246, 0.5), inset 0 0 8px rgba(59, 130, 246, 0.15);
