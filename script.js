@@ -7514,35 +7514,40 @@ function render() {
             const original = meta.original ?? 0;
             const isComplete = state.isComplete || false;
 
-            const sItemCount = state.nums1.length;
-            const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
-            let html = `<div class="array-inner array-dual${sDenseClass}">`;
+            let html = `<div class="array-inner">`;
 
-            // Combined value + symbol row (side by side)
-            html += `<div class="array-section"><div class="array-label">value → symbol lookup (greedy: pick largest that fits)</div><div class="array-visualization">`;
+            // Compact lookup table — pill badges (like #19)
+            html += `<div class="array-section"><div class="array-label">value → symbol lookup (greedy: pick largest that fits)</div>`;
+            html += `<div style="display:flex;justify-content:center;gap:5px;margin:8px 0;flex-wrap:wrap;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.06);">`;
             state.nums1.forEach((val, idx) => {
-                let classes = 'array-item';
-                let pointerLabels = '';
                 const sym = (state.nums2 || [])[idx] || '';
-                if (idx === iPtr) {
-                    classes += ' pointer-1';
-                    pointerLabels = `<div class="pointer-label p1">▼</div>`;
+                const isActive = idx === iPtr;
+                const isPassed = iPtr >= 0 && idx < iPtr;
+                const isFit = isActive && num >= val;
+                let pillStyle = 'padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;transition:all 0.2s;display:inline-flex;align-items:center;gap:3px;';
+                if (isComplete) {
+                    pillStyle += 'background:rgba(16,185,129,0.15);color:var(--accent-green);border:1px solid rgba(16,185,129,0.25);';
+                } else if (isFit) {
+                    pillStyle += 'background:rgba(59,130,246,0.2);color:var(--accent-blue);border:1px solid rgba(59,130,246,0.4);box-shadow:0 0 8px rgba(59,130,246,0.2);';
+                } else if (isActive) {
+                    pillStyle += 'background:rgba(249,115,22,0.15);color:var(--accent-orange);border:1px solid rgba(249,115,22,0.35);';
+                } else if (isPassed) {
+                    pillStyle += 'opacity:0.35;color:var(--text-muted);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);';
+                } else {
+                    pillStyle += 'color:var(--text-secondary);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);';
                 }
-                // Already exhausted values (before i)
-                if (iPtr >= 0 && idx < iPtr) classes += ' visited-cell';
-                // Highlight if this value fits the remaining num
-                if (idx === iPtr && num >= val) classes += ' pointer-merge';
-                if (isComplete) classes += ' pointer-merge';
-                html += `<div class="${classes}" style="font-size:11px;"><span style="font-weight:700">${sym}</span><br><span style="font-size:10px;color:var(--text-muted)">${val}</span>${pointerLabels}</div>`;
+                html += `<span style="${pillStyle}"><strong>${sym}</strong><span style="font-size:10px;opacity:0.7;font-weight:400">${val}</span></span>`;
             });
             html += `</div></div>`;
 
             // Result building visualization
-            html += `<div class="array-section"><div class="array-label">result being built: "<span style="color:var(--accent-green);font-weight:700">${result}</span>"</div>`;
+            html += `<div class="array-section"><div class="array-label">result being built: "<span style="color:var(--accent-green);font-weight:700">${result || ''}</span>"</div>`;
             if (result.length > 0) {
-                html += `<div class="array-visualization">`;
-                result.split('').forEach((ch, idx) => {
-                    html += `<div class="array-item pointer-merge roman-char" style="min-width:28px;">${ch}</div>`;
+                html += `<div class="array-visualization" style="justify-content:center;">`;
+                // Split into Roman symbols (handle two-char symbols like CM, XC)
+                const romanSymbols = result.match(/(CM|CD|XC|XL|IX|IV|[MDCLXVI])/g) || [];
+                romanSymbols.forEach((sym) => {
+                    html += `<div class="array-item pointer-merge roman-char" style="min-width:36px;width:auto;max-width:none;aspect-ratio:auto;flex:0 0 auto;padding:8px 12px;">${sym}</div>`;
                 });
                 html += `</div>`;
             }
@@ -7554,13 +7559,13 @@ function render() {
                 const sym = (state.nums2 || [])[iPtr] || '';
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
                 if (num >= val) {
-                    html += `<span style="color:var(--accent-blue);font-weight:600">num=${num}</span>`;
-                    html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">≥ ${val}</span>`;
-                    html += `<span style="color:var(--text-muted)">→ append "${sym}", num -= ${val} → </span>`;
+                    html += `<span style="color:var(--accent-blue);font-weight:600">num = ${num}</span>`;
+                    html += `<span style="color:var(--accent-green);margin:0 8px;font-weight:700">≥ ${val}</span>`;
+                    html += `<span style="color:var(--text-muted)">→ append "${sym}", num − ${val} = </span>`;
                     html += `<span style="color:var(--accent-orange);font-weight:700">${num - val}</span>`;
                 } else {
-                    html += `<span style="color:var(--accent-blue);font-weight:600">num=${num}</span>`;
-                    html += `<span style="color:var(--accent-red);margin:0 6px">< ${val}</span>`;
+                    html += `<span style="color:var(--accent-blue);font-weight:600">num = ${num}</span>`;
+                    html += `<span style="color:var(--accent-red);margin:0 8px">< ${val}</span>`;
                     html += `<span style="color:var(--text-muted)">→ skip "${sym}", too large</span>`;
                 }
                 html += `</div></div>`;
