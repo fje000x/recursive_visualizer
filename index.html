@@ -464,6 +464,11 @@
                 <select id="mobileAlgorithmSelect" class="mobile-algo-select">
                 </select>
             </div>
+            <!-- Mobile testcase selector -->
+            <div class="mobile-testcase-selector" id="mobileTestcaseSelector" style="display:none;">
+                <select id="mobileTestcaseSelect" class="mobile-algo-select">
+                </select>
+            </div>
             <div id="canvas" class="render-engine">
                 <div id="treeCanvas" class="tree-canvas">
                     <!-- SVG layer for edges / arrows -->
@@ -474,11 +479,12 @@
                 <!-- Queue visualization (hidden when empty) -->
                 <div id="queueContainer" class="queue-container" style="display:none"></div>
             </div>
-            <div class="console-panel">
-                <div id="console" class="console-text"></div>
-            </div>
 
             <div class="action-bar">
+                <div class="testcase-pill" id="testcaseSelector" style="display:none;">
+                    <select id="testcaseSelect" class="testcase-select">
+                    </select>
+                </div>
                 <button onclick="changeStep(-1)" id="prevBtn" class="control-btn">
                     <i class="fas fa-chevron-left"></i><span>Prev</span>
                 </button>
@@ -494,6 +500,10 @@
                 <button onclick="changeStep(1)" id="nextBtn" class="control-btn primary">
                     <i class="fas fa-chevron-right"></i><span>Next</span>
                 </button>
+            </div>
+
+            <div class="console-panel">
+                <div id="console" class="console-text"></div>
             </div>
         </section>
 

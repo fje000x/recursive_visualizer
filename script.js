@@ -8,6 +8,7 @@ const problemDB = {
         difficulty: "easy",
         topics: ["tree", "recursion", "bfs", "dfs"],
         interview150: true,
+        testCaseLabels: { normal: "Balanced Tree", edge: "Skewed Line" },
         tree: {
             v: 5, id: 'n5', x: 0, y: -160,
             left: { v: 2, id: 'n2', x: -180, y: -20, left: null, right: null },
@@ -15,6 +16,19 @@ const problemDB = {
                 v: 8, id: 'n8', x: 180, y: -20,
                 left: { v: 6, id: 'n6', x: 80, y: 120, left: null, right: null },
                 right: { v: 11, id: 'n11', x: 280, y: 120, left: null, right: null }
+            }
+        },
+        edgeCaseTree: {
+            v: 1, id: 'n1', x: 0, y: -160,
+            left: null,
+            right: {
+                v: 2, id: 'n2', x: 100, y: -20,
+                left: null,
+                right: {
+                    v: 3, id: 'n3', x: 200, y: 120,
+                    left: null,
+                    right: null
+                }
             }
         },
         algorithms: {
@@ -97,6 +111,7 @@ const problemDB = {
         difficulty: "easy",
         topics: ["tree", "recursion", "bfs", "dfs"],
         interview150: true,
+        testCaseLabels: { normal: "Balanced Tree", edge: "Single Node" },
         tree: {
             v: 10, id: 'n10', x: 0, y: -160,
             left: { v: 4, id: 'n4', x: -180, y: -20, left: null, right: null },
@@ -105,6 +120,11 @@ const problemDB = {
                 left: { v: 12, id: 'n12', x: 80, y: 120, left: null, right: null },
                 right: { v: 22, id: 'n22', x: 280, y: 120, left: null, right: null }
             }
+        },
+        edgeCaseTree: {
+            v: 7, id: 'n7', x: 0, y: -160,
+            left: null,
+            right: null
         },
         algorithms: {
             recursive: {
@@ -183,6 +203,7 @@ const problemDB = {
         difficulty: "easy",
         topics: ["array", "two-pointers"],
         interview150: true,
+        testCaseLabels: { normal: "Both Non-Empty", edge: "Empty Second Array" },
         tree: null,
         algorithms: {
             twoPointers: {
@@ -212,6 +233,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateMergeSortedArrayHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateMergeSortedArrayEdgeHistory();
                 }
             }
         }
@@ -225,6 +249,7 @@ const problemDB = {
         difficulty: "easy",
         topics: ["array", "two-pointers"],
         interview150: true,
+        testCaseLabels: { normal: "Mixed Values", edge: "All Match Target" },
         tree: null,
         algorithms: {
             twoPointers: {
@@ -243,6 +268,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateRemoveElementHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateRemoveElementEdgeHistory();
                 }
             }
         }
@@ -256,6 +284,7 @@ const problemDB = {
         difficulty: "easy",
         topics: ["array", "two-pointers"],
         interview150: true,
+        testCaseLabels: { normal: "Has Duplicates", edge: "Already Unique" },
         tree: null,
         algorithms: {
             twoPointers: {
@@ -275,6 +304,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateRemoveDuplicatesHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateRemoveDuplicatesEdgeHistory();
                 }
             }
         }
@@ -320,6 +352,7 @@ const problemDB = {
         difficulty: "easy",
         topics: ["array", "voting-algorithm"],
         interview150: true,
+        testCaseLabels: { normal: "Mixed Votes", edge: "Unanimous [1,1,1,1,1]" },
         tree: null,
         algorithms: {
             boyerMoore: {
@@ -343,6 +376,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateDominantElementHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateDominantElementEdgeHistory();
                 }
             }
         }
@@ -356,6 +392,7 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "math"],
         interview150: true,
+        testCaseLabels: { normal: "Rotate by 3", edge: "k = 0 (No Rotation)" },
         tree: null,
         algorithms: {
             reverse: {
@@ -379,6 +416,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateCycleArrayHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateCycleArrayEdgeHistory();
                 }
             }
         }
@@ -392,6 +432,7 @@ const problemDB = {
         difficulty: "easy",
         topics: ["array", "dynamic-programming"],
         interview150: true,
+        testCaseLabels: { normal: "Profit Possible", edge: "Only Drops [7,6,4,3,1]" },
         tree: null,
         algorithms: {
             onePass: {
@@ -413,6 +454,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateBestTradeHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateBestTradeEdgeHistory();
                 }
             }
         }
@@ -426,6 +470,7 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "greedy"],
         interview150: true,
+        testCaseLabels: { normal: "Mixed Trends", edge: "Flat Prices [3,3,3,3,3]" },
         tree: null,
         algorithms: {
             greedy: {
@@ -443,6 +488,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateBestTradesHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateBestTradesEdgeHistory();
                 }
             }
         }
@@ -456,6 +504,7 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "greedy"],
         interview150: true,
+        testCaseLabels: { normal: "Reachable ✓", edge: "Stuck at Zero ✗" },
         tree: null,
         algorithms: {
             greedy: {
@@ -474,6 +523,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateCanReachEndHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateCanReachEndEdgeHistory();
                 }
             }
         }
@@ -701,6 +753,7 @@ const problemDB = {
         difficulty: "hard",
         topics: ["array", "two-pointers", "dynamic-programming"],
         interview150: true,
+        testCaseLabels: { normal: "Varied Heights", edge: "Flat Surface (No Water)" },
         tree: null,
         algorithms: {
             twoPointers: {
@@ -727,6 +780,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateTrappedRainwaterHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateTrappedRainwaterEdgeHistory();
                 }
             }
         }
@@ -1009,6 +1065,7 @@ const problemDB = {
         difficulty: "easy",
         topics: ["string", "two-pointers"],
         interview150: true,
+        testCaseLabels: { normal: "\"No lemon, no melon\" ✓", edge: "\"race a car\" ✗" },
         tree: null,
         algorithms: {
             twoPointers: {
@@ -1032,6 +1089,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateValidPalindromeHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateValidPalindromeEdgeHistory();
                 }
             }
         }
@@ -1045,6 +1105,7 @@ const problemDB = {
         difficulty: "easy",
         topics: ["string", "two-pointers"],
         interview150: true,
+        testCaseLabels: { normal: "\"abc\" in \"ahbgdc\"", edge: "Empty String s" },
         tree: null,
         algorithms: {
             twoPointers: {
@@ -1063,6 +1124,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateIsSubsequenceHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateIsSubsequenceEdgeHistory();
                 }
             }
         }
@@ -1076,6 +1140,7 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "two-pointers"],
         interview150: true,
+        testCaseLabels: { normal: "[2,7,11,15] target=9", edge: "[1,2,3,4,5] target=6" },
         tree: null,
         algorithms: {
             twoPointers: {
@@ -1098,6 +1163,9 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateTwoSumIIHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateTwoSumIIEdgeHistory();
                 }
             }
         }
@@ -1329,6 +1397,7 @@ const problemDB = {
         difficulty: "easy",
         topics: ["string", "stack"],
         interview150: true,
+        testCaseLabels: { normal: "({[]}) ✓ Balanced", edge: "([)] ✗ Interleaved" },
         tree: null,
         algorithms: {
             stackApproach: {
@@ -1351,6 +1420,9 @@ const problemDB = {
                 spaceComplexity: "O(n)",
                 generateHistory: function() {
                     return generateValidParenthesesHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateValidParenthesesEdgeHistory();
                 }
             }
         }
@@ -1800,6 +1872,7 @@ const problemDB = {
 
 let currentProbId = "1";
 let currentAlgorithm = "recursive";
+let currentTestCase = "normal"; // "normal" or "edge"
 let history = [];
 let currentStep = 0;
 let autoPlayInterval = null;
@@ -1912,6 +1985,7 @@ function selectProblem(probId) {
     currentProbId = probId;
     const prob = problemDB[probId];
     currentAlgorithm = Object.keys(prob.algorithms)[0]; // Get first algorithm
+    currentTestCase = "normal"; // Reset test case when switching problems
     document.getElementById('searchInput').value = '';
     document.getElementById('searchDropdown').style.display = 'none';
     // Debounce: cancel any pending init, schedule a new one
@@ -3731,7 +3805,7 @@ function generateTextJustificationHistory() {
 
 // Valid Palindrome (LC #125) — Two Pointers
 function generateValidPalindromeHistory() {
-    const s = "A man, a plan, a canal: Panama";
+    const s = "No lemon, no melon";
     const chars = s.split('');
     const h = [];
     let l = 0;
@@ -4819,6 +4893,421 @@ function generateLongestConsecutiveHistory() {
     }
 
     h.push({ msg: `✓ Done! Longest consecutive sequence = ${longest}.`, line: 9, pointers: {}, nums1: [...nums], nums2: [], arrayMeta: { numSet: [...numSet].sort((a, b) => a - b), longest, action: 'done' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// ═══════════════════════════════════════════════════════
+//  EDGE CASE HISTORY GENERATORS
+// ═══════════════════════════════════════════════════════
+
+// Edge: #3 Merge Sorted Array — second array is empty
+function generateMergeSortedArrayEdgeHistory() {
+    const nums1 = [1, 3, 5];
+    const m = 3;
+    const nums2 = [];
+    const n = 0;
+    const h = [];
+    let p1 = m - 1, p2 = n - 1, p = m + n - 1;
+    let step = 0;
+    const merged = [...nums1];
+
+    function record(msg, pointers = {}, isComparison = false, isComplete = false) {
+        h.push({ msg, line: step, pointers: { ...pointers, p1, p2, p }, nums1: [...merged], nums2: [...nums2], isComparison, isComplete, step: h.length });
+    }
+
+    step = 0;
+    record(`Initializing merge. nums1=[${nums1}], nums2=[] (empty!)`);
+    step = 1;
+    record(`Setting pointers: p1=${p1}, p2=${p2}, p=${p}`);
+    step = 5;
+    record(`p2 = ${p2} < 0 → nums2 is empty! Nothing to merge.`);
+    step = 14;
+    record(`✓ nums1 is already sorted and complete. No work needed!`);
+    h.push({ msg: `✓ Merge complete! Result: [${merged}]. Edge case: when nums2 is empty, nums1 is unchanged.`, line: -1, pointers: { p1, p2, p }, nums1: merged, nums2: nums2, isComplete: true, step: h.length });
+    return h;
+}
+
+// Edge: #4 Remove Element — all elements match target
+function generateRemoveElementEdgeHistory() {
+    const nums = [2, 2, 2, 2];
+    const val = 2;
+    const h = [];
+    let k = 0;
+    const arr = [...nums];
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...arr], nums2: [], arrayMeta: { val, k, originalLength: nums.length }, step: h.length, ...extra });
+    }
+
+    record(0, `Call removeElement(nums=[${nums}], val=${val}). Goal: remove all ${val}s in-place.`);
+    record(1, `Initialize write pointer k = 0.`, { k });
+
+    for (let i = 0; i < arr.length; i++) {
+        record(2, `Move read pointer → i = ${i}. nums[${i}] = ${arr[i]}. k = ${k}.`, { i, k });
+        record(3, `nums[${i}] = ${arr[i]} == ${val} → matches target! Skip — k stays at ${k}.`, { i, k }, { isComparison: true, isSkip: true });
+    }
+
+    record(6, `✓ Done! k = ${k}. ALL elements were the target value — result is empty! Edge case: every element removed.`, { k }, { isComplete: true });
+    return h;
+}
+
+// Edge: #5 Remove Duplicates — already unique
+function generateRemoveDuplicatesEdgeHistory() {
+    const nums = [1, 2, 3, 4, 5];
+    const h = [];
+    let k = 1;
+    const arr = [...nums];
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...arr], nums2: [], arrayMeta: { k, originalLength: nums.length }, step: h.length, ...extra });
+    }
+
+    record(0, `Call removeDuplicates(nums=[${nums}]). Goal: remove duplicates in-place.`);
+    record(2, `Initialize k = 1. First element is always kept.`, { k });
+
+    for (let i = 1; i < arr.length; i++) {
+        record(3, `i = ${i}. nums[${i}] = ${arr[i]}, nums[${i - 1}] = ${arr[i - 1]}.`, { i, k });
+        record(4, `nums[${i}] = ${arr[i]} ≠ nums[${k - 1}] = ${arr[k - 1]} → unique! nums[${k}] = ${arr[i]}.`, { i, k }, { isComparison: true });
+        arr[k] = arr[i];
+        k++;
+        record(6, `k++ → k = ${k}.`, { i, k });
+    }
+
+    record(7, `✓ Done! k = ${k}. Edge case: array was already unique — no duplicates removed!`, { k }, { isComplete: true });
+    return h;
+}
+
+// Edge: #9 Best Trade — descending prices, no profit
+function generateBestTradeEdgeHistory() {
+    const prices = [7, 6, 4, 3, 1];
+    const h = [];
+    let minPrice = prices[0];
+    let maxProfit = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...prices], nums2: [], arrayMeta: { minPrice, maxProfit, originalLength: prices.length }, step: h.length, ...extra });
+    }
+
+    record(0, `Call bestTrade(prices=[${prices}]). Goal: find the maximum profit from buying once and selling once.`);
+    record(1, `Initialize minPrice = prices[0] = ${minPrice}.`);
+    record(2, `Initialize maxProfit = 0.`);
+
+    for (let i = 1; i < prices.length; i++) {
+        record(3, `Move to i = ${i}. prices[${i}] = ${prices[i]}. minPrice = ${minPrice}, maxProfit = ${maxProfit}.`, { i });
+        const oldMin = minPrice;
+        minPrice = prices[i];
+        record(4, `prices[${i}] = ${prices[i]} < minPrice (was ${oldMin}) → new low found! minPrice = ${minPrice}.`, { i }, { isComparison: true });
+    }
+
+    record(9, `✓ Done! maxProfit = ${maxProfit}. Edge case: prices only decrease → no profitable trade exists!`, {}, { isComplete: true });
+    return h;
+}
+
+// Edge: #10 Best Trades II — flat prices, no gains
+function generateBestTradesEdgeHistory() {
+    const prices = [3, 3, 3, 3, 3];
+    const h = [];
+    let totalProfit = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...prices], nums2: [], arrayMeta: { totalProfit, originalLength: prices.length }, step: h.length, ...extra });
+    }
+
+    record(0, `Call bestTrades(prices=[${prices}]). Goal: maximize total profit (greedy).`);
+    record(1, `Initialize totalProfit = 0.`);
+
+    for (let i = 1; i < prices.length; i++) {
+        record(2, `Move to i = ${i}. prices[${i}] = ${prices[i]}, prices[${i - 1}] = ${prices[i - 1]}.`, { i });
+        record(3, `prices[${i}] = ${prices[i]} ≤ prices[${i - 1}] = ${prices[i - 1]} → no gain. Skip.`, { i }, { isComparison: true, isSkip: true });
+    }
+
+    record(5, `✓ Done! totalProfit = ${totalProfit}. Edge case: all prices equal → no trades possible!`, {}, { isComplete: true });
+    return h;
+}
+
+// Edge: #11 Jump Game — can't reach end
+function generateCanReachEndEdgeHistory() {
+    const nums = [3, 2, 1, 0, 4];
+    const h = [];
+    let farthest = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...nums], nums2: [], arrayMeta: { farthest, originalLength: nums.length }, step: h.length, ...extra });
+    }
+
+    record(0, `Call canReachEnd(nums=[${nums}]). Goal: determine if we can reach the last index.`);
+    record(1, `Initialize farthest = 0.`);
+
+    for (let i = 0; i < nums.length; i++) {
+        record(2, `Move to i = ${i}. nums[${i}] = ${nums[i]}. farthest = ${farthest}.`, { i });
+        if (i > farthest) {
+            record(3, `i = ${i} > farthest = ${farthest} → we can't reach index ${i}!`, { i }, { isComparison: true });
+            record(4, `Return False — cannot reach the end. Edge case: a 0 creates an impassable barrier!`, {}, { isComplete: true });
+            return h;
+        }
+        const oldFarthest = farthest;
+        farthest = Math.max(farthest, i + nums[i]);
+        record(5, `farthest = max(${oldFarthest}, ${i} + ${nums[i]}) = ${farthest}.`, { i }, { isComparison: true });
+    }
+
+    record(6, `✓ Done! Return True.`, {}, { isComplete: true });
+    return h;
+}
+
+// Edge: #18 Trapping Rain Water — flat surface, no water
+function generateTrappedRainwaterEdgeHistory() {
+    const height = [3, 3, 3, 3, 3];
+    const h = [];
+    let l = 0, r = height.length - 1;
+    let leftMax = height[l], rightMax = height[r];
+    let water = 0;
+    const waterAt = new Array(height.length).fill(0);
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...height], nums2: [...waterAt], arrayMeta: { leftMax, rightMax, water, originalLength: height.length }, step: h.length, ...extra });
+    }
+
+    record(0, `Call trap(height=[${height}]). Goal: compute trapped water.`);
+    record(1, `Set l = 0, r = ${r}.`, { l, r });
+    record(2, `leftMax = height[0] = ${leftMax}.`, { l, r });
+    record(3, `rightMax = height[${r}] = ${rightMax}.`, { l, r });
+    record(4, `water = 0.`, { l, r });
+
+    while (l < r) {
+        record(5, `l = ${l}, r = ${r}. l < r → continue.`, { l, r });
+        if (leftMax < rightMax) {
+            record(6, `leftMax (${leftMax}) < rightMax (${rightMax}) → move left.`, { l, r }, { isComparison: true });
+            l++;
+            record(7, `l = ${l}. height[${l}] = ${height[l]}.`, { l, r });
+            leftMax = Math.max(leftMax, height[l]);
+            const trapped = leftMax - height[l];
+            water += trapped;
+            waterAt[l] = trapped;
+            record(9, `Water at ${l} = ${leftMax} − ${height[l]} = ${trapped}. Total = ${water}.`, { l, r }, { isComparison: true });
+        } else {
+            record(10, `leftMax (${leftMax}) ≥ rightMax (${rightMax}) → move right.`, { l, r }, { isComparison: true });
+            r--;
+            record(11, `r = ${r}. height[${r}] = ${height[r]}.`, { l, r });
+            rightMax = Math.max(rightMax, height[r]);
+            const trapped = rightMax - height[r];
+            water += trapped;
+            waterAt[r] = trapped;
+            record(13, `Water at ${r} = ${rightMax} − ${height[r]} = ${trapped}. Total = ${water}.`, { l, r }, { isComparison: true });
+        }
+    }
+
+    record(14, `✓ Total trapped water = ${water}. Edge case: flat surface → no water trapped!`, { l, r }, { isComplete: true });
+    return h;
+}
+
+// Edge: #27 Valid Palindrome — NOT a palindrome
+function generateValidPalindromeEdgeHistory() {
+    const s = "race a car";
+    const chars = s.split('');
+    const h = [];
+    let l = 0;
+    let r = chars.length - 1;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({ msg, line, pointers: { ...pointers }, nums1: chars.map(c => /[a-zA-Z0-9]/.test(c) ? c : c === ' ' ? '␣' : c), nums2: [], arrayMeta: { left: l, right: r, originalLength: chars.length }, step: h.length, ...extra });
+    }
+
+    record(0, `Call isPalindrome("${s}"). Compare only alphanumeric characters.`);
+    record(1, `l = 0, r = ${r}.`, { l, r });
+
+    while (l < r) {
+        while (l < r && !/[a-zA-Z0-9]/.test(chars[l])) {
+            record(3, `s[${l}] = '${chars[l]}' is not alphanumeric → skip. l += 1.`, { l, r });
+            l++;
+        }
+        while (l < r && !/[a-zA-Z0-9]/.test(chars[r])) {
+            record(5, `s[${r}] = '${chars[r]}' is not alphanumeric → skip. r -= 1.`, { l, r });
+            r--;
+        }
+
+        if (l >= r) break;
+
+        const lc = chars[l].toLowerCase();
+        const rc = chars[r].toLowerCase();
+        record(7, `Compare s[${l}] = '${lc}' vs s[${r}] = '${rc}'.`, { l, r }, { isComparison: true });
+
+        if (lc !== rc) {
+            record(8, `'${lc}' ≠ '${rc}' → NOT a palindrome!`, { l, r });
+            record(8, `✓ Done! Return False. Edge case: "race a car" fails — a common trick question!`, {}, { isComplete: true });
+            return h;
+        }
+
+        record(7, `'${lc}' == '${rc}' ✓ → match!`, { l, r });
+        l++;
+        r--;
+        record(9, `l += 1 → ${l}, r -= 1 → ${r}.`, { l, r });
+    }
+
+    record(11, `✓ Done! IS a valid palindrome.`, {}, { isComplete: true });
+    return h;
+}
+
+// Edge: #36 Valid Parentheses — unbalanced
+function generateValidParenthesesEdgeHistory() {
+    const s = "([)]";
+    const chars = s.split('');
+    const h = [];
+    const stack = [];
+    const pairs = { ')': '(', '}': '{', ']': '[' };
+    const openBrackets = new Set(['(', '{', '[']);
+
+    function record(line, msg, idx, extra = {}) {
+        h.push({ msg, line, pointers: { i: idx }, nums1: [...chars], nums2: [], arrayMeta: { stack: [...stack], stackStr: stack.join(''), action: extra.action || '', matchPair: extra.matchPair || '', currentChar: extra.currentChar || '' }, step: h.length, ...extra });
+    }
+
+    record(0, `Call isValid("${s}"). Edge case: interleaved brackets.`, -1);
+    record(2, `pairs: ) matches (, ] matches [.`, -1);
+
+    // i=0: '(' → push
+    stack.push('(');
+    record(9, `i=0: '(' is OPENING → push. Stack: [${stack.join(' ')}].`, 0, { action: 'push', currentChar: '(' });
+
+    // i=1: '[' → push
+    stack.push('[');
+    record(9, `i=1: '[' is OPENING → push. Stack: [${stack.join(' ')}].`, 1, { action: 'push', currentChar: '[' });
+
+    // i=2: ')' → needs '(' but top is '['
+    const expected = pairs[')'];
+    const got = stack[stack.length - 1];
+    record(6, `i=2: ')' is CLOSING → needs '${expected}' on top, but got '${got}' → MISMATCH!`, 2, { action: 'mismatch', currentChar: ')' });
+
+    h.push({ msg: `✗ Done! Mismatch found → Valid = False. Edge case: interleaved brackets like "([)]" are NOT valid!`, line: 6, pointers: {}, nums1: [...chars], nums2: [], arrayMeta: { stack: [...stack], stackStr: stack.join(''), action: 'invalid' }, step: h.length, isComplete: true });
+    return h;
+}
+
+// Edge: #7 Dominant Element — dominant element appears every time
+function generateDominantElementEdgeHistory() {
+    const nums = [1, 1, 1, 1, 1];
+    const h = [];
+    let candidate = nums[0];
+    let count = 1;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...nums], nums2: [], arrayMeta: { candidate, count, originalLength: nums.length }, step: h.length, ...extra });
+    }
+
+    record(0, `Call majorityElement(nums=[${nums}]). Goal: find the element that appears > n/2 times.`);
+    record(1, `Initialize candidate = ${candidate}.`, { i: 0 });
+    record(2, `Initialize count = 1.`, { i: 0 });
+
+    for (let i = 1; i < nums.length; i++) {
+        record(3, `i = ${i}. nums[${i}] = ${nums[i]}. candidate = ${candidate}, count = ${count}.`, { i });
+        count++;
+        record(7, `nums[${i}] = ${nums[i]} == candidate ${candidate} → count++ → ${count}.`, { i }, { isComparison: true });
+    }
+
+    record(11, `✓ Done! candidate = ${candidate}, count = ${count}. Edge case: ALL elements are the same!`, {}, { isComplete: true });
+    return h;
+}
+
+// Edge: #28 Is Subsequence — empty subsequence (always true)
+function generateIsSubsequenceEdgeHistory() {
+    const s = "";
+    const t = "hello";
+    const sChars = s.split('');
+    const tChars = t.split('');
+    const h = [];
+    let i = 0, j = 0;
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: tChars.map(c => c),
+            nums2: sChars.map(c => c),
+            arrayMeta: { s, t, sLen: s.length, tLen: t.length, i, j },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call isSubsequence("${s}", "${t}"). Is "" a subsequence of "${t}"?`);
+    record(1, `i = 0, j = 0. s is EMPTY (sLen = 0).`, { i: 0, j: 0 });
+    record(6, `i = 0 ≥ sLen = 0 → all characters of s matched! Return True.`);
+    record(7, `✓ Done! Return True. Edge case: empty string is always a subsequence.`, {}, { isComplete: true });
+    return h;
+}
+
+// Edge: #29 Two Sum II — target at endpoints
+function generateTwoSumIIEdgeHistory() {
+    const numbers = [1, 2, 3, 4, 5];
+    const target = 6;
+    const h = [];
+    let l = 0, r = numbers.length - 1;
+    let sumDir = '';
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({
+            msg, line,
+            pointers: { ...pointers },
+            nums1: [...numbers],
+            nums2: [],
+            arrayMeta: {
+                target,
+                curSum: (pointers.l != null && pointers.r != null) ? numbers[pointers.l] + numbers[pointers.r] : 0,
+                sumDirection: sumDir,
+                lVal: pointers.l != null ? numbers[pointers.l] : null,
+                rVal: pointers.r != null ? numbers[pointers.r] : null
+            },
+            step: h.length,
+            ...extra
+        });
+    }
+
+    record(0, `Call twoSum([${numbers}], target=${target}). Find two numbers that add to ${target}.`);
+    record(1, `l = 0, r = ${r}. Array is sorted, use two pointers.`, { l: 0, r });
+
+    while (l < r) {
+        const curSum = numbers[l] + numbers[r];
+        sumDir = '';
+        record(2, `l = ${l}, r = ${r}: check.`, { l, r });
+        sumDir = curSum < target ? 'low' : curSum > target ? 'high' : 'match';
+        record(3, `curSum = numbers[${l}] + numbers[${r}] = ${numbers[l]} + ${numbers[r]} = ${curSum}.`, { l, r });
+
+        if (curSum === target) {
+            record(4, `${curSum} == ${target} ✓ → found!`, { l, r }, { isComparison: true });
+            sumDir = 'match';
+            record(5, `✓ Done! Return [${l + 1}, ${r + 1}] (1-indexed). Edge case: answer found quickly!`, {}, { isComplete: true });
+            return h;
+        } else if (curSum < target) {
+            record(6, `${curSum} < ${target} → too small. l += 1.`, { l, r }, { isComparison: true });
+            l++;
+            sumDir = '';
+            record(7, `l = ${l}.`, { l, r });
+        } else {
+            record(8, `${curSum} > ${target} → too big. r -= 1.`, { l, r }, { isComparison: true });
+            r--;
+            sumDir = '';
+            record(9, `r = ${r}.`, { l, r });
+        }
+    }
+
+    record(10, `✓ Done! No pair found. Return [].`, {}, { isComplete: true });
+    return h;
+}
+
+// Edge: #8 Cycle Array — k = 0 (no rotation)
+function generateCycleArrayEdgeHistory() {
+    const nums = [1, 2, 3, 4, 5];
+    const k_input = 0;
+    const h = [];
+    const n = nums.length;
+    const k = k_input % n;
+    const arr = [...nums];
+
+    function record(line, msg, pointers = {}, extra = {}) {
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...arr], nums2: [], arrayMeta: { k: k_input, n, effectiveK: k, originalLength: n }, step: h.length, ...extra });
+    }
+
+    record(0, `Call cycleElements(nums=[${nums}], k=${k_input}).`);
+    record(1, `n = ${n}.`);
+    record(2, `k = ${k_input} % ${n} = ${k}. Effective rotation = 0!`);
+    record(5, `✓ Done! Edge case: k = 0 (or k is multiple of n) → array stays the same: [${arr}].`, {}, { isComplete: true });
     return h;
 }
 
@@ -6172,7 +6661,7 @@ function render() {
             
             const sItemCount = prices.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
-            let html = `<div class="array-inner${sDenseClass}">`;
+            let html = `<div class="array-inner array-dual${sDenseClass}">`;
             html += `<div class="array-label">prices — collect every consecutive gain (greedy: buy low, sell high, repeat)</div>`;
 
             // Price chart with gain-coloring
@@ -6350,6 +6839,8 @@ function render() {
                     </div>
                 </div>
             `;
+            html += `</div>`;
+            arrayContainer.innerHTML = html;
         }
         
         // Problem 12: Fewest Jumps to End (Jump Game II) — BFS level zones
@@ -6688,7 +7179,7 @@ function render() {
             
             const sItemCount = gas.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
-            let html = `<div class="array-inner array-dual${sDenseClass}">`;
+            let html = `<div class="array-inner array-compact${sDenseClass}">`;
             
             // gas row
             html += `<div class="array-section"><div class="array-label">gas ⛽ (fuel at station)</div><div class="array-visualization">`;
@@ -6787,7 +7278,7 @@ function render() {
             
             const sItemCount = ratings.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
-            let html = `<div class="array-inner array-dual${sDenseClass}">`;
+            let html = `<div class="array-inner array-compact${sDenseClass}">`;
             
             // ratings row with comparison arrows
             html += `<div class="array-section"><div class="array-label">ratings ⭐ (${isLeftPass ? '← LEFT PASS →' : isRightPass ? '← RIGHT PASS →' : 'compare neighbors'})</div><div class="array-visualization">`;
@@ -7276,7 +7767,7 @@ function render() {
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
             html += `<div class="array-label">words — reverse word order using two pointers</div>`;
-            html += `<div class="array-visualization">`;
+            html += `<div class="array-visualization" style="flex-wrap:wrap;">`;
 
             state.nums1.forEach((word, idx) => {
                 let classes = 'array-item';
@@ -7295,7 +7786,7 @@ function render() {
                     pointerLabels = `<div class="pointer-label p2">R</div>`;
                 }
 
-                html += `<div class="${classes}">${word}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+                html += `<div class="${classes}" style="width:auto;max-width:none;aspect-ratio:auto;flex:0 0 auto;padding:8px 14px;font-size:14px;white-space:nowrap;">${word}${pointerLabels}<div class="array-index">${idx}</div></div>`;
             });
 
             html += `</div>`;
@@ -7542,7 +8033,7 @@ function render() {
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
 
-                html += `<div class="${classes}">${word}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+                html += `<div class="${classes}" style="width:auto;max-width:none;aspect-ratio:auto;flex:0 0 auto;padding:8px 14px;font-size:14px;white-space:nowrap;">${word}${pointerLabels}<div class="array-index">${idx}</div></div>`;
             });
 
             html += `</div>`;
@@ -8355,7 +8846,7 @@ function render() {
 
             let html = `<div class="array-inner">`;
             html += `<div class="array-label">matrix ${m}×${n} — peel layers in spiral: → ↓ ← ↑ repeat</div>`;
-            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:4px;max-width:${n * 52}px;margin:0 auto;">`;
+            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:6px;max-width:${n * 64}px;margin:0 auto;">`;
 
             for (let i = 0; i < m; i++) {
                 for (let j = 0; j < n; j++) {
@@ -8364,7 +8855,7 @@ function render() {
                     if (visited[idx]) classes += ' visited';
                     if (i === row && j === col) classes += ' pointer-1';
                     if (isComplete) classes += ' pointer-merge';
-                    html += `<div class="${classes}" style="margin:0;min-width:36px;">${matrix[i]?.[j] ?? ''}<div class="array-index">[${i}][${j}]</div></div>`;
+                    html += `<div class="${classes}" style="margin:0;min-width:44px;aspect-ratio:1;">${matrix[i]?.[j] ?? ''}</div>`;
                 }
             }
 
@@ -8415,7 +8906,7 @@ function render() {
 
             let html = `<div class="array-inner">`;
             html += `<div class="array-label">matrix ${n}×${n} — rotate 90° CW = transpose + reverse rows</div>`;
-            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:4px;max-width:${n * 52}px;margin:0 auto;">`;
+            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:6px;max-width:${n * 64}px;margin:0 auto;">`;
 
             for (let i = 0; i < n; i++) {
                 for (let j = 0; j < n; j++) {
@@ -8423,7 +8914,7 @@ function render() {
                     if (isComplete) classes += ' pointer-merge';
                     if (i === row && j === col) classes += ' pointer-1';
                     if (phase === 'transpose' && i === col && j === row && row >= 0) classes += ' pointer-2';
-                    html += `<div class="${classes}" style="margin:0;min-width:36px;">${matrix[i]?.[j] ?? ''}<div class="array-index">[${i}][${j}]</div></div>`;
+                    html += `<div class="${classes}" style="margin:0;min-width:44px;aspect-ratio:1;">${matrix[i]?.[j] ?? ''}</div>`;
                 }
             }
 
@@ -8468,7 +8959,7 @@ function render() {
 
             let html = `<div class="array-inner">`;
             html += `<div class="array-label">matrix ${m}×${n} — use first row/col as markers, then zero in-place</div>`;
-            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:4px;max-width:${n * 52}px;margin:0 auto;">`;
+            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:6px;max-width:${n * 64}px;margin:0 auto;">`;
 
             for (let i = 0; i < m; i++) {
                 for (let j = 0; j < n; j++) {
@@ -8478,7 +8969,7 @@ function render() {
                     // Highlight marker row/col
                     if ((i === 0 || j === 0) && phase === 'mark') classes += ' active-window';
                     if (i === row && j === col) classes += ' pointer-1';
-                    html += `<div class="${classes}" style="margin:0;min-width:36px;">${val}<div class="array-index">[${i}][${j}]</div></div>`;
+                    html += `<div class="${classes}" style="margin:0;min-width:44px;aspect-ratio:1;">${val}</div>`;
                 }
             }
 
@@ -8529,7 +9020,7 @@ function render() {
 
             let html = `<div class="array-inner">`;
             html += `<div class="array-label">board ${m}×${n} — Game of Life: encode next state in-place, then decode</div>`;
-            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:4px;max-width:${n * 52}px;margin:0 auto;">`;
+            html += `<div class="matrix-grid" style="display:grid;grid-template-columns:repeat(${n},1fr);gap:6px;max-width:${n * 64}px;margin:0 auto;">`;
 
             for (let i = 0; i < m; i++) {
                 for (let j = 0; j < n; j++) {
@@ -8540,7 +9031,7 @@ function render() {
                     if (val === 2) classes += ' highlight-char';
                     if (i === row && j === col) classes += ' pointer-1';
                     const display = phase === 'decode' || phase === 'done' ? (val > 0 ? val : '·') : (val === 0 ? '·' : val === 1 ? '■' : val === 2 ? '★' : '■');
-                    html += `<div class="${classes}" style="margin:0;min-width:36px;">${display}<div class="array-index">[${i}][${j}]</div></div>`;
+                    html += `<div class="${classes}" style="margin:0;min-width:44px;aspect-ratio:1;">${display}</div>`;
                 }
             }
 
@@ -9692,6 +10183,36 @@ function init() {
     // Explicitly set the value on both selects
     algorithmSelect.value = currentAlgorithm;
     if (mobileAlgorithmSelect) mobileAlgorithmSelect.value = currentAlgorithm;
+
+    // Show/hide testcase selector and populate with problem-specific labels
+    const testcaseSelector = document.getElementById('testcaseSelector');
+    const testcaseSelect = document.getElementById('testcaseSelect');
+    const mobileTestcaseSelector = document.getElementById('mobileTestcaseSelector');
+    const mobileTestcaseSelect = document.getElementById('mobileTestcaseSelect');
+    const hasEdgeCase = algorithm.generateEdgeCaseHistory || prob.edgeCaseTree;
+
+    // Helper to populate a testcase <select>
+    function populateTestcaseSelect(sel, labels) {
+        sel.innerHTML = '';
+        const optNormal = document.createElement('option');
+        optNormal.value = 'normal';
+        optNormal.textContent = labels.normal;
+        sel.appendChild(optNormal);
+        const optEdge = document.createElement('option');
+        optEdge.value = 'edge';
+        optEdge.textContent = labels.edge;
+        sel.appendChild(optEdge);
+        sel.value = currentTestCase;
+    }
+
+    if (testcaseSelector) testcaseSelector.style.display = hasEdgeCase ? '' : 'none';
+    if (mobileTestcaseSelector) mobileTestcaseSelector.style.display = hasEdgeCase ? '' : 'none';
+
+    if (hasEdgeCase) {
+        const labels = prob.testCaseLabels || { normal: 'Example', edge: 'Edge Case' };
+        if (testcaseSelect) populateTestcaseSelect(testcaseSelect, labels);
+        if (mobileTestcaseSelect) populateTestcaseSelect(mobileTestcaseSelect, labels);
+    }
     
     // Update code editor with proper indentation
     const codeEditor = document.getElementById('codeEditor');
@@ -9733,7 +10254,11 @@ function init() {
         }
         
         // Don't draw tree for array problems
-        history = algorithm.generateHistory();
+        if (currentTestCase === 'edge' && algorithm.generateEdgeCaseHistory) {
+            history = algorithm.generateEdgeCaseHistory();
+        } else {
+            history = algorithm.generateHistory();
+        }
         currentStep = 0;
         render();
         return;
@@ -9860,10 +10385,17 @@ function init() {
         }
     }
     
-    drawTree(prob.tree);
+    // Use edge case tree if available and selected
+    const activeTree = (currentTestCase === 'edge' && prob.edgeCaseTree) ? prob.edgeCaseTree : prob.tree;
+
+    drawTree(activeTree);
     
     // Generate history based on algorithm
-    history = algorithm.generateHistory(prob.tree);
+    if (currentTestCase === 'edge' && algorithm.generateEdgeCaseHistory) {
+        history = algorithm.generateEdgeCaseHistory(activeTree);
+    } else {
+        history = algorithm.generateHistory(activeTree);
+    }
     currentStep = 0;
     render();
 }
@@ -10017,8 +10549,33 @@ function setupEventListeners() {
         // Sync mobile selector
         const mobileSelect = document.getElementById('mobileAlgorithmSelect');
         if (mobileSelect) mobileSelect.value = currentAlgorithm;
+        currentTestCase = "normal"; // Reset test case when switching algorithms
         init();
     });
+
+    // Test case selector (desktop — in action bar)
+    const testcaseSelectEl = document.getElementById('testcaseSelect');
+    if (testcaseSelectEl) {
+        testcaseSelectEl.addEventListener('change', (e) => {
+            currentTestCase = e.target.value;
+            // Sync mobile testcase selector
+            const mobileTc = document.getElementById('mobileTestcaseSelect');
+            if (mobileTc) mobileTc.value = currentTestCase;
+            init();
+        });
+    }
+
+    // Test case selector (mobile — in viz module)
+    const mobileTestcaseSelectEl = document.getElementById('mobileTestcaseSelect');
+    if (mobileTestcaseSelectEl) {
+        mobileTestcaseSelectEl.addEventListener('change', (e) => {
+            currentTestCase = e.target.value;
+            // Sync desktop testcase selector
+            const desktopTc = document.getElementById('testcaseSelect');
+            if (desktopTc) desktopTc.value = currentTestCase;
+            init();
+        });
+    }
 
     const mobileAlgoSelect = document.getElementById('mobileAlgorithmSelect');
     if (mobileAlgoSelect) {
@@ -10026,6 +10583,7 @@ function setupEventListeners() {
             currentAlgorithm = e.target.value;
             // Sync desktop selector
             document.getElementById('algorithmSelect').value = currentAlgorithm;
+            currentTestCase = "normal"; // Reset test case when switching algorithms
             init();
         });
     }

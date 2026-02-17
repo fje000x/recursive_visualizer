@@ -1586,22 +1586,64 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Action Bar — floating controls inside viz area */
+/* Action Bar — controls strip between viz and console */
 .action-bar {
-    position: absolute;
-    bottom: 110px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 16px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 2px;
+    padding: 6px 0;
+    background: rgba(15, 23, 42, 0.85);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     z-index: 20;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.08);
+}
+
+/* Testcase pill inside action-bar */
+.testcase-pill {
+    display: flex;
+    align-items: center;
+    margin-right: 6px;
+    padding-right: 8px;
+    border-right: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.testcase-select {
+    background: rgba(59, 130, 246, 0.10);
+    border: 1px solid rgba(59, 130, 246, 0.30);
+    color: var(--text-primary);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 5px 24px 5px 9px;
+    border-radius: 8px;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 7px center;
+    white-space: nowrap;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.testcase-select:hover {
+    background-color: rgba(59, 130, 246, 0.18);
+    border-color: rgba(59, 130, 246, 0.45);
+}
+
+.testcase-select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* Mobile testcase selector (inside viz module) */
+.mobile-testcase-selector {
+    display: none;
 }
 
 .viz-module {
@@ -1620,7 +1662,7 @@ body {
     align-items: center;
     gap: 4px;
     background: none;
-    color: #334155;
+    color: var(--text-secondary);
     border: none;
     padding: 8px 12px;
     border-radius: 10px;
@@ -1632,11 +1674,16 @@ body {
 .control-btn span {
     font-size: 10px;
     font-weight: 700;
-    color: #334155;
+    color: var(--text-secondary);
 }
 
 .control-btn:hover:not(:disabled) {
-    background: rgba(0, 0, 0, 0.07);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+}
+
+.control-btn:hover:not(:disabled) span {
+    color: var(--text-primary);
 }
 
 .control-btn:disabled {
@@ -1645,15 +1692,19 @@ body {
 }
 
 .control-btn.primary {
-    color: #334155;
+    color: var(--text-primary);
+}
+
+.control-btn.primary span {
+    color: var(--text-primary);
 }
 
 .control-btn.primary:hover:not(:disabled) {
-    background: rgba(0, 0, 0, 0.07);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .control-btn.secondary {
-    color: #334155;
+    color: var(--text-secondary);
 }
 
 /* Speed button */
@@ -1667,7 +1718,7 @@ body {
 .speed-btn .speed-label {
     font-size: 11px;
     font-weight: 800;
-    color: #334155;
+    color: var(--text-secondary);
     letter-spacing: -0.3px;
     line-height: 1;
 }
@@ -3636,6 +3687,80 @@ body.problem-page-active .action-bar {
     padding: 5px 10px;
 }
 
+/* ── Compact layout for tall multi-row problems (3+ sections) ── */
+/* Reduces vertical space so content fits without scrolling */
+.array-inner.array-compact {
+    gap: 6px;
+    padding: 10px 16px;
+}
+.array-inner.array-compact .array-section {
+    gap: 2px;
+}
+.array-inner.array-compact .array-label {
+    font-size: 10px;
+    letter-spacing: 0.6px;
+    margin-bottom: 0;
+}
+.array-inner.array-compact .array-visualization {
+    padding: 6px 10px;
+    min-height: 50px;
+    gap: 6px;
+    border-radius: 8px;
+}
+.array-inner.array-compact .array-item {
+    width: 48px;
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 1;
+    font-size: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    margin-bottom: 16px;
+    flex: 1 1 48px;
+    max-width: 48px;
+}
+.array-inner.array-compact .array-index {
+    font-size: 8px;
+    bottom: -14px;
+    padding: 1px 4px;
+}
+.array-inner.array-compact .pointer-label {
+    font-size: 8px;
+    top: -16px;
+    padding: 1px 5px;
+}
+.array-inner.array-compact .pointer-info {
+    padding: 6px 10px;
+    gap: 8px;
+    margin-top: 0;
+}
+.array-inner.array-compact .pointer-detail-label {
+    font-size: 9px;
+}
+.array-inner.array-compact .pointer-detail-value {
+    font-size: 13px;
+    padding: 4px 8px;
+}
+.array-inner.array-compact .sum-bridge {
+    padding: 4px 10px;
+    margin: 0;
+}
+.array-inner.array-compact .sum-bridge-label {
+    font-size: 10px;
+}
+.array-inner.array-compact .price-chart-viz {
+    height: 120px !important;
+    min-height: 120px !important;
+    padding: 20px 14px 40px !important;
+}
+.array-inner.array-compact .price-chart-viz .price-bar {
+    height: 100% !important;
+    min-height: 20px;
+}
+.array-inner.array-compact .price-chart-viz .price-val {
+    font-size: 9px;
+}
+
 /* Dense layout for 9+ items on desktop — smaller items so they all fit */
 .array-dense .array-item {
     width: 44px;
@@ -3943,7 +4068,13 @@ body.problem-page-active .action-bar {
 /* ===== Price Chart / Bar Visualization (Stock, H-Index, Candy) ===== */
 .price-chart-viz {
     align-items: flex-end !important;
-    min-height: 80px;
+    width: 100% !important;
+    height: 200px !important;
+    min-height: 200px !important;
+    overflow: visible !important;
+    padding: 28px 20px 56px !important;
+    box-sizing: content-box;
+    gap: 6px !important;
 }
 .price-chart-viz .price-bar {
     position: relative;
@@ -3951,8 +4082,18 @@ body.problem-page-active .action-bar {
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    min-height: calc(var(--bar-h, 50%) + 20px);
-    transition: min-height 0.3s ease, background 0.3s ease;
+    height: 100% !important;
+    min-height: 30px;
+    transition: background 0.3s ease;
+    aspect-ratio: auto !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    flex: 1 1 0 !important;
+    border: none !important;
+    background: none !important;
+    border-radius: 0 !important;
 }
 .price-chart-viz .price-bar::before {
     content: '';
@@ -3967,11 +4108,23 @@ body.problem-page-active .action-bar {
     transition: height 0.3s ease, background 0.3s ease;
 }
 .price-chart-viz .price-bar .price-val {
-    position: relative;
+    position: absolute;
+    bottom: calc(var(--bar-h, 50%) + 4px);
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 1;
     font-size: 11px;
     font-weight: 700;
-    margin-bottom: 2px;
+    white-space: nowrap;
+    color: var(--text-secondary);
+}
+/* Price bars don't need the regular aspect-ratio/margin — override */
+.price-chart-viz .price-bar .array-index {
+    bottom: -22px;
+}
+.price-chart-viz .price-bar .pointer-label {
+    top: auto;
+    bottom: -44px;
 }
 /* Stock Buy/Sell highlights */
 .price-bar.price-buy::before { background: rgba(16, 185, 129, 0.35); }
@@ -4082,6 +4235,70 @@ body.problem-page-active .action-bar {
 .array-item.water-cell {
     box-shadow: 0 0 12px rgba(59, 130, 246, 0.5), inset 0 0 8px rgba(59, 130, 246, 0.15);
     border-color: var(--accent-blue);
+}
+
+/* Rainwater bar chart */
+.rain-viz {
+    align-items: flex-end !important;
+    height: 180px !important;
+    min-height: 180px !important;
+    overflow: visible !important;
+    padding: 28px 14px 40px !important;
+    box-sizing: content-box;
+    gap: 3px !important;
+}
+.rain-viz .rain-bar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100% !important;
+    min-height: 20px;
+    aspect-ratio: auto !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    flex: 1 1 0 !important;
+    border: none !important;
+    background: none !important;
+    border-radius: 0 !important;
+    font-size: 12px !important;
+    color: var(--text-primary);
+    z-index: 1;
+}
+.rain-viz .rain-bar::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 2px;
+    right: 2px;
+    height: var(--bar-h, 50%);
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 3px 3px 0 0;
+    z-index: 0;
+    transition: height 0.3s ease;
+}
+.rain-viz .rain-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 2px;
+    right: 2px;
+    height: var(--water-h, 50%);
+    background: rgba(59, 130, 246, 0.15);
+    border-radius: 3px 3px 0 0;
+    z-index: 0;
+    transition: height 0.3s ease;
+}
+.rain-viz .rain-bar .array-index {
+    bottom: -22px;
+}
+.rain-viz .rain-bar .pointer-label,
+.rain-viz .rain-bar .pointer-label-pair {
+    top: auto;
+    bottom: -44px;
 }
 
 .array-index {
@@ -4839,8 +5056,7 @@ body > main > section.module.viz-module > div.module-header:empty {
 
     /* Compact action bar — above console */
     .action-bar {
-        bottom: 62px;
-        padding: 4px 6px;
+        padding: 4px 0;
     }
 
     .action-bar .control-btn {
@@ -4854,6 +5070,8 @@ body > main > section.module.viz-module > div.module-header:empty {
 
     .action-bar .speed-btn { padding: 4px 6px !important; min-width: 28px; }
     .action-bar .speed-btn .speed-label { font-size: 9px; }
+    .action-bar .testcase-select { font-size: 9px; padding: 4px 20px 4px 7px; max-width: 140px; }
+    .action-bar .testcase-pill { margin-right: 4px; padding-right: 6px; }
 
     /* Console */
     .console-panel {
@@ -5113,9 +5331,7 @@ body > main > section.module.viz-module > div.module-header:empty {
 
     /* Compact action bar */
     .action-bar {
-        bottom: 48px;
-        padding: 3px 5px;
-        border-radius: 12px;
+        padding: 3px 0;
     }
 
     .action-bar .control-btn {
@@ -5130,6 +5346,8 @@ body > main > section.module.viz-module > div.module-header:empty {
 
     .action-bar .speed-btn { padding: 3px 5px !important; min-width: 24px; }
     .action-bar .speed-btn .speed-label { font-size: 8px; }
+    .action-bar .testcase-select { font-size: 8px; padding: 3px 18px 3px 6px; max-width: 120px; }
+    .action-bar .testcase-pill { margin-right: 3px; padding-right: 5px; }
 
     /* Compact complexity info */
     .code-info {
@@ -5545,6 +5763,27 @@ body > main > section.module.viz-module > div.module-header:empty {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 8px center;
+    }
+
+    /* ---- Mobile Testcase Selector ---- */
+    .mobile-testcase-selector {
+        display: block;
+        position: absolute;
+        top: 42px;
+        left: 8px;
+        z-index: 30;
+    }
+    .mobile-testcase-selector .mobile-algo-select {
+        background: rgba(59, 130, 246, 0.10);
+        border: 1px solid rgba(59, 130, 246, 0.30);
+        font-size: 10px;
+        padding: 6px 24px 6px 8px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 6px center;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* ---- Array sections on mobile ---- */
@@ -5989,7 +6228,7 @@ body > main > section.module.viz-module > div.module-header:empty {
     .code-info { padding: 12px 14px; }
 
     /* Viz module */
-    .action-bar { bottom: 112px; padding: 7px 12px; gap: 3px; }
+    .action-bar { padding: 7px 0; gap: 3px; }
     .control-btn { padding: 9px 14px; font-size: 14px; }
     .control-btn span { font-size: 11px; }
     .speed-btn .speed-label { font-size: 12px; }
@@ -6070,7 +6309,7 @@ body > main > section.module.viz-module > div.module-header:empty {
     .code-info { padding: 13px 16px; }
 
     /* Viz module */
-    .action-bar { bottom: 118px; padding: 8px 14px; gap: 4px; border-radius: 18px; }
+    .action-bar { padding: 8px 0; gap: 4px; }
     .control-btn { padding: 10px 16px; font-size: 15px; border-radius: 12px; }
     .control-btn span { font-size: 12px; }
     .speed-btn .speed-label { font-size: 13px; }
@@ -6183,7 +6422,7 @@ body > main > section.module.viz-module > div.module-header:empty {
     .line[data-indent="4"] { padding-left: 70px; }
 
     /* Viz module */
-    .action-bar { bottom: 124px; padding: 10px 20px; gap: 6px; border-radius: 22px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), 0 0 24px rgba(255, 255, 255, 0.1); }
+    .action-bar { padding: 8px 0; gap: 6px; }
     .action-bar .control-btn { padding: 14px 24px; font-size: 18px; border-radius: 14px; gap: 6px; }
     .action-bar .control-btn span { font-size: 14px; font-weight: 700; }
     .action-bar .speed-btn .speed-label { font-size: 15px; }
@@ -6298,7 +6537,7 @@ body > main > section.module.viz-module > div.module-header:empty {
     .detail-label { font-size: 12px; }
     .detail-value { font-size: 15px; }
 
-    .action-bar { bottom: 140px; padding: 12px 26px; gap: 8px; border-radius: 26px; box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.1); }
+    .action-bar { padding: 10px 0; gap: 8px; }
     .action-bar .control-btn { padding: 16px 30px; font-size: 22px; border-radius: 16px; gap: 8px; }
     .action-bar .control-btn span { font-size: 16px; font-weight: 700; }
     .action-bar .speed-btn .speed-label { font-size: 18px; }
