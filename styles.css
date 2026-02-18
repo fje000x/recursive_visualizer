@@ -3879,6 +3879,55 @@ body.problem-page-active .action-bar {
     transform: scale(1.05);
 }
 
+/* Green pointer — k (write/placement target) in merge problems */
+.array-item.pointer-k {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: var(--accent-green);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    transform: scale(1.05);
+}
+
+/* Battle highlight — yellow glow when two values are being compared */
+.array-item.merge-battle {
+    border-color: #facc15 !important;
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.6), 0 0 4px rgba(250, 204, 21, 0.3) !important;
+}
+
+/* ── Merge Info Bridge (explanation between arrays) ── */
+.merge-info-bridge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px;
+    margin: 2px 0;
+    background: rgba(139, 92, 246, 0.06);
+    border: 1.5px solid rgba(139, 92, 246, 0.25);
+    border-radius: 8px;
+    animation: bridgeFadeIn 0.25s ease;
+}
+.merge-info-bridge.merge-info-battle {
+    background: rgba(250, 204, 21, 0.08);
+    border-color: rgba(250, 204, 21, 0.35);
+}
+.merge-info-bridge.merge-info-done {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.35);
+}
+.merge-info-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.4;
+}
+.merge-info-battle .merge-info-text {
+    color: #facc15;
+}
+.merge-info-done .merge-info-text {
+    color: var(--accent-green);
+}
+
 .array-item.pointer-merge-alt {
     background: rgba(239, 68, 68, 0.2);
     border-color: var(--accent-red);
@@ -4379,6 +4428,13 @@ body.problem-page-active .action-bar {
     color: var(--accent-orange);
     border-color: var(--accent-orange);
     box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
+}
+
+.pointer-label.p-green {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--accent-green);
+    border-color: var(--accent-green);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
 }
 
 .pointer-info {

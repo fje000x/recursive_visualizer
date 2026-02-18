@@ -4077,110 +4077,124 @@ function generateThreeSumHistory() {
 }
 
 function generateMergeSortedArrayHistory() {
-    // More complex test case that exercises both loops
     const nums1 = [4, 5, 6, 0, 0, 0, 0, 0, 0];
     const m = 3;
     const nums2 = [1, 2, 3, 7, 8, 9];
     const n = 6;
     
     const h = [];
-    let p1 = m - 1;
-    let p2 = n - 1;
-    let p = m + n - 1;
+    let i = m - 1;
+    let j = n - 1;
+    let k = m + n - 1;
     let step = 0;
     const merged = [...nums1];
     
-    function record(msg, pointers = {}, isComparison = false, isComplete = false) {
+    function record(msg, extra = {}) {
         h.push({
             msg,
             line: step,
-            pointers: { ...pointers, p1, p2, p },
+            pointers: { i, j, k },
             nums1: [...merged],
             nums2: [...nums2],
-            isComparison,
-            isComplete,
+            m,
+            mergeInfo: extra.mergeInfo || '',
+            isComparison: extra.isComparison || false,
+            isComplete: extra.isComplete || false,
             step: h.length
         });
     }
     
-    record(`Initializing merge. nums1=[${nums1}], nums2=[${nums2}]`, {}, false);
+    record(`We merge nums2 into nums1's buffer slots. Key insight: fill from the END so we never overwrite data we still need.`, { mergeInfo: `Filling right → left. i reads nums1, j reads nums2, k writes.` });
     step = 1;
     
-    record(`Setting pointers: p1=${p1}, p2=${p2}, p=${p}`, {}, false);
+    record(`i=${i} → last real value in nums1 (${merged[i]}). j=${j} → last in nums2 (${nums2[j]}). k=${k} → last empty slot.`, { mergeInfo: `i=${i}  j=${j}  k=${k} — ready to compare` });
     step = 5;
     
-    let comparisonCount = 0;
-    
-    // First loop: comparing both arrays
-    while (p1 >= 0 && p2 >= 0) {
+    while (i >= 0 && j >= 0) {
         step = 6;
-        record(`Comparing nums1[${p1}]=${nums1[p1]} vs nums2[${p2}]=${nums2[p2]}`, { comparing: true }, true);
-        comparisonCount++;
+        record(`Compare: nums1[${i}]=${merged[i]} vs nums2[${j}]=${nums2[j]}. Larger one goes to k=${k}.`, {
+            isComparison: true,
+            mergeInfo: `${merged[i]} vs ${nums2[j]} — who fills slot ${k}?`
+        });
         
-        if (nums1[p1] > nums2[p2]) {
+        if (merged[i] > nums2[j]) {
+            const winVal = merged[i];
+            const loseVal = nums2[j];
             step = 7;
-            record(`✓ nums1[${p1}]=${nums1[p1]} > nums2[${p2}]=${nums2[p2]}, placing ${nums1[p1]} at position ${p}`, {}, false);
+            record(`${winVal} > ${loseVal} → place ${winVal} at k=${k}. Only move i — nums2[${j}]=${loseVal} hasn't been placed yet, it still needs to compete.`, {
+                mergeInfo: `${winVal} > ${loseVal} → i wins! Move i left, j stays (${loseVal} still unplaced)`
+            });
             
-            merged[p] = nums1[p1];
+            merged[k] = winVal;
             step = 8;
-            record(`Placed ${nums1[p1]} at merged[${p}]`, {}, false);
+            record(`nums1[${k}] = ${merged[k]} ✓`, { mergeInfo: `Placed ${merged[k]} at index ${k}` });
             
-            p1--;
+            i--;
             step = 9;
-            record(`Moved p1 to ${p1}`, {}, false);
+            record(`i-- → ${i}. Why not j? Because nums2[${j}]=${nums2[j]} was smaller — it belongs further left, so it waits.`, {
+                mergeInfo: `i→${i} (consumed). j stays at ${j} — ${loseVal} waits for next round`
+            });
         } else {
+            const winVal = nums2[j];
+            const loseVal = merged[i];
             step = 10;
-            record(`✓ nums2[${p2}]=${nums2[p2]} >= nums1[${p1}]=${nums1[p1]}, placing ${nums2[p2]} at position ${p}`, {}, false);
+            record(`${winVal} ≥ ${loseVal} → place ${winVal} at k=${k}. Only move j — nums1[${i}]=${loseVal} hasn't been placed yet, it still needs to compete.`, {
+                mergeInfo: `${winVal} ≥ ${loseVal} → j wins! Move j left, i stays (${loseVal} still unplaced)`
+            });
             
-            merged[p] = nums2[p2];
+            merged[k] = winVal;
             step = 11;
-            record(`Placed ${nums2[p2]} at merged[${p}]`, {}, false);
+            record(`nums1[${k}] = ${merged[k]} ✓`, { mergeInfo: `Placed ${merged[k]} at index ${k}` });
             
-            p2--;
+            j--;
             step = 12;
-            record(`Moved p2 to ${p2}`, {}, false);
+            record(`j-- → ${j}. Why not i? Because nums1[${i}]=${merged[i]} was larger or equal — it belongs further left, so it waits.`, {
+                mergeInfo: `j→${j} (consumed). i stays at ${i} — ${loseVal} waits for next round`
+            });
         }
         
-        p--;
+        k--;
         step = 13;
-        record(`Moved p to ${p}`, {}, false);
+        record(`k-- → ${k}. One more slot filled.`, { mergeInfo: `k→${k} — always decrements after each placement` });
     }
     
     step = 14;
-    record(`First loop complete. p1=${p1}, p2=${p2}. Checking remaining elements...`, {}, false);
     
-    // Second loop: handle remaining elements from nums2
-    if (p2 >= 0) {
-        record(`⚠️ nums1 exhausted! Remaining elements in nums2 (from index 0 to ${p2})`, {}, false);
+    if (j >= 0) {
+        record(`i exhausted! nums2 has ${j + 1} element(s) left — copy them directly, no comparisons needed.`, {
+            mergeInfo: `i done ✓ — copying remaining nums2 values`
+        });
     }
     
-    while (p2 >= 0) {
+    while (j >= 0) {
         step = 15;
-        record(`Remaining elements in nums2. Placing nums2[${p2}]=${nums2[p2]} at position ${p}`, {}, false);
+        record(`Copy nums2[${j}]=${nums2[j]} → nums1[${k}]`, { mergeInfo: `Copying: ${nums2[j]} → slot ${k}` });
         
-        merged[p] = nums2[p2];
+        merged[k] = nums2[j];
         step = 16;
-        record(`Placed ${nums2[p2]} at merged[${p}]`, {}, false);
+        record(`Placed.`, { mergeInfo: `nums1[${k}] = ${merged[k]} ✓` });
         
-        p2--;
+        j--;
         step = 17;
-        record(`Moved p2 to ${p2}`, {}, false);
+        record(`j-- → ${j}`, { mergeInfo: j >= 0 ? `${j + 1} remaining` : `j done ✓` });
         
-        p--;
+        k--;
         step = 13;
-        record(`Moved p to ${p}`, {}, false);
+        record(`k-- → ${k}`, { mergeInfo: `k→${k}` });
     }
     
-    if (p1 >= 0) {
-        record(`✓ All nums2 elements placed. nums1 elements already in correct position!`, {}, false);
+    if (i >= 0) {
+        record(`✓ All nums2 placed! nums1 elements at 0–${i} are already correct.`, { mergeInfo: `✓ nums1[0..${i}] already in place — no moves needed` });
     }
     
     h.push({
-        msg: `✓ Merge complete! Result: [${merged}]`,
+        msg: `✅ Merge complete! [${merged}]. Right-to-left fill = no overwrites. O(m+n) time, O(1) space.`,
         line: -1,
-        pointers: { p1, p2, p },
+        pointers: { i, j, k },
         nums1: merged,
         nums2: nums2,
+        m,
+        mergeInfo: '✅ Sorted!',
         isComplete: true,
         step: h.length
     });
@@ -4907,23 +4921,23 @@ function generateMergeSortedArrayEdgeHistory() {
     const nums2 = [];
     const n = 0;
     const h = [];
-    let p1 = m - 1, p2 = n - 1, p = m + n - 1;
+    let i = m - 1, j = n - 1, k = m + n - 1;
     let step = 0;
     const merged = [...nums1];
 
-    function record(msg, pointers = {}, isComparison = false, isComplete = false) {
-        h.push({ msg, line: step, pointers: { ...pointers, p1, p2, p }, nums1: [...merged], nums2: [...nums2], isComparison, isComplete, step: h.length });
+    function record(msg, extra = {}) {
+        h.push({ msg, line: step, pointers: { i, j, k }, nums1: [...merged], nums2: [...nums2], m, isComparison: extra.isComparison || false, isComplete: extra.isComplete || false, step: h.length });
     }
 
     step = 0;
     record(`Initializing merge. nums1=[${nums1}], nums2=[] (empty!)`);
     step = 1;
-    record(`Setting pointers: p1=${p1}, p2=${p2}, p=${p}`);
+    record(`Setting pointers: i=${i}, j=${j}, k=${k}`);
     step = 5;
-    record(`p2 = ${p2} < 0 → nums2 is empty! Nothing to merge.`);
+    record(`j = ${j} < 0 → nums2 is empty! Nothing to merge.`);
     step = 14;
     record(`✓ nums1 is already sorted and complete. No work needed!`);
-    h.push({ msg: `✓ Merge complete! Result: [${merged}]. Edge case: when nums2 is empty, nums1 is unchanged.`, line: -1, pointers: { p1, p2, p }, nums1: merged, nums2: nums2, isComplete: true, step: h.length });
+    h.push({ msg: `✅ Merge complete! Result: [${merged}]. Edge case: when nums2 is empty, nums1 is unchanged.`, line: -1, pointers: { i, j, k }, nums1: merged, nums2: nums2, m, isComplete: true, step: h.length });
     return h;
 }
 
@@ -6232,41 +6246,56 @@ function render() {
             engine.appendChild(arrayContainer);
         }
         
-        // Problem 3: Merge Sorted Array (two arrays, three pointers)
+        // Problem 3: Merge Sorted Array (two arrays, three pointers: i, j, k)
         if (currentProbId === '3' && state.nums1 && state.nums2) {
-            const p1 = state.pointers?.p1 ?? -1;
-            const p2 = state.pointers?.p2 ?? -1;
-            const pMerge = state.pointers?.p ?? -1;
+            const iPtr = state.pointers?.i ?? -1;
+            const jPtr = state.pointers?.j ?? -1;
+            const kPtr = state.pointers?.k ?? -1;
+            const mVal = state.m ?? 0;
+            const isBattle = state.isComparison || false;
             
             const itemCount = state.nums1.length;
             const denseClass = itemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner array-dual${denseClass}">`; 
             html += `
                 <div class="array-section">
-                    <div class="array-label">nums1 (merged array)</div>
+                    <div class="array-label">nums1 (merge in-place, slots ${mVal}–${state.nums1.length - 1} are buffer)</div>
                     <div class="array-visualization">
             `;
             
             state.nums1.forEach((val, idx) => {
                 let classes = 'array-item';
-                let pointerLabel = '';
+                let pointerLabels = '';
                 
-                if (idx === p1) {
-                    classes += ' pointer-1';
-                    pointerLabel = `<div class="pointer-label p1">p1</div>`;
-                }
-                if (idx === pMerge) {
-                    classes += ' pointer-merge';
-                    pointerLabel = `<div class="pointer-label p-merge">p</div>`;
-                }
-                if (val === 0 && idx >= 3) {
+                // Buffer slots: originally empty (index >= m) and still holding 0
+                if (val === 0 && idx >= mVal) {
                     classes += ' empty';
+                }
+                
+                // Battle highlight: yellow glow on the two cells being compared
+                if (isBattle && (idx === iPtr || idx === kPtr)) {
+                    // Only highlight i's cell in nums1 during comparison
+                }
+                if (isBattle && idx === iPtr) {
+                    classes += ' merge-battle';
+                }
+                
+                // Handle overlapping pointers (i and k on same cell)
+                if (idx === iPtr && idx === kPtr) {
+                    classes += ' pointer-1 pointer-k';
+                    pointerLabels = `<div class="pointer-label-pair"><div class="pointer-label p1 pair-left">i</div><div class="pointer-label p-green pair-right">k</div></div>`;
+                } else if (idx === iPtr) {
+                    classes += ' pointer-1';
+                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                } else if (idx === kPtr) {
+                    classes += ' pointer-k';
+                    pointerLabels = `<div class="pointer-label p-green">k</div>`;
                 }
                 
                 html += `
                     <div class="${classes}">
                         ${val}
-                        ${pointerLabel}
+                        ${pointerLabels}
                         <div class="array-index">${idx}</div>
                     </div>
                 `;
@@ -6275,8 +6304,22 @@ function render() {
             html += `
                     </div>
                 </div>
+            `;
+            
+            // Merge info bridge — explanation between the two arrays
+            const mergeInfo = state.mergeInfo || '';
+            if (mergeInfo) {
+                const bridgeClass = isBattle ? ' merge-info-battle' : (state.isComplete ? ' merge-info-done' : '');
+                html += `
+                    <div class="merge-info-bridge${bridgeClass}">
+                        <span class="merge-info-text">${mergeInfo}</span>
+                    </div>
+                `;
+            }
+            
+            html += `
                 <div class="array-section">
-                    <div class="array-label">nums2 (second array)</div>
+                    <div class="array-label">nums2 (source array)</div>
                     <div class="array-visualization">
             `;
             
@@ -6284,9 +6327,14 @@ function render() {
                 let classes = 'array-item';
                 let pointerLabel = '';
                 
-                if (idx === p2) {
+                // Battle highlight on j's cell
+                if (isBattle && idx === jPtr) {
+                    classes += ' merge-battle';
+                }
+                
+                if (idx === jPtr) {
                     classes += ' pointer-2';
-                    pointerLabel = `<div class="pointer-label p2">p2</div>`;
+                    pointerLabel = `<div class="pointer-label p2">j</div>`;
                 }
                 
                 html += `
@@ -6303,16 +6351,16 @@ function render() {
                 </div>
                 <div class="pointer-info">
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">p1 (nums1 pointer)</div>
-                        <div class="pointer-detail-value p1">${p1 >= 0 ? p1 : 'Done'}</div>
+                        <div class="pointer-detail-label">i (nums1 read)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : 'Done'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">p2 (nums2 pointer)</div>
-                        <div class="pointer-detail-value p2">${p2 >= 0 ? p2 : 'Done'}</div>
+                        <div class="pointer-detail-label">j (nums2 read)</div>
+                        <div class="pointer-detail-value p2">${jPtr >= 0 ? jPtr : 'Done'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">p (merge pointer)</div>
-                        <div class="pointer-detail-value p-merge">${pMerge >= 0 ? pMerge : 'Done'}</div>
+                        <div class="pointer-detail-label">k (write target)</div>
+                        <div class="pointer-detail-value p-green">${kPtr >= 0 ? kPtr : 'Done'}</div>
                     </div>
                 </div>
             `;
