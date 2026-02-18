@@ -6429,6 +6429,52 @@ function render() {
             
             html += `</div>`; // close array-visualization
             
+            // Decision bridge: explain keep vs skip
+            if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
+                const readVal = state.nums1[iPtr];
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (currentProbId === '4') {
+                    if (readVal !== (meta.val ?? -1)) {
+                        html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${readVal}</span>`;
+                        html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">≠ val(${meta.val})</span>`;
+                        html += `<span style="color:var(--accent-green)">✓ KEEP → write to nums[${kPtr}]</span>`;
+                    } else {
+                        html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${readVal}</span>`;
+                        html += `<span style="color:var(--accent-red);margin:0 6px;font-weight:700">== val(${meta.val})</span>`;
+                        html += `<span style="color:var(--text-muted)">→ SKIP — k stays at ${kPtr}</span>`;
+                    }
+                } else if (currentProbId === '5') {
+                    const compareIdx = kPtr > 0 ? kPtr - 1 : 0;
+                    const compareVal = state.nums1[compareIdx];
+                    if (readVal !== compareVal || kPtr === 0) {
+                        html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${readVal}</span>`;
+                        html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">≠ nums[k-1]=${compareVal}</span>`;
+                        html += `<span style="color:var(--accent-green)">✓ NEW unique → write to nums[${kPtr}]</span>`;
+                    } else {
+                        html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${readVal}</span>`;
+                        html += `<span style="color:var(--accent-red);margin:0 6px;font-weight:700">== nums[k-1]=${compareVal}</span>`;
+                        html += `<span style="color:var(--text-muted)">→ duplicate! SKIP</span>`;
+                    }
+                } else { // Problem 6
+                    const compareIdx = kPtr >= 2 ? kPtr - 2 : 0;
+                    const compareVal = state.nums1[compareIdx];
+                    if (kPtr < 2 || readVal !== compareVal) {
+                        html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${readVal}</span>`;
+                        html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">≠ nums[k-2]=${compareVal}</span>`;
+                        html += `<span style="color:var(--accent-green)">✓ ≤ 2 copies → KEEP at nums[${kPtr}]</span>`;
+                    } else {
+                        html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${readVal}</span>`;
+                        html += `<span style="color:var(--accent-red);margin:0 6px;font-weight:700">== nums[k-2]=${compareVal}</span>`;
+                        html += `<span style="color:var(--text-muted)">→ 3rd+ copy! SKIP</span>`;
+                    }
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Done! Kept ${kVal} elements: [${state.nums1.slice(0, kVal)}]</span>`;
+                html += `</div></div>`;
+            }
+
             // Pointer info bar
             html += `
                 <div class="pointer-info">
@@ -6572,6 +6618,30 @@ function render() {
             });
             
             html += `</div>`;
+
+            // Bridge: swap explanation per phase
+            if (lo >= 0 && hi >= 0 && lo < state.nums1.length && hi < state.nums1.length && !isComplete) {
+                const phase = meta.phase || '';
+                const phaseLabel = phase === 'full' ? 'Reverse entire array' : phase === 'left' ? `Reverse first k=${meta.k} elements` : phase === 'right' ? `Reverse remaining [${meta.k}..${state.nums1.length - 1}]` : 'Reversing';
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-purple);font-weight:600;font-size:11px">${phaseLabel}</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">|</span>`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">nums[${lo}]=${state.nums1[lo]}</span>`;
+                html += `<span style="color:var(--accent-green);margin:0 4px;font-weight:700">⇄</span>`;
+                html += `<span style="color:var(--accent-orange);font-weight:600">nums[${hi}]=${state.nums1[hi]}</span>`;
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Rotated right by k=${meta.k}: [${state.nums1}]</span>`;
+                html += `</div></div>`;
+            } else if (meta.phase) {
+                const phase = meta.phase;
+                const phaseLabel = phase === 'full' ? 'Step 1: Reverse entire array' : phase === 'left' ? `Step 2: Reverse first k=${meta.k}` : `Step 3: Reverse rest [${meta.k}..end]`;
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-purple);font-weight:600">${phaseLabel}</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -6581,6 +6651,10 @@ function render() {
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">hi (right pointer)</div>
                         <div class="pointer-detail-value p2">${hi >= 0 ? hi : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">phase</div>
+                        <div class="pointer-detail-value p-merge">${meta.phase || '—'}</div>
                     </div>
                 </div>
             `;
@@ -7367,6 +7441,41 @@ function render() {
                 html += `<div class="${classes}" style="--bar-h:${barPct}%"><span class="price-val">${val}</span><div class="array-index">${idx}</div></div>`;
             });
             html += `</div></div>`;
+
+            // Bridge: Why this candy assignment?
+            if (iPtr >= 0 && iPtr < ratings.length && !isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (isLeftPass && iPtr >= 1) {
+                    const cmp = ratings[iPtr] > ratings[iPtr - 1];
+                    if (cmp) {
+                        html += `<span style="color:var(--accent-green);font-weight:600">rating ${ratings[iPtr]} > neighbor ${ratings[iPtr-1]}</span>`;
+                        html += `<span style="color:var(--text-muted);margin:0 6px">→</span>`;
+                        html += `<span style="color:var(--accent-green);font-weight:700">must give MORE than left → ${candies[iPtr]} candies</span>`;
+                    } else {
+                        html += `<span style="color:var(--accent-red);font-weight:600">rating ${ratings[iPtr]} ≤ neighbor ${ratings[iPtr-1]}</span>`;
+                        html += `<span style="color:var(--text-muted);margin:0 6px">→</span>`;
+                        html += `<span style="color:var(--text-muted)">no obligation from left side → keep ${candies[iPtr]}</span>`;
+                    }
+                } else if (isRightPass && iPtr < ratings.length - 1) {
+                    const cmp = ratings[iPtr] > ratings[iPtr + 1];
+                    if (cmp) {
+                        html += `<span style="color:var(--accent-green);font-weight:600">rating ${ratings[iPtr]} > right neighbor ${ratings[iPtr+1]}</span>`;
+                        html += `<span style="color:var(--text-muted);margin:0 6px">→</span>`;
+                        html += `<span style="color:var(--accent-green);font-weight:700">must give MORE than right → max(${candies[iPtr]}, ${candies[iPtr+1]}+1)</span>`;
+                    } else {
+                        html += `<span style="color:var(--accent-red);font-weight:600">rating ${ratings[iPtr]} ≤ right neighbor ${ratings[iPtr+1]}</span>`;
+                        html += `<span style="color:var(--text-muted);margin:0 6px">→</span>`;
+                        html += `<span style="color:var(--text-muted)">no obligation from right side → keep ${candies[iPtr]}</span>`;
+                    }
+                } else {
+                    html += `<span style="color:var(--accent-purple);font-weight:600">Setting up: everyone starts with 1 candy</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ All neighbors satisfied! candies = [${candies}] → total = ${total} 🍬</span>`;
+                html += `</div></div>`;
+            }
             
             html += `
                 <div class="pointer-info">
@@ -7436,6 +7545,35 @@ function render() {
                 html += `<div class="${classes}">${val}<div class="array-index">${idx}</div></div>`;
             });
             html += `</div></div>`;
+
+            // Bridge: explain which pointer moves and why
+            if (lPtr >= 0 && rPtr >= 0 && lPtr < rPtr && !isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (leftMax < rightMax) {
+                    const trapped = leftMax - state.nums1[lPtr];
+                    html += `<span style="color:var(--accent-blue);font-weight:600">leftMax(${leftMax})</span>`;
+                    html += `<span style="color:var(--accent-red);margin:0 4px">&lt;</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:600">rightMax(${rightMax})</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">→ move L right</span>`;
+                    if (trapped > 0) {
+                        html += `<span style="color:var(--accent-green);font-weight:700">+${trapped} water trapped</span>`;
+                    }
+                } else {
+                    const trapped = rightMax - state.nums1[rPtr];
+                    html += `<span style="color:var(--accent-blue);font-weight:600">leftMax(${leftMax})</span>`;
+                    html += `<span style="color:var(--accent-green);margin:0 4px">≥</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:600">rightMax(${rightMax})</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">→ move R left</span>`;
+                    if (trapped > 0) {
+                        html += `<span style="color:var(--accent-green);font-weight:700">+${trapped} water trapped</span>`;
+                    }
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Total water trapped = ${waterTotal} units 💧</span>`;
+                html += `</div></div>`;
+            }
 
             html += `
                 <div class="pointer-info">
@@ -7843,6 +7981,21 @@ function render() {
             });
 
             html += `</div>`;
+
+            // Bridge: swap explanation
+            if (lPtr >= 0 && rPtr >= 0 && lPtr < rPtr && !isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">"${state.nums1[lPtr]}"</span>`;
+                html += `<span style="color:var(--accent-green);margin:0 4px;font-weight:700">⇄</span>`;
+                html += `<span style="color:var(--accent-orange);font-weight:600">"${state.nums1[rPtr]}"</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:8px;font-size:11px">then L++, R--</span>`;
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Words reversed: "${state.nums1.join(' ')}"</span>`;
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
@@ -8190,6 +8343,40 @@ function render() {
             });
 
             html += `</div>`;
+
+            // Bridge: compare L and R characters
+            if (lPtr >= 0 && rPtr >= 0 && lPtr <= rPtr && !isComplete) {
+                const lCh = state.nums1[lPtr];
+                const rCh = state.nums1[rPtr];
+                const isAlphaL = /[a-zA-Z0-9]/.test(lCh);
+                const isAlphaR = /[a-zA-Z0-9]/.test(rCh);
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (!isAlphaL) {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">s[${lPtr}]='${lCh}'</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">→ not alphanumeric, skip L++</span>`;
+                } else if (!isAlphaR) {
+                    html += `<span style="color:var(--accent-orange);font-weight:600">s[${rPtr}]='${rCh}'</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">→ not alphanumeric, skip R--</span>`;
+                } else if (lCh.toLowerCase() === rCh.toLowerCase()) {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">s[${lPtr}]='${lCh}'</span>`;
+                    html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">== s[${rPtr}]='${rCh}'</span>`;
+                    html += `<span style="color:var(--accent-green)">✓ mirror match! L++, R--</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-blue);font-weight:600">s[${lPtr}]='${lCh}'</span>`;
+                    html += `<span style="color:var(--accent-red);margin:0 6px;font-weight:700">≠ s[${rPtr}]='${rCh}'</span>`;
+                    html += `<span style="color:var(--accent-red)">✗ NOT a palindrome!</span>`;
+                }
+                html += `</div></div>`;
+            } else if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (state.msg && state.msg.includes('NOT')) {
+                    html += `<span style="color:var(--accent-red);font-weight:700">✗ Characters didn't match — not a palindrome</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-green);font-weight:700">✓ All characters matched — it IS a palindrome!</span>`;
+                }
+                html += `</div></div>`;
+            }
+
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
