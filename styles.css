@@ -1351,6 +1351,7 @@ body {
     --accent-red: #ef4444;
     --accent-yellow: #f59e0b;
     --accent-cyan: #06b6d4;
+    --bm-gold: #fbbf24;
     --border: #475569;
     --border-light: #64748b;
 
@@ -3935,46 +3936,995 @@ body.problem-page-active .action-bar {
     transform: scale(1.05);
 }
 
+/* ── Value-Changed Animation (overwrite / swap / write) ── */
+.array-item.val-changed {
+    animation: valChanged 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+@keyframes valChanged {
+    0% {
+        transform: scale(0.65) translateY(10px);
+        opacity: 0.2;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+        border-color: var(--accent-green);
+        color: var(--accent-green);
+    }
+    40% {
+        transform: scale(1.18);
+        opacity: 1;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.65);
+        border-color: var(--accent-green);
+        color: var(--accent-green);
+    }
+    70% {
+        transform: scale(0.95);
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: none;
+    }
+}
+
+/* ── Merge Ghost Float Animation ── */
+.merge-ghost {
+    position: absolute;
+    z-index: 100;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.15);
+    border: 2px solid var(--accent-green);
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.6), 0 0 40px rgba(16, 185, 129, 0.2);
+    animation: ghostFloat var(--ghost-duration, 0.6s) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes ghostFloat {
+    0% {
+        transform: translate(0, 0) scale(1.15);
+        opacity: 1;
+        box-shadow: 0 0 18px rgba(16, 185, 129, 0.6), 0 0 40px rgba(16, 185, 129, 0.2);
+    }
+    20% {
+        transform: translate(calc(var(--dx) * 0.15), calc(var(--dy) * 0.3 - 18px)) scale(1.2);
+        opacity: 1;
+        box-shadow: 0 0 24px rgba(16, 185, 129, 0.8), 0 0 50px rgba(16, 185, 129, 0.3);
+    }
+    70% {
+        transform: translate(calc(var(--dx) * 0.85), calc(var(--dy) * 0.85)) scale(1.05);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate(var(--dx), var(--dy)) scale(1);
+        opacity: 0;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+/* Dense layout adjustments for ghost */
+.array-dual.array-dense ~ .merge-ghost,
+.array-dense .merge-ghost {
+    width: 38px;
+    height: 38px;
+    font-size: 13px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Problem 4: Remove Element — Enhanced Animations
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Ghost of the Past Value (overwrite dissolve) ── */
+.re4-old-val {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: inherit;
+    color: var(--accent-orange);
+    pointer-events: none;
+    z-index: 4;
+    animation: re4OldDissolve 0.65s ease forwards;
+}
+
+@keyframes re4OldDissolve {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        filter: none;
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.1) translateY(-4px);
+        filter: blur(1px);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.7) translateY(-12px);
+        filter: blur(3px);
+    }
+}
+
+/* ── 3. Skip Animation — k freezes, cell pulses ── */
+
+/* Badge goes red & still — "frozen in place" */
+.pointer-label.re4-k-frozen {
+    border-color: var(--accent-red) !important;
+    box-shadow: 0 0 10px rgba(255, 80, 80, 0.4) !important;
+    background: rgba(255, 60, 60, 0.15) !important;
+    color: var(--accent-red) !important;
+    transition: all 0.3s ease;
+}
+
+/* The cell under k gets a ripple pulse — "I'm not moving" */
+.array-item.re4-cell-held {
+    animation: re4CellHeld 0.6s ease;
+}
+
+@keyframes re4CellHeld {
+    0% { box-shadow: 0 0 0 0 rgba(255, 80, 80, 0.5); }
+    40% { box-shadow: 0 0 0 8px rgba(255, 80, 80, 0.15); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 80, 80, 0); }
+}
+
+/* ── 4. Finished State — kept zone, ghost zone, scissors cut ── */
+
+/* Kept cells: green accent */
+.array-item.re4-kept {
+    background: rgba(80, 200, 120, 0.18);
+    border-color: var(--accent-green);
+    box-shadow: 0 0 8px rgba(80, 200, 120, 0.25);
+}
+
+/* Ghost zone: dimmed irrelevant memory */
+.array-item.re4-ghost {
+    opacity: 0.3;
+    filter: grayscale(0.5);
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+    animation: re4GhostFade 0.5s ease;
+}
+
+@keyframes re4GhostFade {
+    0% { opacity: 0.8; filter: none; }
+    100% { opacity: 0.3; filter: grayscale(0.5); }
+}
+
+/* Scissors cut — dashed left border on first ghost cell */
+.array-item.re4-cut {
+    border-left: 3px dashed var(--accent-red) !important;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    position: relative;
+}
+
+.array-item.re4-cut::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* New Length label */
+.re4-newlen-label {
+    text-align: center;
+    font-size: 0.82em;
+    color: var(--text-secondary);
+    margin: 6px 0 2px;
+    letter-spacing: 0.3px;
+}
+.re4-newlen-label strong {
+    color: var(--accent-green);
+}
+
+/* Copy-transport ghost — value box slides from i → k (shared by Problems 4, 5, 6) */
+.copy-ghost {
+    position: absolute;
+    z-index: 100;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.14);
+    border: 2px solid var(--accent-green);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.5), 0 0 30px rgba(16, 185, 129, 0.15);
+    animation: copySlide var(--ghost-duration, 0.55s) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes copySlide {
+    0% {
+        transform: translate(0, 0) scale(1.1);
+        opacity: 1;
+        box-shadow: 0 0 14px rgba(16, 185, 129, 0.5), 0 0 30px rgba(16, 185, 129, 0.15);
+    }
+    25% {
+        transform: translate(calc(var(--dx) * 0.2), calc(var(--dy) * 0.3 - 14px)) scale(1.15);
+        opacity: 1;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.7), 0 0 40px rgba(16, 185, 129, 0.25);
+    }
+    75% {
+        transform: translate(calc(var(--dx) * 0.85), calc(var(--dy) * 0.85)) scale(1.05);
+        opacity: 0.85;
+    }
+    100% {
+        transform: translate(var(--dx), var(--dy)) scale(1);
+        opacity: 0;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Problem 7: Boyer-Moore — Battle Arena
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Arena layout ── */
+.bm-arena {
+    display: flex;
+    justify-content: center;
+    margin: 8px 0 14px;
+}
+
+.bm-champion-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 24px;
+    border: 2px solid var(--bm-gold);
+    border-radius: 12px;
+    background: rgba(251, 191, 36, 0.06);
+    min-width: 100px;
+    position: relative;
+}
+
+.bm-champion-title {
+    font-size: 0.78em;
+    font-weight: 700;
+    color: var(--bm-gold);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* ── Stack of blocks ── */
+.bm-stack-container {
+    display: flex;
+    flex-direction: column-reverse; /* bottom block first */
+    align-items: center;
+    gap: 3px;
+    min-height: 44px;
+    position: relative;
+}
+
+.bm-stack-block {
+    width: 44px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--bm-gold);
+    background: rgba(251, 191, 36, 0.12);
+    border: 1.5px solid var(--bm-gold);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.bm-stack-block.bm-stack-top {
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+}
+
+.bm-stack-block.bm-victor {
+    background: rgba(251, 191, 36, 0.2);
+    box-shadow: 0 0 16px rgba(251, 191, 36, 0.6);
+    animation: bmVictorPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes bmVictorPulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
+    50% { box-shadow: 0 0 22px rgba(251, 191, 36, 0.7); }
+}
+
+.bm-stack-overflow {
+    font-size: 0.7em;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.bm-throne-empty {
+    width: 44px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    color: var(--text-muted);
+    border: 1.5px dashed var(--border);
+    border-radius: 6px;
+    font-style: italic;
+    white-space: nowrap;
+    padding: 0 10px;
+}
+
+.bm-count-label {
+    font-size: 0.75em;
+    color: var(--text-secondary);
+}
+
+.bm-count-label strong {
+    color: var(--bm-gold);
+    font-size: 1.1em;
+}
+
+/* ── Array cell battle coloring ── */
+.array-item.bm-friendly {
+    border-color: var(--accent-green) !important;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.array-item.bm-enemy {
+    border-color: var(--accent-red) !important;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
+
+.array-item.bm-victor-cell {
+    border-color: var(--bm-gold) !important;
+    background: rgba(251, 191, 36, 0.1);
+    box-shadow: 0 0 14px rgba(251, 191, 36, 0.35);
+}
+
+/* ── Battle ghost (flies from challenger cell to champion stack) ── */
+.bm-battle-ghost {
+    position: absolute;
+    z-index: 100;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* Reinforcement — green, lands on stack */
+.bm-ghost-reinforce {
+    color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.15);
+    border: 2px solid var(--accent-green);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.5);
+    animation: bmGhostFly var(--ghost-duration, 0.5s) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Clash — red, collides and explodes */
+.bm-ghost-clash {
+    color: var(--accent-red);
+    background: rgba(239, 68, 68, 0.15);
+    border: 2px solid var(--accent-red);
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
+    animation: bmGhostClash var(--ghost-duration, 0.5s) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Coronation — gold, walks to the throne */
+.bm-ghost-coronation {
+    color: var(--bm-gold);
+    background: rgba(251, 191, 36, 0.15);
+    border: 2px solid var(--bm-gold);
+    box-shadow: 0 0 14px rgba(251, 191, 36, 0.5);
+    animation: bmGhostFly var(--ghost-duration, 0.5s) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Fly arc — used by reinforce and coronation */
+@keyframes bmGhostFly {
+    0% {
+        transform: translate(0, 0) scale(1.1);
+        opacity: 1;
+    }
+    30% {
+        transform: translate(calc(var(--dx) * 0.25), calc(var(--dy) * 0.35 - 20px)) scale(1.15);
+        opacity: 1;
+    }
+    80% {
+        transform: translate(calc(var(--dx) * 0.9), calc(var(--dy) * 0.9)) scale(1.05);
+        opacity: 0.85;
+    }
+    100% {
+        transform: translate(var(--dx), var(--dy)) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Clash: fly partway then burst */
+@keyframes bmGhostClash {
+    0% {
+        transform: translate(0, 0) scale(1.1);
+        opacity: 1;
+    }
+    40% {
+        transform: translate(calc(var(--dx) * 0.45), calc(var(--dy) * 0.5 - 10px)) scale(1.15);
+        opacity: 1;
+    }
+    60% {
+        transform: translate(calc(var(--dx) * 0.6), calc(var(--dy) * 0.65)) scale(1.4);
+        opacity: 0.9;
+        box-shadow: 0 0 30px rgba(239, 68, 68, 0.8), 0 0 60px rgba(251, 191, 36, 0.4);
+    }
+    100% {
+        transform: translate(calc(var(--dx) * 0.65), calc(var(--dy) * 0.7)) scale(0);
+        opacity: 0;
+        box-shadow: 0 0 0 transparent;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Problem 8: Cycle Array — Segment-Colored Rotation
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Segment coloring ── */
+
+/* "Stay Back" group — Blue */
+.array-item.cy-stay-back {
+    border-color: var(--accent-blue) !important;
+    background: rgba(59, 130, 246, 0.10);
+}
+
+/* "Move Front" group — Orange */
+.array-item.cy-move-front {
+    border-color: var(--accent-orange) !important;
+    background: rgba(249, 115, 22, 0.10);
+}
+
+/* Out-of-scope cells (not in the current phase's range) */
+.array-item.cy-out-of-scope {
+    opacity: 0.4;
+}
+
+/* ── Split marker — dashed left border on the k-th cell ── */
+.array-item.cy-split-right {
+    border-left: 2.5px dashed var(--accent-purple) !important;
+}
+
+/* ── Blueprint: 3-step strategy legend ── */
+.cy-blueprint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin: 2px 0 6px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.cy-bp-step {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    opacity: 0.45;
+    transition: opacity 0.35s ease, border-color 0.35s ease, background 0.35s ease;
+}
+
+.cy-bp-step.cy-bp-active {
+    opacity: 1;
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.cy-bp-step.cy-bp-done {
+    opacity: 0.55;
+    border-color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.06);
+}
+
+.cy-bp-step.cy-bp-done .cy-bp-num {
+    color: var(--accent-green);
+}
+
+.cy-bp-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.cy-bp-text {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+}
+
+.cy-bp-arrow {
+    color: var(--text-muted);
+    font-size: 12px;
+    opacity: 0.4;
+}
+
+/* ── "Why" line — contextual explanation ── */
+.cy-why {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--text-secondary);
+    text-align: center;
+    max-width: 480px;
+    margin: 0 auto 8px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* ── Insight (i) button ── */
+.cy-insight-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-left: 6px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    font-style: italic;
+    font-family: Georgia, 'Times New Roman', serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    vertical-align: middle;
+    line-height: 1;
+    padding: 0;
+}
+.cy-insight-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── Insight Modal ── */
+.insight-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+.insight-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+}
+
+.insight-modal-content {
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    width: 480px;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95) translateY(10px);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.insight-modal.show .insight-modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.insight-modal-header {
+    padding: 20px 24px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.insight-modal-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+.insight-modal-close {
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 15px;
+}
+.insight-modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.insight-modal-body {
+    padding: 20px 24px 24px;
+    overflow-y: auto;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+.insight-modal-body p {
+    margin: 0 0 10px;
+}
+.insight-analogy {
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.insight-core-idea {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+}
+
+.insight-example-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 14px 0 6px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.insight-example-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+.insight-example-array {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.insight-step {
+    display: flex;
+    gap: 12px;
+    margin: 14px 0;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.insight-step-num {
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    font-size: 16px;
+    font-weight: 800;
+    margin-top: 1px;
+}
+.insight-step-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.insight-step-body strong {
+    color: var(--text-primary);
+    font-size: 13px;
+}
+.insight-step-body p {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--text-muted);
+}
+.insight-transform {
+    font-size: 13px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--text-secondary);
+    letter-spacing: 0.3px;
+}
+
+.insight-key {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: rgba(34, 197, 94, 0.06);
+    border: 1px solid rgba(34, 197, 94, 0.15);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+}
+.insight-key strong {
+    color: var(--accent-green);
+}
+
+.insight-complexity {
+    margin-top: 12px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.insight-complexity strong {
+    color: var(--text-secondary);
+}
+
+/* ── Ghost target row ── */
+.cy-ghost-target {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.45;
+    transition: opacity 0.3s ease;
+}
+
+.cy-ghost-target:hover {
+    opacity: 0.7;
+}
+
+.cy-ghost-label {
+    font-size: 0.72em;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.cy-ghost-cells {
+    gap: 3px !important;
+    min-height: 0 !important;
+    padding: 2px 4px 14px !important;
+    flex-wrap: nowrap !important;
+    overflow: visible !important;
+}
+
+.cy-ghost-cell {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    width: 28px !important;
+    height: 28px !important;
+    flex: 1 1 0 !important;
+    max-width: 32px !important;
+    font-size: 11px !important;
+    border-width: 1px !important;
+    border-style: dashed !important;
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    margin: 0 0 12px 0 !important;
+}
+
+.cy-ghost-cell .array-index {
+    font-size: 7px !important;
+}
+
+.cy-ghost-cell.cy-ghost-blue {
+    border-color: var(--accent-blue) !important;
+}
+
+.cy-ghost-cell.cy-ghost-orange {
+    border-color: var(--accent-orange) !important;
+}
+
+/* When current value matches goal position — subtle solid glow */
+.cy-ghost-cell.cy-ghost-matched {
+    border-style: solid !important;
+    opacity: 0.9;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.3);
+    color: var(--accent-green) !important;
+}
+
+/* ── Swap ghost — flies between two positions in an arc ── */
+.cy-swap-ghost {
+    position: absolute;
+    z-index: 100;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    background: rgba(30, 30, 50, 0.85);
+    border: 2px solid;
+    animation: swapArc var(--swap-duration, 0.5s) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes swapArc {
+    0% {
+        transform: translate(0, 0) scale(1.15);
+        opacity: 1;
+    }
+    30% {
+        transform: translate(calc(var(--dx) * 0.3), var(--arc)) scale(1.1);
+        opacity: 1;
+    }
+    70% {
+        transform: translate(calc(var(--dx) * 0.7), calc(var(--arc) * 0.3)) scale(1.05);
+        opacity: 0.85;
+    }
+    100% {
+        transform: translate(var(--dx), 0px) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Compact swap ghost sizing */
+.cy-compact .cy-swap-ghost {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+}
+
+/* ── Problem 8 compact layout — fits without scroll on desktop ── */
+.array-inner.cy-compact {
+    gap: 6px;
+    padding: 14px 24px 10px;
+}
+.cy-compact .array-label {
+    font-size: 11px;
+    margin-bottom: 0;
+}
+.cy-compact .array-visualization {
+    padding: 6px 10px;
+    min-height: 60px;
+    gap: 6px;
+}
+.cy-compact .array-item {
+    width: 44px;
+    height: 44px;
+    min-width: 0;
+    flex: 1 1 44px;
+    max-width: 44px;
+    font-size: 15px;
+    border-radius: 10px;
+    margin-top: 22px;
+    margin-bottom: 20px;
+}
+.cy-compact .pointer-label {
+    top: -20px;
+    font-size: 9px;
+    padding: 1px 5px;
+}
+.cy-compact .array-index {
+    font-size: 8px;
+    bottom: -16px;
+}
+.cy-compact .cy-blueprint {
+    margin: 0 0 2px;
+}
+.cy-compact .cy-bp-step {
+    padding: 3px 8px;
+}
+.cy-compact .cy-bp-num {
+    font-size: 11px;
+}
+.cy-compact .cy-bp-text {
+    font-size: 10px;
+}
+.cy-compact .cy-why {
+    font-size: 11px;
+    padding: 4px 10px;
+    margin: 0 auto 4px;
+}
+.cy-compact .cy-ghost-target {
+    margin-top: 4px;
+    gap: 2px;
+}
+.cy-compact .cy-ghost-cell {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 10px !important;
+    margin: 0 0 10px 0 !important;
+}
+.cy-compact .cy-ghost-label {
+    font-size: 0.65em;
+}
+.cy-compact .pointer-info {
+    margin-top: 4px;
+    padding: 6px 12px;
+    gap: 12px;
+}
+.cy-compact .pointer-detail-label {
+    font-size: 8px;
+}
+.cy-compact .pointer-detail-value {
+    font-size: 11px;
+    padding: 2px 6px;
+}
+.cy-compact .sum-bridge {
+    margin: 4px 0 0;
+    padding: 6px 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+
 /* ── Data Structure Visual Containers ── */
 .ds-container {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    gap: 6px;
-    margin: 8px 0;
+    gap: 8px;
+    margin: 10px 0 6px;
     flex-wrap: wrap;
 }
 
 .ds-bucket {
     border: 2px solid var(--accent-purple);
-    border-radius: 10px;
-    padding: 8px 12px 6px;
+    border-radius: 12px;
+    padding: 10px 14px 8px;
     background: rgba(139, 92, 246, 0.06);
-    min-width: 80px;
+    min-width: 90px;
     text-align: center;
     position: relative;
+    box-shadow: 0 2px 12px rgba(139, 92, 246, 0.10);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .ds-bucket.ds-set {
     border-color: var(--accent-purple);
-    background: rgba(139, 92, 246, 0.06);
+    background: rgba(139, 92, 246, 0.08);
+    box-shadow: 0 2px 14px rgba(139, 92, 246, 0.12);
 }
 
 .ds-bucket.ds-map {
     border-color: var(--accent-blue);
-    background: rgba(59, 130, 246, 0.06);
+    background: rgba(59, 130, 246, 0.08);
+    box-shadow: 0 2px 14px rgba(59, 130, 246, 0.12);
 }
 
 .ds-bucket-label {
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
+    letter-spacing: 0.8px;
+    margin-bottom: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 3px;
 }
 
 .ds-bucket.ds-set .ds-bucket-label {
@@ -3987,33 +4937,37 @@ body.problem-page-active .action-bar {
 
 .ds-bucket-items {
     display: flex;
-    gap: 4px;
+    gap: 5px;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+    min-height: 22px;
 }
 
 .ds-item {
-    padding: 2px 8px;
-    border-radius: 5px;
+    padding: 3px 9px;
+    border-radius: 6px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     color: #fff;
     transition: all 0.2s ease;
+    letter-spacing: 0.3px;
 }
 
 .ds-item.ds-set-item {
     background: var(--accent-purple);
+    box-shadow: 0 1px 4px rgba(139, 92, 246, 0.25);
 }
 
 .ds-item.ds-map-item {
     background: var(--accent-blue);
+    box-shadow: 0 1px 4px rgba(59, 130, 246, 0.25);
 }
 
 .ds-item.ds-active {
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.7);
     background: var(--accent-green) !important;
-    transform: scale(1.1);
+    transform: scale(1.12);
 }
 
 .ds-item.ds-ping {
@@ -4022,21 +4976,24 @@ body.problem-page-active .action-bar {
 
 .ds-item.ds-miss {
     background: var(--accent-red) !important;
-    opacity: 0.7;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+    opacity: 0.8;
 }
 
 .ds-brace {
-    font-size: 22px;
-    font-weight: 300;
+    font-size: 26px;
+    font-weight: 700;
     line-height: 1;
 }
 
 .ds-bucket.ds-set .ds-brace {
     color: var(--accent-purple);
+    text-shadow: 0 0 6px rgba(139, 92, 246, 0.3);
 }
 
 .ds-bucket.ds-map .ds-brace {
     color: var(--accent-blue);
+    text-shadow: 0 0 6px rgba(59, 130, 246, 0.3);
 }
 
 @keyframes dsPing {
@@ -4116,6 +5073,7 @@ body.problem-page-active .action-bar {
 
 /* ===== Price Chart / Bar Visualization (Stock, H-Index, Candy) ===== */
 .price-chart-viz {
+    position: relative;
     align-items: flex-end !important;
     width: 100% !important;
     height: 200px !important;
@@ -4173,7 +5131,7 @@ body.problem-page-active .action-bar {
 }
 .price-chart-viz .price-bar .pointer-label {
     top: auto;
-    bottom: -44px;
+    bottom: -50px;
 }
 /* Stock Buy/Sell highlights */
 .price-bar.price-buy::before { background: rgba(16, 185, 129, 0.35); }
@@ -4183,6 +5141,19 @@ body.problem-page-active .action-bar {
 .price-bar.price-gain { color: var(--accent-green) !important; }
 .price-bar.price-drop::before { background: rgba(239, 68, 68, 0.15); }
 .price-bar.price-drop { color: var(--accent-red) !important; }
+
+/* Override pointer-1 blue box for price bars — keep it subtle */
+.price-chart-viz .price-bar.pointer-1 {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+.price-chart-viz .price-bar.pointer-1::before {
+    outline: 2px solid rgba(59, 130, 246, 0.5);
+    outline-offset: -2px;
+    border-radius: 4px 4px 0 0;
+}
 .price-floor-line {
     display: flex;
     align-items: center;
@@ -4190,9 +5161,266 @@ body.problem-page-active .action-bar {
     border-top: 2px dashed var(--accent-green);
     margin-top: 2px;
 }
-/* H-Index pass/fail */
+
+/* ===== Problem 9 — Stock Trade Visualization Enhancements ===== */
+
+/* Feature 2: Profit Gap — green block inside the sell bar */
+.profit-gap-block {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    bottom: var(--gap-bottom, 0%);
+    height: calc(var(--gap-top, 50%) - var(--gap-bottom, 0%));
+    background: rgba(16, 185, 129, 0.22);
+    border: 1px solid rgba(16, 185, 129, 0.45);
+    border-radius: 3px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: profitGapFadeIn 0.4s ease-out;
+}
+.profit-gap-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--accent-green);
+    text-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+    white-space: nowrap;
+}
+@keyframes profitGapFadeIn {
+    0% { opacity: 0; transform: scaleY(0.3); }
+    100% { opacity: 1; transform: scaleY(1); }
+}
+.profit-gap-best {
+    background: rgba(16, 185, 129, 0.32);
+    border-color: rgba(16, 185, 129, 0.65);
+}
+.profit-gap-best .profit-gap-label {
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+}
+
+/* Feature 3: Ghost outline for previous best trade */
+.profit-ghost-outline {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: var(--ghost-bottom, 0%);
+    height: calc(var(--ghost-top, 50%) - var(--ghost-bottom, 0%));
+    border: 1.5px dashed rgba(16, 185, 129, 0.3);
+    border-radius: 3px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.45;
+    pointer-events: none;
+}
+.profit-ghost-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(16, 185, 129, 0.5);
+    white-space: nowrap;
+}
+.stock-prev-best::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 0;
+    top: 0;
+    border: 1.5px dashed rgba(16, 185, 129, 0.2);
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Feature 4: Trade arc SVG */
+.trade-arc-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 10;
+    overflow: visible;
+}
+.trade-arc-path {
+    fill: none;
+    stroke: rgba(16, 185, 129, 0.45);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+    stroke-linecap: round;
+    animation: tradeArcDraw 0.6s ease-out;
+}
+@keyframes tradeArcDraw {
+    0% { stroke-dashoffset: 200; opacity: 0; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+}
+.trade-arc-label {
+    fill: rgba(16, 185, 129, 0.7);
+    font-size: 9px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: auto;
+}
+
+/* Feature 1: maxProfit box flash animation */
+.stock-mp-box {
+    transition: all 0.3s ease;
+}
+.stock-mp-box.stock-mp-flash {
+    animation: mpFlash 0.6s ease-out;
+}
+.stock-mp-box.stock-mp-flash .pointer-detail-value {
+    color: var(--accent-green) !important;
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+@keyframes mpFlash {
+    0% { background: rgba(239, 68, 68, 0.3); transform: scale(1.05); }
+    30% { background: rgba(239, 68, 68, 0.2); }
+    60% { background: rgba(16, 185, 129, 0.25); transform: scale(1.08); }
+    100% { background: transparent; transform: scale(1); }
+}
+
+/* Old → New value transition inside maxProfit box */
+.stock-mp-old {
+    color: var(--accent-red, #ef4444) !important;
+    text-decoration: line-through;
+    opacity: 0.6;
+    margin-right: 6px;
+    font-size: 0.85em;
+    animation: mpOldFade 0.6s ease-out forwards;
+}
+.stock-mp-new {
+    color: var(--accent-green) !important;
+    font-weight: 800;
+    animation: mpNewPop 0.6s ease-out;
+}
+@keyframes mpOldFade {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0.35; }
+}
+@keyframes mpNewPop {
+    0% { opacity: 0; transform: scale(0.7); }
+    50% { opacity: 1; transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+/* H-Index pass/fail (legacy) */
 .price-bar.hindex-pass::before { background: rgba(16, 185, 129, 0.3); }
 .price-bar.hindex-fail::before { background: rgba(239, 68, 68, 0.15); }
+
+/* ===== H-Index Durfee-Square SVG Visualization ===== */
+.hindex-svg-wrap {
+    width: 100%;
+    max-width: 560px;
+    margin: 8px auto 4px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.18);
+    padding: 12px 8px 6px;
+    min-height: 180px;
+}
+.hindex-svg {
+    width: 100%;
+    height: auto;
+    min-height: 160px;
+    aspect-ratio: 520 / 280;
+    display: block;
+    overflow: visible;
+}
+/* Axis labels */
+.hindex-axis-label {
+    fill: var(--text-muted, rgba(255,255,255,0.4));
+    font-size: 10px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+/* Bars */
+.hindex-bar {
+    transition: fill 0.3s ease, opacity 0.3s ease;
+    fill: rgba(255, 255, 255, 0.1);
+}
+.hindex-bar-sort {
+    fill: rgba(139, 92, 246, 0.25);
+}
+.hindex-bar-pass {
+    fill: rgba(16, 185, 129, 0.35);
+}
+.hindex-bar-fail {
+    fill: rgba(239, 68, 68, 0.18);
+}
+.hindex-bar-final {
+    fill: rgba(16, 185, 129, 0.5);
+    filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.4));
+}
+.hindex-bar-active {
+    stroke: var(--accent-blue, #60a5fa);
+    stroke-width: 2;
+}
+/* Value + index labels */
+.hindex-bar-val {
+    fill: var(--text-secondary, rgba(255,255,255,0.7));
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+.hindex-bar-idx {
+    fill: var(--text-muted, rgba(255,255,255,0.4));
+    font-size: 10px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+/* Pointer i label */
+.hindex-pointer-i {
+    fill: var(--accent-blue, #60a5fa);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+/* Durfee square overlays */
+.hindex-square-pass {
+    fill: rgba(16, 185, 129, 0.12);
+    stroke: rgba(16, 185, 129, 0.6);
+    stroke-width: 2;
+    stroke-dasharray: 6, 3;
+    transition: all 0.4s ease;
+}
+.hindex-square-fail {
+    fill: rgba(239, 68, 68, 0.08);
+    stroke: rgba(239, 68, 68, 0.5);
+    stroke-width: 2;
+    stroke-dasharray: 6, 3;
+    transition: all 0.4s ease;
+}
+.hindex-square-label {
+    fill: var(--text-secondary, rgba(255,255,255,0.7));
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+/* y = x diagonal */
+.hindex-diagonal {
+    stroke: rgba(250, 204, 21, 0.45);
+    stroke-width: 1.5;
+    stroke-dasharray: 6, 4;
+}
+.hindex-diag-label {
+    fill: rgba(250, 204, 21, 0.6);
+    font-size: 10px;
+    font-style: italic;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+/* Threshold line */
+.hindex-threshold {
+    stroke: var(--accent-blue, #60a5fa);
+    stroke-width: 1.5;
+    stroke-dasharray: 8, 4;
+    opacity: 0.7;
+}
+.hindex-threshold-label {
+    fill: var(--accent-blue, #60a5fa);
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
 
 /* ===== Jump Game Visualization ===== */
 .jump-viz .jump-reachable {
@@ -4374,7 +5602,7 @@ body.problem-page-active .action-bar {
     font-size: 11px;
     font-weight: 800;
     padding: 5px 12px;
-    border-radius: 6px;
+    border-radius: 4px;
     font-family: 'JetBrains Mono', monospace;
     white-space: nowrap;
     border: 1.5px solid;
@@ -4400,12 +5628,12 @@ body.problem-page-active .action-bar {
 }
 
 .pointer-label-pair .pair-left {
-    border-radius: 5px 0 0 5px;
+    border-radius: 4px 0 0 4px;
     border-right: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .pointer-label-pair .pair-right {
-    border-radius: 0 5px 5px 0;
+    border-radius: 0 4px 4px 0;
     border-left: none;
 }
 
@@ -6130,6 +7358,104 @@ body > main > section.module.viz-module > div.module-header:empty {
         display: flex !important;
         bottom: 13px;
     }
+
+    /* ── Problem 8 mobile compact ── */
+    .array-inner.cy-compact {
+        gap: 4px;
+        padding: 8px 10px 6px;
+    }
+    .cy-compact .array-label {
+        font-size: 10px;
+    }
+    .cy-compact .cy-blueprint {
+        margin: 0 0 2px;
+        gap: 3px;
+    }
+    .cy-compact .cy-bp-step {
+        padding: 2px 6px;
+        border-radius: 5px;
+    }
+    .cy-compact .cy-bp-num {
+        font-size: 10px;
+    }
+    .cy-compact .cy-bp-text {
+        font-size: 9px;
+    }
+    .cy-compact .cy-bp-arrow {
+        font-size: 10px;
+    }
+    .cy-compact .cy-why {
+        font-size: 10px;
+        padding: 3px 8px;
+        margin: 0 auto 2px;
+        max-width: 100%;
+    }
+    .cy-compact .array-visualization {
+        padding: 4px 6px;
+        min-height: 50px;
+        gap: 4px;
+    }
+    .cy-compact .array-item {
+        width: 36px;
+        height: 36px;
+        flex: 1 1 36px;
+        max-width: 36px;
+        font-size: 13px;
+        border-radius: 8px;
+        margin-top: 18px;
+        margin-bottom: 16px;
+    }
+    .cy-compact .pointer-label {
+        top: -16px;
+        font-size: 7.5px;
+        padding: 1px 4px;
+    }
+    .cy-compact .array-index {
+        font-size: 7px;
+        bottom: -14px;
+    }
+    .cy-compact .cy-ghost-target {
+        margin-top: 2px;
+        gap: 1px;
+    }
+    .cy-compact .cy-ghost-cell {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 9px !important;
+        margin: 0 0 8px 0 !important;
+    }
+    .cy-compact .cy-ghost-label {
+        font-size: 0.6em;
+    }
+    .cy-compact .cy-ghost-cell .array-index {
+        font-size: 6px !important;
+    }
+    .cy-compact .pointer-info {
+        margin-top: 2px;
+        padding: 4px 8px;
+        gap: 8px;
+    }
+    .cy-compact .pointer-detail-label {
+        font-size: 7px;
+    }
+    .cy-compact .pointer-detail-value {
+        font-size: 10px;
+        padding: 2px 5px;
+    }
+    .cy-compact .sum-bridge {
+        margin: 2px 0 0;
+        padding: 4px 8px;
+    }
+    .cy-compact .cy-swap-ghost {
+        width: 30px;
+        height: 30px;
+        font-size: 11px;
+    }
+    .cy-compact .cy-insight-btn {
+        width: 15px;
+        height: 15px;
+        font-size: 9px;
+    }
 }
 
 /* Small mobile - 480px and below */
@@ -6248,6 +7574,58 @@ body > main > section.module.viz-module > div.module-header:empty {
         padding: 3px 5px;
         border-radius: 4px;
         border-width: 1px;
+    }
+
+    /* ── Problem 8 tiny mobile ── */
+    .cy-compact .array-item {
+        width: 30px;
+        height: 30px;
+        flex: 1 1 30px;
+        max-width: 30px;
+        font-size: 11px;
+        margin-top: 16px;
+        margin-bottom: 14px;
+        border-radius: 7px;
+        border-width: 1.5px;
+    }
+    .cy-compact .cy-why {
+        font-size: 9px;
+        line-height: 1.35;
+        padding: 2px 6px;
+    }
+    .cy-compact .cy-bp-step {
+        padding: 2px 5px;
+        border-width: 1px;
+    }
+    .cy-compact .cy-bp-num {
+        font-size: 9px;
+    }
+    .cy-compact .cy-bp-text {
+        font-size: 8px;
+    }
+    .cy-compact .cy-ghost-cell {
+        width: 18px !important;
+        height: 18px !important;
+        font-size: 7px !important;
+        border-width: 1px !important;
+        margin: 0 !important;
+    }
+    .cy-compact .cy-ghost-cell .array-index {
+        display: none !important;
+    }
+    .cy-compact .pointer-label {
+        top: -14px;
+        font-size: 6.5px;
+    }
+    .cy-compact .array-index {
+        font-size: 6px;
+        bottom: -12px;
+    }
+    .cy-compact .cy-swap-ghost {
+        width: 26px;
+        height: 26px;
+        font-size: 10px;
+        border-width: 1.5px;
     }
 }
 
@@ -6516,7 +7894,7 @@ body > main > section.module.viz-module > div.module-header:empty {
     .array-container { padding: 26px; }
     .array-item { width: 76px; min-width: 0; height: auto; aspect-ratio: 1; font-size: 22px; border-radius: 12px; margin-top: 38px; margin-bottom: 34px; flex: 1 1 76px; max-width: 76px; }
     .array-visualization { gap: 14px; padding: 20px; min-height: 110px; border-radius: 12px; }
-    .pointer-label { font-size: 12px; padding: 5px 12px; top: -36px; border-radius: 6px; }
+    .pointer-label { font-size: 12px; padding: 5px 12px; top: -36px; border-radius: 4px; }
     .pointer-label-pair { top: -36px; }
     .array-index { font-size: 11px; padding: 4px 10px; bottom: -34px; border-radius: 6px; }
     .array-label { font-size: 15px; }
@@ -6603,7 +7981,7 @@ body > main > section.module.viz-module > div.module-header:empty {
     .array-container { padding: 34px; }
     .array-item { width: 88px; min-width: 0; height: auto; aspect-ratio: 1; font-size: 26px; border-radius: 14px; margin-top: 40px; margin-bottom: 36px; flex: 1 1 88px; max-width: 88px; }
     .array-visualization { gap: 16px; padding: 22px; min-height: 120px; border-radius: 14px; }
-    .pointer-label { font-size: 13px; padding: 6px 13px; top: -42px; border-radius: 7px; }
+    .pointer-label { font-size: 13px; padding: 6px 13px; top: -42px; border-radius: 4px; }
     .pointer-label-pair { top: -42px; }
     .array-index { font-size: 12px; padding: 5px 11px; bottom: -38px; border-radius: 7px; }
     .array-label { font-size: 16px; }
@@ -6621,3 +7999,169 @@ body > main > section.module.viz-module > div.module-header:empty {
     .problem-search-bar input { font-size: 16px; }
     .filter-btn { font-size: 14px; padding: 9px 20px; }
 }
+
+/* ===== Report / Feedback Modal ===== */
+.report-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9000;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: var(--bg-card, #1e293b);
+    color: var(--text-secondary, #94a3b8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+.report-fab:hover {
+    background: var(--bg-card-light, #334155);
+    color: var(--text-primary, #fff);
+    transform: scale(1.08);
+    border-color: rgba(255,255,255,0.2);
+}
+
+.report-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+}
+.report-modal.show {
+    display: flex;
+}
+.report-modal-content {
+    background: var(--bg-card, #1e293b);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-radius: 16px;
+    width: 90%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: reportSlideIn 0.25s ease-out;
+}
+@keyframes reportSlideIn {
+    0% { opacity: 0; transform: translateY(20px) scale(0.97); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.report-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border, rgba(255,255,255,0.06));
+}
+.report-modal-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary, #fff);
+    margin: 0;
+}
+.report-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted, rgba(255,255,255,0.4));
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.15s;
+}
+.report-modal-close:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-primary, #fff);
+}
+
+.report-form {
+    padding: 20px 24px 24px;
+}
+.report-field {
+    margin-bottom: 16px;
+}
+.report-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary, #94a3b8);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+.report-optional {
+    text-transform: none;
+    font-weight: 400;
+    color: var(--text-muted, rgba(255,255,255,0.35));
+    letter-spacing: 0;
+}
+.report-field select,
+.report-field input,
+.report-field textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border, rgba(255,255,255,0.1));
+    background: rgba(0,0,0,0.25);
+    color: var(--text-primary, #fff);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.report-field select:focus,
+.report-field input:focus,
+.report-field textarea:focus {
+    border-color: var(--accent-blue, #3b82f6);
+}
+.report-field textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+.report-actions {
+    margin-top: 8px;
+}
+.report-submit-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent-blue, #3b82f6);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.report-submit-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+.report-submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+.report-status {
+    margin-top: 12px;
+    font-size: 13px;
+    text-align: center;
+    min-height: 20px;
+}
+.report-status.success {
+    color: var(--accent-green, #10b981);
+}
+.report-status.error {
+    color: var(--accent-red, #ef4444);
+}
+

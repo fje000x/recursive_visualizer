@@ -9,3 +9,8 @@ build/
 *.swo
 *~
 .env.local
+.env
+server/node_modules/
+server/*.db
+server/*.db-shm
+server/*.db-wal

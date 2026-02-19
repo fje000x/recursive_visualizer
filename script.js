@@ -573,6 +573,7 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "sorting"],
         interview150: true,
+        testCaseLabels: { normal: "[3,0,6,1,5] → h=3", edge: "[0,0,0] → h=0", tc2: "[100,100] → h=2", tc3: "[10] → h=1" },
         tree: null,
         algorithms: {
             sorting: {
@@ -593,6 +594,15 @@ const problemDB = {
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
                     return generateHIndexHistory();
+                },
+                generateEdgeCaseHistory: function() {
+                    return generateHIndexEdgeHistory();
+                },
+                generateTc2History: function() {
+                    return generateHIndexTestCase2History();
+                },
+                generateTc3History: function() {
+                    return generateHIndexTestCase3History();
                 }
             }
         }
@@ -1877,6 +1887,7 @@ let history = [];
 let currentStep = 0;
 let autoPlayInterval = null;
 let autoPlaySpeed = 2000;
+let prevArraySnapshot = null; // tracks previous step's array for change-detection animations
 const speedPresets = [
     { label: '0.5x', ms: 3000 },
     { label: '1x',   ms: 2000 },
@@ -1915,6 +1926,78 @@ function closeYouTubeModal() {
     const modal = document.getElementById('youtubeModal');
     modal.classList.remove('show');
 }
+
+// Insight Modal (Problem 8 — why 3 reverses work)
+function openInsightModal() {
+    const modal = document.getElementById('insightModal');
+    modal.classList.add('show');
+}
+
+function closeInsightModal() {
+    const modal = document.getElementById('insightModal');
+    modal.classList.remove('show');
+}
+
+// Close insight modal on backdrop click or close button
+document.addEventListener('DOMContentLoaded', () => {
+    const insightModal = document.getElementById('insightModal');
+    if (insightModal) {
+        document.getElementById('insightModalClose').addEventListener('click', closeInsightModal);
+        insightModal.addEventListener('click', (e) => {
+            if (e.target === insightModal) closeInsightModal();
+        });
+    }
+});
+
+// ── Report / Feedback Modal ──
+
+function openReportModal() {
+    const modal = document.getElementById('reportModal');
+    const problemField = document.getElementById('reportProblem');
+    if (problemField) problemField.value = currentProbId || '';
+    document.getElementById('reportStatus').textContent = '';
+    document.getElementById('reportStatus').className = 'report-status';
+    document.getElementById('reportSubmitBtn').disabled = false;
+    modal.classList.add('show');
+}
+
+function closeReportModal() {
+    document.getElementById('reportModal').classList.remove('show');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // FAB button opens modal
+    const fab = document.getElementById('reportFab');
+    if (fab) fab.addEventListener('click', openReportModal);
+
+    // Close button
+    const closeBtn = document.getElementById('reportModalClose');
+    if (closeBtn) closeBtn.addEventListener('click', closeReportModal);
+
+    // Backdrop click
+    const modal = document.getElementById('reportModal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeReportModal();
+        });
+    }
+
+    // Form submit
+    const form = document.getElementById('reportForm');
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('reportSubmitBtn');
+            const status = document.getElementById('reportStatus');
+            btn.disabled = true;
+
+            status.textContent = 'Currently not working, check back soon.';
+            status.className = 'report-status error';
+
+            setTimeout(() => { btn.disabled = false; }, 1200);
+        });
+    }
+});
 
 function showLoadingRecommendations() {
     const youtubeContent = document.getElementById('youtubeContent');
@@ -1983,6 +2066,7 @@ function initSearch() {
 
 function selectProblem(probId) {
     currentProbId = probId;
+    prevArraySnapshot = null; // reset change-detection on problem switch
     const prob = problemDB[probId];
     currentAlgorithm = Object.keys(prob.algorithms)[0]; // Get first algorithm
     currentTestCase = "normal"; // Reset test case when switching problems
@@ -2701,7 +2785,7 @@ function generateRemoveElementHistory() {
             pointers: { ...pointers },
             nums1: [...arr],
             nums2: [],
-            arrayMeta: { val, k, originalLength: nums.length },
+            arrayMeta: { val, k, originalLength: nums.length, overwrittenVal: extra.overwrittenVal ?? null, copyFrom: extra.copyFrom ?? null, copyTo: extra.copyTo ?? null },
             step: h.length,
             ...extra
         });
@@ -2716,8 +2800,9 @@ function generateRemoveElementHistory() {
         if (arr[i] !== val) {
             record(3, `nums[${i}] = ${arr[i]} ≠ ${val} → not the target value, so we keep it.`, { i, k }, { isComparison: true });
             const prevK = k;
+            const oldVal = arr[k];
             arr[k] = arr[i];
-            record(4, `Execute nums[k] = nums[i] → nums[${prevK}] = nums[${i}] = ${arr[prevK]}. Array: [${arr}].`, { i, k });
+            record(4, `Execute nums[k] = nums[i] → nums[${prevK}] = nums[${i}] = ${arr[prevK]}. Array: [${arr}].`, { i, k }, { overwrittenVal: (prevK !== i) ? oldVal : null, copyFrom: (prevK !== i) ? i : null, copyTo: (prevK !== i) ? prevK : null });
             k++;
             record(5, `k++ → k = ${k}. Kept ${k} so far: [${arr.slice(0, k)}]. i will move to ${i + 1} next.`, { i, k });
         } else {
@@ -2743,7 +2828,7 @@ function generateRemoveDuplicatesHistory() {
             pointers: { ...pointers },
             nums1: [...arr],
             nums2: [],
-            arrayMeta: { k, originalLength: nums.length },
+            arrayMeta: { k, originalLength: nums.length, copyFrom: extra.copyFrom ?? null, copyTo: extra.copyTo ?? null },
             step: h.length,
             ...extra
         });
@@ -2766,7 +2851,7 @@ function generateRemoveDuplicatesHistory() {
             record(4, `nums[${i}] = ${arr[i]} ≠ nums[${k - 1}] = ${arr[k - 1]} → new unique value found!`, { i, k }, { isComparison: true });
             const prevK = k;
             arr[k] = arr[i];
-            record(5, `Execute nums[k] = nums[i] → nums[${prevK}] = nums[${i}] = ${arr[prevK]}. Array: [${arr}].`, { i, k });
+            record(5, `Execute nums[k] = nums[i] → nums[${prevK}] = nums[${i}] = ${arr[prevK]}. Array: [${arr}].`, { i, k }, { copyFrom: (prevK !== i) ? i : null, copyTo: (prevK !== i) ? prevK : null });
             k++;
             record(6, `k++ → k = ${k}. Found ${k} unique so far: [${arr.slice(0, k)}]. i will move to ${i + 1} next.`, { i, k });
         } else {
@@ -2792,7 +2877,7 @@ function generateTrimExcessDuplicatesHistory() {
             pointers: { ...pointers },
             nums1: [...arr],
             nums2: [],
-            arrayMeta: { k, originalLength: nums.length },
+            arrayMeta: { k, originalLength: nums.length, copyFrom: extra.copyFrom ?? null, copyTo: extra.copyTo ?? null },
             step: h.length,
             ...extra
         });
@@ -2815,7 +2900,7 @@ function generateTrimExcessDuplicatesHistory() {
             record(4, `nums[${i}] = ${arr[i]} ≠ nums[${k - 2}] = ${arr[k - 2]} → still room (not a third copy). Keep it!`, { i, k }, { isComparison: true });
             const prevK = k;
             arr[k] = arr[i];
-            record(5, `Execute nums[k] = nums[i] → nums[${prevK}] = ${arr[prevK]}. Array: [${arr}].`, { i, k });
+            record(5, `Execute nums[k] = nums[i] → nums[${prevK}] = ${arr[prevK]}. Array: [${arr}].`, { i, k }, { copyFrom: (prevK !== i) ? i : null, copyTo: (prevK !== i) ? prevK : null });
             k++;
             record(6, `k++ → k = ${k}. Kept ${k} so far: [${arr.slice(0, k)}].`, { i, k });
         } else {
@@ -2841,30 +2926,39 @@ function generateDominantElementHistory() {
             pointers: { ...pointers },
             nums1: [...nums],
             nums2: [],
-            arrayMeta: { candidate, count, originalLength: nums.length },
+            arrayMeta: {
+                candidate, count, originalLength: nums.length,
+                battleType: extra.battleType ?? null,   // 'coronation' | 'reinforce' | 'clash' | null
+                prevCount: extra.prevCount ?? null,
+                prevCandidate: extra.prevCandidate ?? null,
+                challengerVal: extra.challengerVal ?? null,
+            },
             step: h.length,
             ...extra
         });
     }
 
     record(0, `Call findDominant(nums=[${nums}]). Goal: find the element that appears more than ⌊n/2⌋ times using Boyer-Moore Voting.`);
-    record(1, `Initialize candidate = nums[0] = ${candidate}.`, { i: 0 });
+    record(1, `Initialize candidate = nums[0] = ${candidate}.`, { i: 0 }, { battleType: 'coronation', challengerVal: candidate, prevCount: 0, prevCandidate: null });
     record(2, `Initialize count = 1. Start scanning from index 1.`, { i: 0 });
 
     for (let i = 1; i < nums.length; i++) {
         record(3, `Move to i = ${i}. nums[${i}] = ${nums[i]}. Current candidate = ${candidate}, count = ${count}.`, { i });
 
         if (count === 0) {
+            const prevCand = candidate;
             candidate = nums[i];
-            record(4, `count == 0 → pick new candidate = nums[${i}] = ${candidate}.`, { i }, { isComparison: true });
+            record(4, `count == 0 → The throne is empty! New King: ${candidate}.`, { i }, { isComparison: true, battleType: 'coronation', challengerVal: nums[i], prevCount: 0, prevCandidate: prevCand });
             count = 1;
             record(6, `Reset count = 1 for new candidate ${candidate}.`, { i });
         } else if (nums[i] === candidate) {
+            const pc = count;
             count++;
-            record(7, `nums[${i}] = ${nums[i]} == candidate ${candidate} → count++ → count = ${count}.`, { i }, { isComparison: true });
+            record(7, `nums[${i}] = ${nums[i]} == candidate ${candidate} → Reinforcement! count++ → ${count}.`, { i }, { isComparison: true, battleType: 'reinforce', challengerVal: nums[i], prevCount: pc });
         } else {
+            const pc = count;
             count--;
-            record(9, `nums[${i}] = ${nums[i]} ≠ candidate ${candidate} → count-- → count = ${count}.`, { i }, { isComparison: true, isSkip: true });
+            record(9, `nums[${i}] = ${nums[i]} ≠ candidate ${candidate} → Clash! count-- → ${count}.`, { i }, { isComparison: true, isSkip: true, battleType: 'clash', challengerVal: nums[i], prevCount: pc });
         }
     }
 
@@ -2881,6 +2975,19 @@ function generateCycleArrayHistory() {
     const n = arr.length;
     const k = k_input % n;
 
+    // Pre-compute: which original indices belong to which segment
+    // "Stay Back" = original indices 0..n-k-1 (Blue)
+    // "Move Front" = original indices n-k..n-1 (Orange)
+    // Track where each original index is at each step
+    const posMap = nums.map((_, i) => i); // posMap[currentPos] = originalIndex
+
+    // Compute the solved target array
+    const target = [...nums.slice(n - k), ...nums.slice(0, n - k)];
+
+    // Track which phases have completed for orientation indicators
+    // 0 = nothing done, 1 = full reversed, 2 = left fixed, 3 = all done
+    let phasesCompleted = 0;
+
     function record(line, msg, pointers = {}, extra = {}) {
         h.push({
             msg,
@@ -2888,7 +2995,14 @@ function generateCycleArrayHistory() {
             pointers: { ...pointers },
             nums1: [...arr],
             nums2: [],
-            arrayMeta: { k: k, n: n, phase: extra.phase || '' },
+            arrayMeta: {
+                k: k, n: n,
+                phase: extra.phase || '',
+                posMap: [...posMap],
+                splitAt: n - k,
+                target: target,
+                phasesCompleted: phasesCompleted,
+            },
             step: h.length,
             ...extra
         });
@@ -2897,10 +3011,14 @@ function generateCycleArrayHistory() {
     function reverseSection(lo, hi, phase) {
         record(8, `  reverse(nums, ${lo}, ${hi}) — begin reversing indices [${lo}..${hi}].`, { lo, hi }, { phase });
         while (lo < hi) {
-            record(9, `  Swap nums[${lo}]=${arr[lo]} ↔ nums[${hi}]=${arr[hi]}.`, { lo, hi }, { isComparison: true, phase });
+            const loVal = arr[lo], hiVal = arr[hi];
+            record(9, `  Swap nums[${lo}]=${loVal} ↔ nums[${hi}]=${hiVal}.`, { lo, hi }, { isComparison: true, phase, swapIndices: [lo, hi], swapVals: [loVal, hiVal] });
             const tmp = arr[lo];
             arr[lo] = arr[hi];
             arr[hi] = tmp;
+            const tmpP = posMap[lo];
+            posMap[lo] = posMap[hi];
+            posMap[hi] = tmpP;
             record(9, `  After swap: [${arr}].`, { lo, hi }, { phase });
             lo++;
             hi--;
@@ -2908,18 +3026,25 @@ function generateCycleArrayHistory() {
         record(11, `  Reverse done. Array: [${arr}].`, {}, { phase });
     }
 
-    record(0, `Call cycleElements(nums=[${nums}], k=${k_input}). Goal: rotate the array to the right by ${k_input} positions.`);
+    record(0, `Call cycleElements(nums=[${nums}], k=${k_input}). Goal: move the last ${k_input} elements to the front.`);
     record(1, `n = len(nums) = ${n}.`);
-    record(2, `k = ${k_input} % ${n} = ${k}. (Effective rotation amount.)`);
+    if (k_input >= n) {
+        record(2, `k = ${k_input} % ${n} = ${k}. Rotating by ${n} is a full cycle (back to start), so we only need to rotate by ${k}.`);
+    } else {
+        record(2, `k = ${k_input} % ${n} = ${k}. (Already < n, no reduction needed.)`);
+    }
     
-    record(3, `Step 1: Reverse the entire array [0..${n - 1}].`, {}, { phase: 'full' });
+    record(3, `Step 1: Reverse the entire array [0..${n - 1}]. This puts the last ${k} elements at the front — but everything is backwards.`, {}, { phase: 'full' });
     reverseSection(0, n - 1, 'full');
+    phasesCompleted = 1;
 
-    record(4, `Step 2: Reverse the first k = ${k} elements [0..${k - 1}].`, {}, { phase: 'left' });
+    record(4, `Step 2: Reverse [0..${k - 1}]. The front ${k} elements (orange) landed backwards — flip them right-side up.`, {}, { phase: 'left' });
     reverseSection(0, k - 1, 'left');
+    phasesCompleted = 2;
 
-    record(5, `Step 3: Reverse the remaining elements [${k}..${n - 1}].`, {}, { phase: 'right' });
+    record(5, `Step 3: Reverse [${k}..${n - 1}]. The back ${n - k} elements (blue) are still backwards — flip them too.`, {}, { phase: 'right' });
     reverseSection(k, n - 1, 'right');
+    phasesCompleted = 3;
 
     record(5, `✓ Done! Array rotated by ${k} positions: [${arr}].`, {}, { isComplete: true });
     return h;
@@ -2930,7 +3055,10 @@ function generateBestTradeHistory() {
     const prices = [8, 3, 5, 1, 7, 4, 9, 2];
     const h = [];
     let minPrice = prices[0];
+    let minPriceIdx = 0;
     let maxProfit = 0;
+    let bestBuyIdx = -1;
+    let bestSellIdx = -1;
 
     function record(line, msg, pointers = {}, extra = {}) {
         h.push({
@@ -2939,7 +3067,14 @@ function generateBestTradeHistory() {
             pointers: { ...pointers },
             nums1: [...prices],
             nums2: [],
-            arrayMeta: { minPrice, maxProfit, originalLength: prices.length },
+            arrayMeta: {
+                minPrice,
+                minPriceIdx,
+                maxProfit,
+                bestBuyIdx,
+                bestSellIdx,
+                originalLength: prices.length
+            },
             step: h.length,
             ...extra
         });
@@ -2955,16 +3090,27 @@ function generateBestTradeHistory() {
         if (prices[i] < minPrice) {
             const oldMin = minPrice;
             minPrice = prices[i];
+            minPriceIdx = i;
             record(4, `prices[${i}] = ${prices[i]} < minPrice (was ${oldMin}) → new low found! minPrice = ${minPrice}.`, { i }, { isComparison: true });
         } else {
             const profit = prices[i] - minPrice;
-            record(6, `prices[${i}] = ${prices[i]} ≥ minPrice ${minPrice} → potential sell. profit = ${prices[i]} − ${minPrice} = ${profit}.`, { i }, { isComparison: true });
             if (profit > maxProfit) {
                 const oldProfit = maxProfit;
+                const oldBuyIdx = bestBuyIdx;
+                const oldSellIdx = bestSellIdx;
                 maxProfit = profit;
-                record(8, `profit ${profit} > maxProfit (was ${oldProfit}) → maxProfit = ${maxProfit}! Buy at ${minPrice}, sell at ${prices[i]}.`, { i });
+                bestBuyIdx = minPriceIdx;
+                bestSellIdx = i;
+                record(8, `Profit = $${profit}. Is $${profit} > $${oldProfit}? Yes! Updating Max Profit.`, { i }, {
+                    isComparison: true,
+                    isNewBest: true,
+                    prevMaxProfit: oldProfit,
+                    prevBuyIdx: oldBuyIdx,
+                    prevSellIdx: oldSellIdx,
+                    currentProfit: profit
+                });
             } else {
-                record(8, `profit ${profit} ≤ maxProfit ${maxProfit} → no update.`, { i }, { isSkip: true });
+                record(8, `sell $${prices[i]} − buy $${minPrice} = $${profit} profit ≤ best $${maxProfit} → no update.`, { i }, { isComparison: true, isSkip: true, currentProfit: profit });
             }
         }
     }
@@ -3097,9 +3243,10 @@ function generateFewestJumpsHistory() {
 }
 
 // Researcher Impact Score (LC #274) — H-Index via Sort
-function generateHIndexHistory() {
-    const citations = [3, 0, 6, 1, 5];
+function generateHIndexHistory(inputCitations) {
+    const citations = inputCitations || [3, 0, 6, 1, 5];
     const h_arr = [];
+    const unsorted = [...citations];
     const arr = [...citations].sort((a, b) => b - a); // sort descending
     let hIdx = 0;
 
@@ -3108,32 +3255,102 @@ function generateHIndexHistory() {
             msg,
             line,
             pointers: { ...pointers },
-            nums1: [...arr],
+            nums1: extra._useArr ? [...extra._useArr] : [...arr],
             nums2: [],
-            arrayMeta: { h: hIdx, originalLength: arr.length, sorted: true },
+            arrayMeta: {
+                h: hIdx,
+                originalLength: arr.length,
+                sorted: extra.phase !== 'unsorted',
+                squareSize: hIdx,             // current Durfee square side
+                trySquare: extra.trySquare ?? null, // square being tested this step
+                thresholdH: extra.thresholdH ?? null, // horizontal line height
+                passBars: extra.passBars ?? [],  // indices of bars above threshold
+                failBars: extra.failBars ?? [],  // indices of bars below threshold
+                crossingIdx: extra.crossingIdx ?? null, // where y=x diagonal crosses
+                phase: extra.phase === 'unsorted' ? 'sort' : (extra.phase ?? 'scan'),
+            },
             step: h_arr.length,
-            ...extra
+            isComparison: extra.isComparison || false,
+            isComplete: extra.isComplete || false,
+            isSkip: extra.isSkip || false,
         });
     }
 
-    record(0, `Call hIndex(citations=[${citations}]). Goal: find h such that h papers have ≥ h citations each.`);
-    record(1, `Sort descending → [${arr}]. Now citations[i] = the (i+1)th most-cited paper.`);
-    record(2, `Initialize h = 0.`);
+    // Phase: sort — show unsorted first, then sorted
+    record(0, `Call hIndex(citations=[${citations}]). Goal: find h such that h papers have ≥ h citations each.`, {}, { phase: 'unsorted', _useArr: unsorted });
+    record(1, `Sort descending → [${arr}]. Tallest bars on the left — now we can scan left to right and grow the square.`, {}, { phase: 'sort' });
+    record(2, `Initialize h = 0. The Durfee square starts at 0×0 — can we grow it?`, {}, { phase: 'sort' });
 
     for (let i = 0; i < arr.length; i++) {
-        record(3, `Move to i = ${i}. citations[${i}] = ${arr[i]}. Need citations[i] ≥ ${i + 1} to increase h.`, { i });
+        const tryH = i + 1;
+        const passBars = [];
+        const failBars = [];
+        for (let b = 0; b < arr.length; b++) {
+            if (arr[b] >= tryH) passBars.push(b);
+            else failBars.push(b);
+        }
 
-        if (arr[i] >= i + 1) {
-            hIdx = i + 1;
-            record(4, `${arr[i]} ≥ ${i + 1} → h = ${hIdx}. At least ${hIdx} papers have ≥ ${hIdx} citations.`, { i }, { isComparison: true });
+        record(3, `Try h = ${tryH}: need ≥ ${tryH} papers with ≥ ${tryH} citations. Draw a ${tryH}×${tryH} square — does it fit under the bars?`, { i }, {
+            phase: 'scan',
+            trySquare: tryH,
+            thresholdH: tryH,
+            passBars,
+            failBars,
+        });
+
+        if (arr[i] >= tryH) {
+            hIdx = tryH;
+            record(4, `citations[${i}] = ${arr[i]} ≥ ${tryH} ✓ — the ${tryH}×${tryH} square fits! ${passBars.length} bar${passBars.length > 1 ? 's' : ''} poke above the threshold line. h grows to ${hIdx}.`, { i }, {
+                isComparison: true,
+                phase: 'scan',
+                trySquare: tryH,
+                thresholdH: tryH,
+                passBars,
+                failBars,
+            });
         } else {
-            record(6, `${arr[i]} < ${i + 1} → stop. Can't have ${i + 1} papers with ≥ ${i + 1} citations.`, { i }, { isComparison: true, isSkip: true });
+            record(6, `citations[${i}] = ${arr[i]} < ${tryH} ✗ — the ${tryH}×${tryH} square overflows! Bar #${tryH} is too short. Stop here.`, { i }, {
+                isComparison: true,
+                isSkip: true,
+                phase: 'scan',
+                trySquare: tryH,
+                thresholdH: tryH,
+                passBars,
+                failBars,
+                crossingIdx: i,
+            });
             break;
         }
     }
 
-    record(8, `✓ Done! H-Index = ${hIdx}. The researcher has ${hIdx} papers with at least ${hIdx} citations each.`, {}, { isComplete: true });
+    // Final pass/fail lists for the answer
+    const finalPass = [];
+    const finalFail = [];
+    for (let b = 0; b < arr.length; b++) {
+        if (arr[b] >= hIdx) finalPass.push(b);
+        else finalFail.push(b);
+    }
+
+    record(8, `✅ H-Index = ${hIdx}. The ${hIdx}×${hIdx} Durfee square is the largest that fits under the curve. ${hIdx} papers each have ≥ ${hIdx} citations.`, {}, {
+        isComplete: true,
+        phase: 'done',
+        thresholdH: hIdx,
+        passBars: finalPass,
+        failBars: finalFail,
+    });
     return h_arr;
+}
+
+function generateHIndexEdgeHistory() {
+    return generateHIndexHistory([0, 0, 0]);
+}
+
+function generateHIndexTestCase2History() {
+    return generateHIndexHistory([100, 100]);
+}
+
+function generateHIndexTestCase3History() {
+    return generateHIndexHistory([10]);
 }
 
 // Randomized Collection (LC #380) — Design: HashMap + Array
@@ -4090,7 +4307,7 @@ function generateMergeSortedArrayHistory() {
     const merged = [...nums1];
     
     function record(msg, extra = {}) {
-        h.push({
+        const state = {
             msg,
             line: step,
             pointers: { i, j, k },
@@ -4101,13 +4318,20 @@ function generateMergeSortedArrayHistory() {
             isComparison: extra.isComparison || false,
             isComplete: extra.isComplete || false,
             step: h.length
-        });
+        };
+        if (extra.mergeSource !== undefined) {
+            state.mergeSource = extra.mergeSource;
+            state.sourceIdx = extra.sourceIdx;
+            state.targetIdx = extra.targetIdx;
+            state.placedVal = extra.placedVal;
+        }
+        h.push(state);
     }
     
     record(`We merge nums2 into nums1's buffer slots. Key insight: fill from the END so we never overwrite data we still need.`, { mergeInfo: `Filling right → left. i reads nums1, j reads nums2, k writes.` });
     step = 1;
     
-    record(`i=${i} → last real value in nums1 (${merged[i]}). j=${j} → last in nums2 (${nums2[j]}). k=${k} → last empty slot.`, { mergeInfo: `i=${i}  j=${j}  k=${k} — ready to compare` });
+    record(`Pointers set → i=index ${i} (last real value in nums1: ${merged[i]}), j=index ${j} (last in nums2: ${nums2[j]}), k=index ${k} (last empty slot).`, { mergeInfo: `i=idx ${i}  j=idx ${j}  k=idx ${k} — ready to compare` });
     step = 5;
     
     while (i >= 0 && j >= 0) {
@@ -4127,7 +4351,7 @@ function generateMergeSortedArrayHistory() {
             
             merged[k] = winVal;
             step = 8;
-            record(`nums1[${k}] = ${merged[k]} ✓`, { mergeInfo: `Placed ${merged[k]} at index ${k}` });
+            record(`nums1[${k}] = ${merged[k]} ✓`, { mergeInfo: `Placed ${merged[k]} at index ${k}`, mergeSource: 'i', sourceIdx: i, targetIdx: k, placedVal: winVal });
             
             i--;
             step = 9;
@@ -4144,7 +4368,7 @@ function generateMergeSortedArrayHistory() {
             
             merged[k] = winVal;
             step = 11;
-            record(`nums1[${k}] = ${merged[k]} ✓`, { mergeInfo: `Placed ${merged[k]} at index ${k}` });
+            record(`nums1[${k}] = ${merged[k]} ✓`, { mergeInfo: `Placed ${merged[k]} at index ${k}`, mergeSource: 'j', sourceIdx: j, targetIdx: k, placedVal: winVal });
             
             j--;
             step = 12;
@@ -4161,30 +4385,30 @@ function generateMergeSortedArrayHistory() {
     step = 14;
     
     if (j >= 0) {
-        record(`i exhausted! nums2 has ${j + 1} element(s) left — copy them directly, no comparisons needed.`, {
-            mergeInfo: `i done ✓ — copying remaining nums2 values`
+        record(`Loop condition broke: i < 0, so (i >= 0 && j >= 0) is false. nums1 is fully consumed — but nums2 still has ${j + 1} element(s). We must now loop through nums2 and copy them into nums1.`, {
+            mergeInfo: `i < 0 → exit main loop. Drain remaining nums2 into nums1`
         });
     }
     
     while (j >= 0) {
         step = 15;
-        record(`Copy nums2[${j}]=${nums2[j]} → nums1[${k}]`, { mergeInfo: `Copying: ${nums2[j]} → slot ${k}` });
+        record(`Copy nums2[${j}]=${nums2[j]} → nums1[${k}]. No comparison needed — everything left in nums2 is smaller than what's already placed.`, { mergeInfo: `Draining: nums2[${j}]=${nums2[j]} → index ${k}` });
         
         merged[k] = nums2[j];
         step = 16;
-        record(`Placed.`, { mergeInfo: `nums1[${k}] = ${merged[k]} ✓` });
+        record(`nums1[${k}] = ${merged[k]} ✓`, { mergeInfo: `Placed ${merged[k]} at index ${k}`, mergeSource: 'j', sourceIdx: j, targetIdx: k, placedVal: nums2[j] });
         
         j--;
         step = 17;
-        record(`j-- → ${j}`, { mergeInfo: j >= 0 ? `${j + 1} remaining` : `j done ✓` });
+        record(`j-- → ${j}.${j >= 0 ? ` Still ${j + 1} left to drain.` : ' nums2 fully drained!'}`, { mergeInfo: j >= 0 ? `${j + 1} remaining in nums2` : `nums2 drained ✓` });
         
         k--;
         step = 13;
-        record(`k-- → ${k}`, { mergeInfo: `k→${k}` });
+        record(`k-- → ${k}.`, { mergeInfo: `k→${k}` });
     }
     
     if (i >= 0) {
-        record(`✓ All nums2 placed! nums1 elements at 0–${i} are already correct.`, { mergeInfo: `✓ nums1[0..${i}] already in place — no moves needed` });
+        record(`✓ All of nums2 placed! nums1 elements at indices 0–${i} are already in their correct sorted positions — no moves needed.`, { mergeInfo: `✓ nums1[0..${i}] already in place` });
     }
     
     h.push({
@@ -4932,7 +5156,7 @@ function generateMergeSortedArrayEdgeHistory() {
     step = 0;
     record(`Initializing merge. nums1=[${nums1}], nums2=[] (empty!)`);
     step = 1;
-    record(`Setting pointers: i=${i}, j=${j}, k=${k}`);
+    record(`Setting pointers: i=index ${i}, j=index ${j}, k=index ${k}`);
     step = 5;
     record(`j = ${j} < 0 → nums2 is empty! Nothing to merge.`);
     step = 14;
@@ -4973,7 +5197,7 @@ function generateRemoveDuplicatesEdgeHistory() {
     const arr = [...nums];
 
     function record(line, msg, pointers = {}, extra = {}) {
-        h.push({ msg, line, pointers: { ...pointers }, nums1: [...arr], nums2: [], arrayMeta: { k, originalLength: nums.length }, step: h.length, ...extra });
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...arr], nums2: [], arrayMeta: { k, originalLength: nums.length, copyFrom: extra.copyFrom ?? null, copyTo: extra.copyTo ?? null }, step: h.length, ...extra });
     }
 
     record(0, `Call removeDuplicates(nums=[${nums}]). Goal: remove duplicates in-place.`);
@@ -4996,10 +5220,13 @@ function generateBestTradeEdgeHistory() {
     const prices = [7, 6, 4, 3, 1];
     const h = [];
     let minPrice = prices[0];
+    let minPriceIdx = 0;
     let maxProfit = 0;
+    let bestBuyIdx = -1;
+    let bestSellIdx = -1;
 
     function record(line, msg, pointers = {}, extra = {}) {
-        h.push({ msg, line, pointers: { ...pointers }, nums1: [...prices], nums2: [], arrayMeta: { minPrice, maxProfit, originalLength: prices.length }, step: h.length, ...extra });
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...prices], nums2: [], arrayMeta: { minPrice, minPriceIdx, maxProfit, bestBuyIdx, bestSellIdx, originalLength: prices.length }, step: h.length, ...extra });
     }
 
     record(0, `Call bestTrade(prices=[${prices}]). Goal: find the maximum profit from buying once and selling once.`);
@@ -5010,6 +5237,7 @@ function generateBestTradeEdgeHistory() {
         record(3, `Move to i = ${i}. prices[${i}] = ${prices[i]}. minPrice = ${minPrice}, maxProfit = ${maxProfit}.`, { i });
         const oldMin = minPrice;
         minPrice = prices[i];
+        minPriceIdx = i;
         record(4, `prices[${i}] = ${prices[i]} < minPrice (was ${oldMin}) → new low found! minPrice = ${minPrice}.`, { i }, { isComparison: true });
     }
 
@@ -5202,17 +5430,18 @@ function generateDominantElementEdgeHistory() {
     let count = 1;
 
     function record(line, msg, pointers = {}, extra = {}) {
-        h.push({ msg, line, pointers: { ...pointers }, nums1: [...nums], nums2: [], arrayMeta: { candidate, count, originalLength: nums.length }, step: h.length, ...extra });
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...nums], nums2: [], arrayMeta: { candidate, count, originalLength: nums.length, battleType: extra.battleType ?? null, prevCount: extra.prevCount ?? null, prevCandidate: extra.prevCandidate ?? null, challengerVal: extra.challengerVal ?? null }, step: h.length, ...extra });
     }
 
     record(0, `Call majorityElement(nums=[${nums}]). Goal: find the element that appears > n/2 times.`);
-    record(1, `Initialize candidate = ${candidate}.`, { i: 0 });
+    record(1, `Initialize candidate = ${candidate}.`, { i: 0 }, { battleType: 'coronation', challengerVal: candidate, prevCount: 0, prevCandidate: null });
     record(2, `Initialize count = 1.`, { i: 0 });
 
     for (let i = 1; i < nums.length; i++) {
         record(3, `i = ${i}. nums[${i}] = ${nums[i]}. candidate = ${candidate}, count = ${count}.`, { i });
+        const pc = count;
         count++;
-        record(7, `nums[${i}] = ${nums[i]} == candidate ${candidate} → count++ → ${count}.`, { i }, { isComparison: true });
+        record(7, `nums[${i}] = ${nums[i]} == candidate ${candidate} → Reinforcement! count++ → ${count}.`, { i }, { isComparison: true, battleType: 'reinforce', challengerVal: nums[i], prevCount: pc });
     }
 
     record(11, `✓ Done! candidate = ${candidate}, count = ${count}. Edge case: ALL elements are the same!`, {}, { isComplete: true });
@@ -5315,7 +5544,7 @@ function generateCycleArrayEdgeHistory() {
     const arr = [...nums];
 
     function record(line, msg, pointers = {}, extra = {}) {
-        h.push({ msg, line, pointers: { ...pointers }, nums1: [...arr], nums2: [], arrayMeta: { k: k_input, n, effectiveK: k, originalLength: n }, step: h.length, ...extra });
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...arr], nums2: [], arrayMeta: { k: k_input, n, effectiveK: k, originalLength: n, phase: '', posMap: nums.map((_, i) => i), splitAt: n - (k || n), target: [...arr], phasesCompleted: 0 }, step: h.length, ...extra });
     }
 
     record(0, `Call cycleElements(nums=[${nums}], k=${k_input}).`);
@@ -6246,6 +6475,18 @@ function render() {
             engine.appendChild(arrayContainer);
         }
         
+        // ── Change-detection: find which array cells mutated since last step ──
+        const curArr = state.nums1 || [];
+        const changedIndices = new Set();
+        if (prevArraySnapshot && prevArraySnapshot.probId === currentProbId) {
+            const prev = prevArraySnapshot.arr;
+            for (let ci = 0; ci < curArr.length; ci++) {
+                if (ci < prev.length && prev[ci] !== curArr[ci]) changedIndices.add(ci);
+            }
+        }
+        // Save snapshot AFTER computing diff (will be used on next render)
+        prevArraySnapshot = { probId: currentProbId, arr: [...curArr] };
+        
         // Problem 3: Merge Sorted Array (two arrays, three pointers: i, j, k)
         if (currentProbId === '3' && state.nums1 && state.nums2) {
             const iPtr = state.pointers?.i ?? -1;
@@ -6352,21 +6593,89 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (nums1 read)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : 'Done'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : 'Done'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">j (nums2 read)</div>
-                        <div class="pointer-detail-value p2">${jPtr >= 0 ? jPtr : 'Done'}</div>
+                        <div class="pointer-detail-value p2">${jPtr >= 0 ? `idx ${jPtr}` : 'Done'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">k (write target)</div>
-                        <div class="pointer-detail-value p-green">${kPtr >= 0 ? kPtr : 'Done'}</div>
+                        <div class="pointer-detail-value p-green">${kPtr >= 0 ? `idx ${kPtr}` : 'Done'}</div>
                     </div>
                 </div>
             `;
             html += `</div>`; // close array-inner
             
             arrayContainer.innerHTML = html;
+            
+            // ── Merge Ghost Float ──
+            // When a value wins and gets placed, spawn a ghost copy that floats from source → target
+            if (state.mergeSource !== undefined && state.targetIdx !== undefined) {
+                requestAnimationFrame(() => {
+                    // Remove any existing ghost
+                    const oldGhost = arrayContainer.querySelector('.merge-ghost');
+                    if (oldGhost) oldGhost.remove();
+                    
+                    const sections = arrayContainer.querySelectorAll('.array-visualization');
+                    const nums1Section = sections[0]; // first array-visualization = nums1
+                    const nums2Section = sections[1]; // second array-visualization = nums2
+                    if (!nums1Section || !nums2Section) return;
+                    
+                    // Find the source cell
+                    let sourceCell;
+                    if (state.mergeSource === 'i') {
+                        // Source is from nums1 — sourceIdx refers to nums1
+                        const nums1Items = nums1Section.querySelectorAll('.array-item');
+                        sourceCell = nums1Items[state.sourceIdx];
+                    } else {
+                        // Source is from nums2 — sourceIdx refers to nums2
+                        const nums2Items = nums2Section.querySelectorAll('.array-item');
+                        sourceCell = nums2Items[state.sourceIdx];
+                    }
+                    
+                    // Find the target cell (always in nums1)
+                    const nums1Items = nums1Section.querySelectorAll('.array-item');
+                    const targetCell = nums1Items[state.targetIdx];
+                    
+                    if (!sourceCell || !targetCell) return;
+                    
+                    // Get bounding rects relative to arrayContainer
+                    const containerRect = arrayContainer.getBoundingClientRect();
+                    const srcRect = sourceCell.getBoundingClientRect();
+                    const tgtRect = targetCell.getBoundingClientRect();
+                    
+                    // Compute ghost start position (center of source cell, offset to container)
+                    const startX = srcRect.left - containerRect.left + (srcRect.width / 2) - 24;
+                    const startY = srcRect.top - containerRect.top + (srcRect.height / 2) - 24;
+                    
+                    // Compute delta to target center
+                    const dx = (tgtRect.left + tgtRect.width / 2) - (srcRect.left + srcRect.width / 2);
+                    const dy = (tgtRect.top + tgtRect.height / 2) - (srcRect.top + srcRect.height / 2);
+                    
+                    // Adjust speed based on auto-play — if fast, shorten the animation
+                    const speed = parseFloat(document.querySelector('.speed-btn.active')?.dataset?.speed || '1');
+                    const baseDuration = 0.55;
+                    const duration = Math.max(0.25, baseDuration / Math.max(speed, 1));
+                    
+                    // Create ghost element
+                    const ghost = document.createElement('div');
+                    ghost.className = 'merge-ghost';
+                    ghost.textContent = state.placedVal;
+                    ghost.style.left = startX + 'px';
+                    ghost.style.top = startY + 'px';
+                    ghost.style.setProperty('--dx', dx + 'px');
+                    ghost.style.setProperty('--dy', dy + 'px');
+                    ghost.style.setProperty('--ghost-duration', duration + 's');
+                    
+                    arrayContainer.appendChild(ghost);
+                    
+                    // Clean up after animation completes
+                    ghost.addEventListener('animationend', () => ghost.remove(), { once: true });
+                    // Fallback cleanup
+                    setTimeout(() => { if (ghost.parentNode) ghost.remove(); }, (duration + 0.2) * 1000);
+                });
+            }
         }
         
         // Problems 4, 5 & 6: Single-array two-pointer (Remove Element / Remove Duplicates / Trim Excess)
@@ -6376,6 +6685,9 @@ function render() {
             const meta = state.arrayMeta || {};
             const kVal = meta.k ?? kPtr;
             const isComplete = state.isComplete || false;
+            const isP4 = currentProbId === '4';
+            const isSkip = isP4 && state.isSkip;
+            const overwrittenVal = isP4 ? (meta.overwrittenVal ?? null) : null;
             
             const sItemCount = state.nums1.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
@@ -6395,13 +6707,14 @@ function render() {
             state.nums1.forEach((val, idx) => {
                 let classes = 'array-item';
                 let pointerLabels = '';
+                let ghostOverlay = '';
                 
-                // Highlight the "kept" region (indices < k)
+                // Highlight the "kept" region (indices < k) — Problem 4 gets green, others get orange
                 if (isComplete && idx < kVal) {
-                    classes += ' pointer-merge'; // reuse merge style (orange accent)
+                    classes += isP4 ? ' re4-kept' : ' pointer-merge';
                 }
                 
-                // Active pointers
+                // Active pointers — Problem 4 uses distinct shapes
                 if (idx === iPtr && idx === kPtr) {
                     classes += ' pointer-1 pointer-2';
                     pointerLabels = `<div class="pointer-label-pair"><div class="pointer-label p1 pair-left">i</div><div class="pointer-label p2 pair-right">k</div></div>`;
@@ -6410,17 +6723,37 @@ function render() {
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 } else if (idx === kPtr) {
                     classes += ' pointer-2';
-                    pointerLabels = `<div class="pointer-label p2">k</div>`;
+                    if (isP4 && isSkip) {
+                        pointerLabels = `<div class="pointer-label p2 re4-k-frozen">k</div>`;
+                    } else {
+                        pointerLabels = `<div class="pointer-label p2">k</div>`;
+                    }
                 }
                 
-                // Dim cells beyond k when complete
+                // Dim cells beyond k when complete — Problem 4 gets ghost zone
                 if (isComplete && idx >= kVal) {
-                    classes += ' empty';
+                    classes += isP4 ? ' re4-ghost' : ' empty';
+                }
+
+                // Problem 4: on skip, the k cell itself shows a "held" pulse
+                if (isP4 && isSkip && idx === kPtr) {
+                    classes += ' re4-cell-held';
+                }
+
+                // Problem 4: scissors cut border on the first ghost cell
+                if (isP4 && isComplete && idx === kVal && kVal < state.nums1.length) {
+                    classes += ' re4-cut';
+                }
+                
+                // Problem 4: ghost overlay for overwritten value
+                if (isP4 && overwrittenVal !== null && changedIndices.has(idx)) {
+                    ghostOverlay = `<div class="re4-old-val">${overwrittenVal}</div>`;
                 }
                 
                 html += `
                     <div class="${classes}">
                         ${val}
+                        ${ghostOverlay}
                         ${pointerLabels}
                         <div class="array-index">${idx}</div>
                     </div>
@@ -6428,6 +6761,15 @@ function render() {
             });
             
             html += `</div>`; // close array-visualization
+
+            // Problem 4: "New Length" label on completion
+            if (isP4 && isComplete) {
+                if (kVal > 0) {
+                    html += `<div class="re4-newlen-label">New Length: <strong>k = ${kVal}</strong> — grader only checks indices 0…${kVal - 1}</div>`;
+                } else {
+                    html += `<div class="re4-newlen-label">New Length: <strong>k = 0</strong> — every element removed, nothing to check</div>`;
+                }
+            }
             
             // Decision bridge: explain keep vs skip
             if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
@@ -6435,11 +6777,11 @@ function render() {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
                 if (currentProbId === '4') {
                     if (readVal !== (meta.val ?? -1)) {
-                        html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${readVal}</span>`;
+                        html += `<span style="color:var(--accent-blue);font-weight:600">nums[i=${iPtr}]=${readVal}</span>`;
                         html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">≠ val(${meta.val})</span>`;
-                        html += `<span style="color:var(--accent-green)">✓ KEEP → write to nums[${kPtr}]</span>`;
+                        html += `<span style="color:var(--accent-green)">✓ KEEP → write to nums[k=${kPtr}]</span>`;
                     } else {
-                        html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${readVal}</span>`;
+                        html += `<span style="color:var(--accent-blue);font-weight:600">nums[i=${iPtr}]=${readVal}</span>`;
                         html += `<span style="color:var(--accent-red);margin:0 6px;font-weight:700">== val(${meta.val})</span>`;
                         html += `<span style="color:var(--text-muted)">→ SKIP — k stays at ${kPtr}</span>`;
                     }
@@ -6480,43 +6822,119 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (read pointer)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">k (write pointer)</div>
-                        <div class="pointer-detail-value p2">${kVal}</div>
+                        <div class="pointer-detail-value p2">idx ${kVal}</div>
                     </div>
                 </div>
             `;
             
             html += `</div>`; // close array-inner
             arrayContainer.innerHTML = html;
+
+            // ── Copy transport — slide the value box from i → k ──
+            if (meta.copyFrom != null && meta.copyTo != null) {
+                requestAnimationFrame(() => {
+                    const oldGhost = arrayContainer.querySelector('.copy-ghost');
+                    if (oldGhost) oldGhost.remove();
+
+                    const vizSection = arrayContainer.querySelector('.array-visualization');
+                    if (!vizSection) return;
+                    const items = vizSection.querySelectorAll('.array-item');
+                    const sourceCell = items[meta.copyFrom];
+                    const targetCell = items[meta.copyTo];
+                    if (!sourceCell || !targetCell) return;
+
+                    const containerRect = arrayContainer.getBoundingClientRect();
+                    const srcRect = sourceCell.getBoundingClientRect();
+                    const tgtRect = targetCell.getBoundingClientRect();
+
+                    const startX = srcRect.left - containerRect.left + (srcRect.width / 2) - 24;
+                    const startY = srcRect.top - containerRect.top + (srcRect.height / 2) - 24;
+                    const dx = (tgtRect.left + tgtRect.width / 2) - (srcRect.left + srcRect.width / 2);
+                    const dy = (tgtRect.top + tgtRect.height / 2) - (srcRect.top + srcRect.height / 2);
+
+                    const speed = parseFloat(document.querySelector('.speed-btn.active')?.dataset?.speed || '1');
+                    const duration = Math.max(0.25, 0.55 / Math.max(speed, 1));
+
+                    const ghost = document.createElement('div');
+                    ghost.className = 'copy-ghost';
+                    ghost.textContent = state.nums1[meta.copyTo]; // the value that was placed
+                    ghost.style.left = startX + 'px';
+                    ghost.style.top = startY + 'px';
+                    ghost.style.setProperty('--dx', dx + 'px');
+                    ghost.style.setProperty('--dy', dy + 'px');
+                    ghost.style.setProperty('--ghost-duration', duration + 's');
+
+                    arrayContainer.appendChild(ghost);
+                    ghost.addEventListener('animationend', () => ghost.remove(), { once: true });
+                    setTimeout(() => { if (ghost.parentNode) ghost.remove(); }, (duration + 0.3) * 1000);
+                });
+            }
         }
         
-        // Problem 7: Dominant Element (Boyer-Moore Voting) — single pointer, candidate/count
+        // Problem 7: Dominant Element (Boyer-Moore Voting) — Battle Arena
         if (currentProbId === '7' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const candidate = meta.candidate;
             const count = meta.count ?? 0;
             const isComplete = state.isComplete || false;
+            const battleType = meta.battleType;       // 'coronation' | 'reinforce' | 'clash' | null
+            const challengerVal = meta.challengerVal;
+            const prevCount = meta.prevCount ?? 0;
             
             const sItemCount = state.nums1.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">nums — find element appearing &gt; ⌊n/2⌋ times</div>`;
+            html += `<div class="array-label">nums — Battle Arena: find the element that survives</div>`;
+            
+            // ── Champion Zone (candidate stack) ──
+            html += `<div class="bm-arena">`;
+            html += `<div class="bm-champion-zone">`;
+            html += `<div class="bm-champion-title">${isComplete ? 'Victor' : 'Current Champion'}</div>`;
+            html += `<div class="bm-stack-container">`;
+            if (count > 0 && candidate != null) {
+                // Build the physical stack of blocks
+                const displayCount = Math.min(count, 8); // cap visual height
+                for (let s = 0; s < displayCount; s++) {
+                    const isTop = s === displayCount - 1;
+                    html += `<div class="bm-stack-block${isComplete ? ' bm-victor' : ''}${isTop ? ' bm-stack-top' : ''}">${candidate}</div>`;
+                }
+                if (count > 8) {
+                    html += `<div class="bm-stack-overflow">+${count - 8} more</div>`;
+                }
+            } else {
+                html += `<div class="bm-throne-empty">Empty Throne</div>`;
+            }
+            html += `</div>`; // close stack-container
+            html += `<div class="bm-count-label">Strength: <strong>${count}</strong></div>`;
+            html += `</div>`; // close champion-zone
+            html += `</div>`; // close arena
+            
+            // ── Array row ──
             html += `<div class="array-visualization">`;
             
             state.nums1.forEach((val, idx) => {
                 let classes = 'array-item';
                 let pointerLabels = '';
                 
+                // Color coding based on battle role
                 if (isComplete && val === candidate) {
-                    classes += ' pointer-merge';
+                    classes += ' bm-victor-cell';
+                } else if (idx === iPtr && !isComplete) {
+                    if (val === candidate) {
+                        classes += ' bm-friendly';  // reinforcement — green
+                    } else {
+                        classes += ' bm-enemy';     // attacker — red
+                    }
                 }
+                
                 if (idx === iPtr) {
                     classes += ' pointer-1';
-                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                    pointerLabels = `<div class="pointer-label p1">challenger</div>`;
                 }
                 
                 html += `
@@ -6530,71 +6948,191 @@ function render() {
             
             html += `</div>`;
 
-            // Bridge: explain the voting logic
-            if (iPtr >= 0 && iPtr < state.nums1.length) {
+            // ── Battle bridge: explain what happened ──
+            if (iPtr >= 0 && iPtr < state.nums1.length && !isComplete) {
                 const val = state.nums1[iPtr];
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                if (count === 0) {
-                    html += `<span style="color:var(--accent-red);font-weight:600">count = 0</span>`;
-                    html += `<span style="color:var(--text-muted);margin:0 6px">→ pick new candidate =</span>`;
-                    html += `<span style="color:var(--accent-green);font-weight:700">${candidate}</span>`;
-                } else if (val === candidate) {
-                    html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${val}</span>`;
-                    html += `<span style="color:var(--accent-green);margin:0 4px">== candidate ${candidate}</span>`;
-                    html += `<span style="color:var(--text-muted)">→</span>`;
-                    html += `<span style="color:var(--accent-green);font-weight:700;margin-left:4px">count++ = ${count}</span>`;
+                if (battleType === 'coronation') {
+                    html += `<span style="color:var(--accent-red);font-weight:600">Throne is empty!</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">→</span>`;
+                    html += `<span style="color:var(--bm-gold);font-weight:700">${candidate} takes the crown</span>`;
+                } else if (battleType === 'reinforce') {
+                    html += `<span style="color:var(--accent-green);font-weight:600">${val} == Champion ${candidate}</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">→</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">Reinforcement! Strength ${prevCount} → ${count}</span>`;
+                } else if (battleType === 'clash') {
+                    html += `<span style="color:var(--accent-red);font-weight:600">${val} ≠ Champion ${candidate}</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">→</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:700">Clash! Both fall — Strength ${prevCount} → ${count}</span>`;
+                    if (count === 0) {
+                        html += `<span style="color:var(--accent-red);margin-left:6px;font-weight:600">Throne empty!</span>`;
+                    }
                 } else {
-                    html += `<span style="color:var(--accent-blue);font-weight:600">nums[${iPtr}]=${val}</span>`;
-                    html += `<span style="color:var(--accent-red);margin:0 4px">≠ candidate ${candidate}</span>`;
-                    html += `<span style="color:var(--text-muted)">→</span>`;
-                    html += `<span style="color:var(--accent-orange);font-weight:700;margin-left:4px">count-- = ${count}</span>`;
+                    html += `<span style="color:var(--text-muted)">Scanning nums[${iPtr}] = ${val}…</span>`;
                 }
                 html += `</div></div>`;
             } else if (isComplete) {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">✓ ${candidate} is the dominant element (appears > ⌊n/2⌋ times)</span>`;
+                html += `<span style="color:var(--bm-gold);font-weight:700">${candidate} is the dominant element — survived the battle with strength ${count}</span>`;
                 html += `</div></div>`;
             }
 
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">i (scanner)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-label">Challenger (i)</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">candidate</div>
-                        <div class="pointer-detail-value p-merge">${candidate ?? '—'}</div>
+                        <div class="pointer-detail-label">Champion</div>
+                        <div class="pointer-detail-value" style="color:var(--bm-gold);border-color:var(--bm-gold)">${candidate ?? '—'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">count</div>
+                        <div class="pointer-detail-label">Strength</div>
                         <div class="pointer-detail-value p2">${count}</div>
                     </div>
                 </div>
             `;
             html += `</div>`;
             arrayContainer.innerHTML = html;
+
+            // ── Battle Animations ──
+            if (battleType && iPtr >= 0) {
+                requestAnimationFrame(() => {
+                    // Remove any existing battle ghost
+                    const oldGhost = arrayContainer.querySelector('.bm-battle-ghost');
+                    if (oldGhost) oldGhost.remove();
+
+                    const vizSection = arrayContainer.querySelector('.array-visualization');
+                    const stackContainer = arrayContainer.querySelector('.bm-stack-container');
+                    if (!vizSection || !stackContainer) return;
+
+                    const items = vizSection.querySelectorAll('.array-item');
+                    const sourceCell = items[iPtr];
+                    if (!sourceCell) return;
+
+                    const containerRect = arrayContainer.getBoundingClientRect();
+                    const srcRect = sourceCell.getBoundingClientRect();
+
+                    // Target: top of the stack (or the empty throne)
+                    const topBlock = stackContainer.querySelector('.bm-stack-top') || stackContainer.querySelector('.bm-throne-empty');
+                    if (!topBlock) return;
+                    const tgtRect = topBlock.getBoundingClientRect();
+
+                    const startX = srcRect.left - containerRect.left + (srcRect.width / 2) - 22;
+                    const startY = srcRect.top - containerRect.top + (srcRect.height / 2) - 22;
+                    const dx = (tgtRect.left + tgtRect.width / 2) - (srcRect.left + srcRect.width / 2);
+                    const dy = (tgtRect.top + tgtRect.height / 2) - (srcRect.top + srcRect.height / 2);
+
+                    const speed = parseFloat(document.querySelector('.speed-btn.active')?.dataset?.speed || '1');
+                    const duration = Math.max(0.2, 0.5 / Math.max(speed, 1));
+
+                    const ghost = document.createElement('div');
+                    ghost.className = 'bm-battle-ghost';
+                    ghost.textContent = challengerVal;
+                    ghost.style.left = startX + 'px';
+                    ghost.style.top = startY + 'px';
+                    ghost.style.setProperty('--dx', dx + 'px');
+                    ghost.style.setProperty('--dy', dy + 'px');
+                    ghost.style.setProperty('--ghost-duration', duration + 's');
+
+                    if (battleType === 'reinforce') {
+                        ghost.classList.add('bm-ghost-reinforce');
+                    } else if (battleType === 'clash') {
+                        ghost.classList.add('bm-ghost-clash');
+                    } else if (battleType === 'coronation') {
+                        ghost.classList.add('bm-ghost-coronation');
+                    }
+
+                    arrayContainer.appendChild(ghost);
+                    ghost.addEventListener('animationend', () => ghost.remove(), { once: true });
+                    setTimeout(() => { if (ghost.parentNode) ghost.remove(); }, (duration + 0.3) * 1000);
+                });
+            }
         }
         
-        // Problem 8: Cycle Array Elements (Reverse Three Times) — lo/hi swap pointers
+        // Problem 8: Cycle Array Elements (Reverse Three Times) — clean rotation visual
         if (currentProbId === '8' && state.nums1) {
             const lo = state.pointers?.lo ?? -1;
             const hi = state.pointers?.hi ?? -1;
             const meta = state.arrayMeta || {};
             const isComplete = state.isComplete || false;
+            const kVal = meta.k ?? 0;
+            const nVal = meta.n ?? state.nums1.length;
+            const phase = meta.phase || '';
+            const posMap = meta.posMap || [];
+            const splitAt = meta.splitAt ?? (nVal - kVal);
+            const target = meta.target || [];
+            const pc = meta.phasesCompleted ?? 0;
             
             const sItemCount = state.nums1.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
-            let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">nums — rotate right by k = ${meta.k ?? '?'} positions${meta.phase ? ' (phase: ' + meta.phase + ')' : ''}</div>`;
+            let html = `<div class="array-inner cy-compact${sDenseClass}">`;
+            html += `<div class="array-label">nums — rotate right by k = ${kVal}`;
+            if (kVal > 0) {
+                html += `<button class="cy-insight-btn" onclick="openInsightModal()" title="Why does this work?">i</button>`;
+            }
+            html += `</div>`;
+
+            // ── Blueprint stepper: shows the 3-step trick ──
+            if (!isComplete && kVal > 0) {
+                html += `<div class="cy-blueprint">`;
+                html += `<div class="cy-bp-step${phase === 'full' ? ' cy-bp-active' : ''}${pc >= 1 ? ' cy-bp-done' : ''}">`;
+                html += `<span class="cy-bp-num">1</span><span class="cy-bp-text">Reverse All</span>`;
+                html += `</div>`;
+                html += `<span class="cy-bp-arrow">→</span>`;
+                html += `<div class="cy-bp-step${phase === 'left' ? ' cy-bp-active' : ''}${pc >= 2 ? ' cy-bp-done' : ''}">`;
+                html += `<span class="cy-bp-num">2</span><span class="cy-bp-text">Fix Front [0..${kVal - 1}]</span>`;
+                html += `</div>`;
+                html += `<span class="cy-bp-arrow">→</span>`;
+                html += `<div class="cy-bp-step${phase === 'right' ? ' cy-bp-active' : ''}${pc >= 3 ? ' cy-bp-done' : ''}">`;
+                html += `<span class="cy-bp-num">3</span><span class="cy-bp-text">Fix Back [${kVal}..${nVal - 1}]</span>`;
+                html += `</div>`;
+                html += `</div>`;
+            }
+
+            // ── "Why" line — the key insight per phase ──
+            if (!isComplete && kVal > 0) {
+                let whyText = '';
+                if (!phase || phase === '') {
+                    whyText = `The last <span style="color:var(--accent-orange)">k = ${kVal} elements (orange)</span> need to move to the front. The remaining <span style="color:var(--accent-blue)">${nVal - kVal} elements (blue)</span> shift to the back.`;
+                } else if (phase === 'full') {
+                    whyText = `Reversing [0..${nVal - 1}] — the <span style="color:var(--accent-orange)">orange elements</span> land at the front, but everything is backwards.`;
+                } else if (phase === 'left') {
+                    whyText = `The <span style="color:var(--accent-orange)">orange section</span> landed backwards. Reverse [0..${kVal - 1}] to fix their order.`;
+                } else if (phase === 'right') {
+                    whyText = `The <span style="color:var(--accent-blue)">blue section</span> is still backwards. Reverse [${kVal}..${nVal - 1}] to fix their order.`;
+                }
+                if (whyText) {
+                    html += `<div class="cy-why">${whyText}</div>`;
+                }
+            }
+            
+            // ── Main array with segment coloring ──
             html += `<div class="array-visualization">`;
             
             state.nums1.forEach((val, idx) => {
                 let classes = 'array-item';
                 let pointerLabels = '';
                 
-                if (isComplete) {
-                    classes += ' pointer-merge';
+                const origIdx = posMap[idx];
+                if (origIdx != null && !isComplete) {
+                    if (origIdx < splitAt) {
+                        classes += ' cy-stay-back';
+                    } else {
+                        classes += ' cy-move-front';
+                    }
+                }
+                
+                if (isComplete) classes += ' pointer-merge';
+                
+                // Dim out-of-scope cells
+                if (!isComplete && phase) {
+                    let inScope = false;
+                    if (phase === 'full') inScope = true;
+                    else if (phase === 'left') inScope = idx < kVal;
+                    else if (phase === 'right') inScope = idx >= kVal;
+                    if (!inScope) classes += ' cy-out-of-scope';
                 }
                 
                 if (idx === lo && idx === hi) {
@@ -6608,58 +7146,111 @@ function render() {
                     pointerLabels = `<div class="pointer-label p2">hi</div>`;
                 }
                 
-                html += `
-                    <div class="${classes}">
-                        ${val}
-                        ${pointerLabels}
-                        <div class="array-index">${idx}</div>
-                    </div>
-                `;
+                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
             });
             
             html += `</div>`;
 
-            // Bridge: swap explanation per phase
-            if (lo >= 0 && hi >= 0 && lo < state.nums1.length && hi < state.nums1.length && !isComplete) {
-                const phase = meta.phase || '';
-                const phaseLabel = phase === 'full' ? 'Reverse entire array' : phase === 'left' ? `Reverse first k=${meta.k} elements` : phase === 'right' ? `Reverse remaining [${meta.k}..${state.nums1.length - 1}]` : 'Reversing';
-                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-purple);font-weight:600;font-size:11px">${phaseLabel}</span>`;
-                html += `<span style="color:var(--text-muted);margin:0 6px">|</span>`;
-                html += `<span style="color:var(--accent-blue);font-weight:600">nums[${lo}]=${state.nums1[lo]}</span>`;
-                html += `<span style="color:var(--accent-green);margin:0 4px;font-weight:700">⇄</span>`;
-                html += `<span style="color:var(--accent-orange);font-weight:600">nums[${hi}]=${state.nums1[hi]}</span>`;
-                html += `</div></div>`;
-            } else if (isComplete) {
-                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">✓ Rotated right by k=${meta.k}: [${state.nums1}]</span>`;
-                html += `</div></div>`;
-            } else if (meta.phase) {
-                const phase = meta.phase;
-                const phaseLabel = phase === 'full' ? 'Step 1: Reverse entire array' : phase === 'left' ? `Step 2: Reverse first k=${meta.k}` : `Step 3: Reverse rest [${meta.k}..end]`;
-                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-purple);font-weight:600">${phaseLabel}</span>`;
+            // ── Ghost target row ──
+            if (target.length > 0 && !isComplete) {
+                html += `<div class="cy-ghost-target">`;
+                html += `<div class="cy-ghost-label">Goal</div>`;
+                html += `<div class="array-visualization cy-ghost-cells">`;
+                target.forEach((val, idx) => {
+                    const origIdx = idx < kVal ? (splitAt + idx) : (idx - kVal);
+                    let segClass = origIdx < splitAt ? 'cy-ghost-blue' : 'cy-ghost-orange';
+                    const matched = state.nums1[idx] === val;
+                    html += `<div class="array-item cy-ghost-cell ${segClass}${matched ? ' cy-ghost-matched' : ''}">${val}<div class="array-index">${idx}</div></div>`;
+                });
                 html += `</div></div>`;
             }
 
+            // ── Completion bridge ──
+            if (isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Rotated right by k=${kVal}: [${state.nums1}]</span>`;
+                html += `</div></div>`;
+            }
+
+            // ── Pointer info ──
+            const phaseIntent = phase === 'full' ? 'Reverse All' : phase === 'left' ? 'Fix Front' : phase === 'right' ? 'Fix Back' : '—';
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">lo (left pointer)</div>
-                        <div class="pointer-detail-value p1">${lo >= 0 ? lo : '—'}</div>
+                        <div class="pointer-detail-label">k</div>
+                        <div class="pointer-detail-value" style="color:var(--accent-purple);border-color:var(--accent-purple)">${kVal}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">hi (right pointer)</div>
-                        <div class="pointer-detail-value p2">${hi >= 0 ? hi : '—'}</div>
+                        <div class="pointer-detail-label">n</div>
+                        <div class="pointer-detail-value" style="color:var(--text-muted);border-color:var(--border-color)">${nVal}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">phase</div>
-                        <div class="pointer-detail-value p-merge">${meta.phase || '—'}</div>
+                        <div class="pointer-detail-label">lo</div>
+                        <div class="pointer-detail-value p1">${lo >= 0 ? `idx ${lo}` : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">hi</div>
+                        <div class="pointer-detail-value p2">${hi >= 0 ? `idx ${hi}` : '—'}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">step</div>
+                        <div class="pointer-detail-value" style="color:var(--accent-purple);border-color:var(--accent-purple)">${phaseIntent}</div>
                     </div>
                 </div>
             `;
             html += `</div>`;
             arrayContainer.innerHTML = html;
+
+            // ── Swap fly animation — two ghosts cross paths ──
+            if (state.swapIndices && state.swapVals) {
+                requestAnimationFrame(() => {
+                    const arrayViz = arrayContainer.querySelector('.array-visualization');
+                    if (!arrayViz) return;
+                    const cells = arrayViz.querySelectorAll('.array-item');
+                    const cellA = cells[state.swapIndices[0]];
+                    const cellB = cells[state.swapIndices[1]];
+                    if (!cellA || !cellB) return;
+
+                    // Remove previous swap ghosts
+                    arrayContainer.querySelectorAll('.cy-swap-ghost').forEach(g => g.remove());
+
+                    const containerRect = arrayContainer.getBoundingClientRect();
+                    const rectA = cellA.getBoundingClientRect();
+                    const rectB = cellB.getBoundingClientRect();
+
+                    const speed = parseFloat(document.querySelector('.speed-btn.active')?.dataset?.speed || '1');
+                    const baseDuration = 0.5;
+                    const duration = Math.max(0.2, baseDuration / Math.max(speed, 1));
+
+                    function makeSwapGhost(val, fromRect, toRect, colorVar, arcDir) {
+                        const ghost = document.createElement('div');
+                        ghost.className = 'cy-swap-ghost';
+                        ghost.textContent = val;
+                        ghost.style.left = (fromRect.left - containerRect.left + fromRect.width / 2 - 20) + 'px';
+                        ghost.style.top = (fromRect.top - containerRect.top + fromRect.height / 2 - 20) + 'px';
+                        const dx = (toRect.left + toRect.width / 2) - (fromRect.left + fromRect.width / 2);
+                        ghost.style.setProperty('--dx', dx + 'px');
+                        ghost.style.setProperty('--arc', arcDir + 'px');
+                        ghost.style.setProperty('--swap-duration', duration + 's');
+                        ghost.style.borderColor = `var(${colorVar})`;
+                        ghost.style.color = `var(${colorVar})`;
+                        ghost.style.boxShadow = `0 0 12px color-mix(in srgb, var(${colorVar}) 50%, transparent)`;
+                        arrayContainer.appendChild(ghost);
+                        ghost.addEventListener('animationend', () => ghost.remove(), { once: true });
+                        setTimeout(() => { if (ghost.parentNode) ghost.remove(); }, (duration + 0.3) * 1000);
+                    }
+
+                    // Determine color based on which segment each element belongs to
+                    const origA = posMap[state.swapIndices[0]];
+                    const colorA = (origA != null && origA >= splitAt) ? '--accent-orange' : '--accent-blue';
+                    const origB = posMap[state.swapIndices[1]];
+                    const colorB = (origB != null && origB >= splitAt) ? '--accent-orange' : '--accent-blue';
+
+                    // Ghost A arcs up, Ghost B arcs down — they cross in the middle
+                    makeSwapGhost(state.swapVals[0], rectA, rectB, colorA, -30);
+                    makeSwapGhost(state.swapVals[1], rectB, rectA, colorB, 30);
+                });
+            }
         }
         
         // Problem 9: Best Moment to Trade (single pass) — price chart + buy/sell visual
@@ -6667,52 +7258,68 @@ function render() {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const minPrice = meta.minPrice;
+            const minPriceIdx = meta.minPriceIdx ?? -1;
             const maxProfit = meta.maxProfit ?? 0;
+            const bestBuyIdx = meta.bestBuyIdx ?? -1;
+            const bestSellIdx = meta.bestSellIdx ?? -1;
             const isComplete = state.isComplete || false;
+            const isNewBest = state.isNewBest || false;
+            const prevMaxProfit = state.prevMaxProfit ?? 0;
+            const prevBuyIdx = state.prevBuyIdx ?? -1;
+            const prevSellIdx = state.prevSellIdx ?? -1;
+            const currentProfit = state.currentProfit ?? 0;
+            const isComparison = state.isComparison || false;
             const prices = state.nums1;
             const maxP = Math.max(...prices, 1);
 
-            // Find the buy/sell indices for highlighting
-            let buyIdx = -1, sellIdx = -1;
-            if (maxProfit > 0) {
-                let mp = prices[0];
-                for (let k = 1; k < prices.length; k++) {
-                    if (prices[k] - mp === maxProfit && buyIdx === -1) { sellIdx = k; }
-                    if (prices[k] < mp) { mp = prices[k]; buyIdx = -1; sellIdx = -1; }
-                    if (prices[k] === mp) buyIdx = k;
-                }
-                // re-derive properly
-                buyIdx = -1; sellIdx = -1;
-                let runMin = prices[0], runMinIdx = 0;
-                for (let k = 1; k < prices.length; k++) {
-                    if (prices[k] < runMin) { runMin = prices[k]; runMinIdx = k; }
-                    if (prices[k] - runMin === maxProfit) { buyIdx = runMinIdx; sellIdx = k; }
-                }
-            }
-
             const sItemCount = prices.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
-            let html = `<div class="array-inner${sDenseClass}">`;
+            let html = `<div class="array-inner${sDenseClass} stock-inner">`;
             html += `<div class="array-label">prices — find max profit (buy once, sell once)</div>`;
 
-            // Price chart with bars
-            html += `<div class="array-visualization price-chart-viz">`;
+            // ── Price chart with bars ──
+            html += `<div class="array-visualization price-chart-viz" id="stock-chart-viz">`;
             prices.forEach((val, idx) => {
                 let classes = 'array-item price-bar';
                 let pointerLabels = '';
                 const barPct = (val / maxP) * 100;
+                const minPricePct = (minPrice / maxP) * 100;
 
-                // Color coding: green = minPrice so far, blue = current, orange = sell candidate
-                if (isComplete && idx === buyIdx) classes += ' price-buy';
-                if (isComplete && idx === sellIdx) classes += ' price-sell';
-                if (!isComplete && val === minPrice && idx <= iPtr) classes += ' price-low';
-                if (idx === iPtr) {
+                // Color coding
+                if (isComplete && idx === bestBuyIdx) classes += ' price-buy';
+                if (isComplete && idx === bestSellIdx) classes += ' price-sell';
+                if (!isComplete && val === minPrice && idx <= iPtr && idx === minPriceIdx) classes += ' price-low';
+                if (idx === iPtr && !isComplete) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
 
-                html += `<div class="${classes}" style="--bar-h:${barPct}%">`;
+                // ── Feature 2: Profit Gap — green block from minPrice floor to bar top ──
+                let profitBlock = '';
+                const showProfitGap = (
+                    (isComparison && idx === iPtr && !isComplete && val > minPrice) ||
+                    (isComplete && idx === bestSellIdx && maxProfit > 0)
+                );
+                if (showProfitGap && val > minPrice) {
+                    const gapProfit = isComplete ? maxProfit : (val - minPrice);
+                    const gapTopPct = barPct;
+                    const gapBottomPct = minPricePct;
+                    const gapClass = isNewBest ? 'profit-gap-block profit-gap-best' : 'profit-gap-block';
+                    profitBlock = `<div class="${gapClass}" style="--gap-bottom:${gapBottomPct}%;--gap-top:${gapTopPct}%"><span class="profit-gap-label">+$${gapProfit}</span></div>`;
+                }
+
+                // ── Feature 3: Ghost previous record holder ──
+                let ghostOutline = '';
+                if (isNewBest && prevSellIdx >= 0 && prevMaxProfit > 0 && idx === prevSellIdx) {
+                    const ghostPct = ((prices[prevSellIdx]) / maxP) * 100;
+                    const ghostFloorPct = (prices[prevBuyIdx] / maxP) * 100;
+                    ghostOutline = `<div class="profit-ghost-outline" style="--ghost-bottom:${ghostFloorPct}%;--ghost-top:${ghostPct}%"><span class="profit-ghost-label">$${prevMaxProfit}</span></div>`;
+                }
+
+                html += `<div class="${classes}" style="--bar-h:${barPct}%" data-idx="${idx}">`;
                 html += `<span class="price-val">$${val}</span>`;
+                html += profitBlock;
+                html += ghostOutline;
                 html += `${pointerLabels}<div class="array-index">day ${idx}</div></div>`;
             });
             html += `</div>`;
@@ -6722,54 +7329,149 @@ function render() {
                 html += `<div class="price-floor-line"><span style="color:var(--accent-green);font-size:11px;font-weight:600">minPrice floor = $${minPrice}</span></div>`;
             }
 
-            // Bridge: profit calculation
-            if (iPtr >= 0 && iPtr < prices.length && !isComplete) {
+            // ── Bridge: profit calculation with Feature 1 state-sync logic ──
+            if (iPtr >= 0 && iPtr < prices.length && !isComplete && isComparison) {
                 const price = prices[iPtr];
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                if (price < minPrice || (price === minPrice && iPtr > 0)) {
+                if (price < minPrice || (price === minPrice && iPtr > 0 && iPtr === minPriceIdx)) {
                     html += `<span style="color:var(--accent-blue);font-weight:600">$${price}</span>`;
                     html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">< minPrice $${meta.minPrice}</span>`;
-                    html += `<span style="color:var(--text-muted)">→ new low! Buy here 📉</span>`;
+                    html += `<span style="color:var(--text-muted)">→ new low! Buy here</span>`;
+                } else if (isNewBest) {
+                    // Feature 1: Explicit evaluation frame
+                    html += `<span style="color:var(--accent-green);font-weight:600">sell $${price}</span>`;
+                    html += `<span class="sum-bridge-op">−</span>`;
+                    html += `<span style="color:var(--accent-orange);font-weight:600">buy $${minPrice}</span>`;
+                    html += `<span class="sum-bridge-eq">=</span>`;
+                    html += `<span style="font-weight:700;color:var(--accent-green)">$${currentProfit} profit</span>`;
+                    html += `<span style="color:var(--text-secondary);margin:0 6px">→</span>`;
+                    html += `<span style="font-weight:700;color:var(--accent-green)">$${currentProfit} > $${prevMaxProfit}? Yes!</span>`;
+                    html += `<span style="color:var(--text-secondary);margin-left:6px">Updating Max Profit</span>`;
                 } else {
                     const profit = price - minPrice;
                     html += `<span style="color:var(--accent-green);font-weight:600">sell $${price}</span>`;
                     html += `<span class="sum-bridge-op">−</span>`;
                     html += `<span style="color:var(--accent-orange);font-weight:600">buy $${minPrice}</span>`;
                     html += `<span class="sum-bridge-eq">=</span>`;
-                    html += `<span style="color:var(--accent-purple);font-weight:700">$${profit} profit</span>`;
-                    if (profit > maxProfit) {
-                        html += `<span style="color:var(--accent-green);margin-left:8px;font-weight:700">NEW BEST! 🎯</span>`;
-                    } else if (profit === maxProfit && profit > 0) {
-                        html += `<span style="color:var(--accent-green);margin-left:8px">= best $${maxProfit}</span>`;
+                    html += `<span style="font-weight:700;color:var(--text-secondary)">$${profit} profit</span>`;
+                    if (profit === maxProfit && profit > 0) {
+                        html += `<span style="color:var(--text-muted);margin-left:8px">= best $${maxProfit}</span>`;
                     } else {
                         html += `<span style="color:var(--text-muted);margin-left:8px">≤ best $${maxProfit}</span>`;
                     }
                 }
                 html += `</div></div>`;
+            } else if (iPtr >= 0 && iPtr < prices.length && !isComplete && !isComparison) {
+                // Scanning step — show what we're looking at
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--text-muted)">Scanning day ${iPtr}: prices[${iPtr}] = $${prices[iPtr]}</span>`;
+                html += `</div></div>`;
             } else if (isComplete) {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">✓ Buy at $${prices[buyIdx] ?? minPrice} (day ${buyIdx >= 0 ? buyIdx : '?'}) → Sell at $${prices[sellIdx] ?? '?'} (day ${sellIdx >= 0 ? sellIdx : '?'}) = $${maxProfit} profit</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ Buy at $${prices[bestBuyIdx] ?? minPrice} (day ${bestBuyIdx >= 0 ? bestBuyIdx : '?'}) → Sell at $${prices[bestSellIdx] ?? '?'} (day ${bestSellIdx >= 0 ? bestSellIdx : '?'}) = $${maxProfit} profit</span>`;
                 html += `</div></div>`;
+            }
+
+            // ── Feature 1: maxProfit box with flash animation on update ──
+            const mpFlashClass = isNewBest ? ' stock-mp-flash' : '';
+            let mpContent;
+            if (isNewBest) {
+                // Show old value crossing out, then new value appearing
+                mpContent = `<span class="stock-mp-old">$${prevMaxProfit}</span><span class="stock-mp-new">$${maxProfit}</span>`;
+            } else {
+                mpContent = `$${maxProfit}`;
             }
 
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (scanner)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">minPrice 📉</div>
+                        <div class="pointer-detail-label">minPrice</div>
                         <div class="pointer-detail-value p2">${minPrice != null ? '$' + minPrice : '—'}</div>
                     </div>
-                    <div class="pointer-detail">
-                        <div class="pointer-detail-label">maxProfit 💰</div>
-                        <div class="pointer-detail-value p-merge">$${maxProfit}</div>
+                    <div class="pointer-detail stock-mp-box${mpFlashClass}">
+                        <div class="pointer-detail-label">maxProfit</div>
+                        <div class="pointer-detail-value p-merge">${mpContent}</div>
                     </div>
                 </div>
             `;
             html += `</div>`;
             arrayContainer.innerHTML = html;
+
+            // ── Feature 4: Trade arc — connect minPrice bar to scanner bar ──
+            if (isComparison && !isComplete && iPtr >= 1 && minPriceIdx >= 0 && minPriceIdx < iPtr && prices[iPtr] >= minPrice) {
+                const chartEl = arrayContainer.querySelector('#stock-chart-viz');
+                const buyBar = chartEl?.querySelector(`[data-idx="${minPriceIdx}"]`);
+                const sellBar = chartEl?.querySelector(`[data-idx="${iPtr}"]`);
+                if (chartEl && buyBar && sellBar) {
+                    requestAnimationFrame(() => {
+                        const chartRect = chartEl.getBoundingClientRect();
+                        const buyBarRect = buyBar.getBoundingClientRect();
+                        const sellBarRect = sellBar.getBoundingClientRect();
+                        // bar-h percentages (same formula used in --bar-h CSS var)
+                        const buyPct = minPrice / maxP;
+                        const sellPct = prices[iPtr] / maxP;
+                        // x = center of each bar element
+                        const x1 = buyBarRect.left + buyBarRect.width / 2 - chartRect.left;
+                        const x2 = sellBarRect.left + sellBarRect.width / 2 - chartRect.left;
+                        // y = top of the visible ::before bar
+                        // ::before is position:absolute, bottom:0, height:var(--bar-h)
+                        // so its top edge = container.bottom - container.height * barPct
+                        const y1 = buyBarRect.bottom - (buyBarRect.height * buyPct) - chartRect.top;
+                        const y2 = sellBarRect.bottom - (sellBarRect.height * sellPct) - chartRect.top;
+                        const midX = (x1 + x2) / 2;
+                        const arcHeight = Math.min(Math.abs(x2 - x1) * 0.12, 30) + 14;
+                        const midY = Math.min(y1, y2) - arcHeight;
+                        const arcPath = `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`;
+                        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                        svg.classList.add('trade-arc-svg');
+                        svg.setAttribute('width', chartRect.width);
+                        svg.setAttribute('height', chartRect.height);
+                        svg.setAttribute('viewBox', `0 0 ${chartRect.width} ${chartRect.height}`);
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', arcPath);
+                        path.classList.add('trade-arc-path');
+                        // arrowhead
+                        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                        marker.setAttribute('id', 'trade-arrow');
+                        marker.setAttribute('viewBox', '0 0 10 10');
+                        marker.setAttribute('refX', '10');
+                        marker.setAttribute('refY', '5');
+                        marker.setAttribute('markerWidth', '6');
+                        marker.setAttribute('markerHeight', '6');
+                        marker.setAttribute('orient', 'auto-start-reverse');
+                        const arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+                        arrowPath.setAttribute('fill', 'rgba(16, 185, 129, 0.6)');
+                        marker.appendChild(arrowPath);
+                        defs.appendChild(marker);
+                        svg.appendChild(defs);
+                        path.setAttribute('marker-end', 'url(#trade-arrow)');
+                        svg.appendChild(path);
+                        // "buy → sell" label at midpoint
+                        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        text.setAttribute('x', midX);
+                        text.setAttribute('y', midY - 4);
+                        text.classList.add('trade-arc-label');
+                        text.textContent = 'buy → sell';
+                        svg.appendChild(text);
+                        chartEl.appendChild(svg);
+                    });
+                }
+            }
+
+            // ── Feature 3: Ghost outline on previous best sell bar (after DOM ready) ──
+            if (isNewBest && prevSellIdx >= 0 && prevMaxProfit > 0) {
+                const chartEl = arrayContainer.querySelector('#stock-chart-viz');
+                const prevBar = chartEl?.querySelector(`[data-idx="${prevSellIdx}"]`);
+                if (prevBar) {
+                    prevBar.classList.add('stock-prev-best');
+                }
+            }
         }
         
         // Problem 10: Best Moments to Trade (greedy) — price chart with gain/loss coloring
@@ -6855,7 +7557,7 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (scanner)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">totalProfit 💰</div>
@@ -6949,15 +7651,15 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (current index)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">farthest reachable</div>
-                        <div class="pointer-detail-value p-merge">${farthest}</div>
+                        <div class="pointer-detail-value p-merge">idx ${farthest}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">goal (last index)</div>
-                        <div class="pointer-detail-value">${lastIdx}</div>
+                        <div class="pointer-detail-value">idx ${lastIdx}</div>
                     </div>
                 </div>
             `;
@@ -7045,7 +7747,7 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (scanner)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">jumps 🦘</div>
@@ -7053,11 +7755,11 @@ function render() {
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">curEnd (level boundary)</div>
-                        <div class="pointer-detail-value p2">${curEnd}</div>
+                        <div class="pointer-detail-value p2">idx ${curEnd}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">farthest</div>
-                        <div class="pointer-detail-value">${farthest}</div>
+                        <div class="pointer-detail-value">idx ${farthest}</div>
                     </div>
                 </div>
             `;
@@ -7065,62 +7767,159 @@ function render() {
             arrayContainer.innerHTML = html;
         }
         
-        // Problem 13: H-Index — threshold visual with citation bars
+        // Problem 13: H-Index — Durfee-square geometric visualization (SVG)
         if (currentProbId === '13' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const hVal = meta.h ?? 0;
             const isComplete = state.isComplete || false;
             const citations = state.nums1;
-            const maxC = Math.max(...citations, 1);
-            
-            const sItemCount = citations.length;
+            const n = citations.length;
+            const maxC = Math.max(...citations, n, 1);
+            const phase = meta.phase || 'scan';
+            const trySquare = meta.trySquare ?? null;
+            const thresholdH = meta.thresholdH ?? null;
+            const passBars = meta.passBars || [];
+            const failBars = meta.failBars || [];
+            const crossingIdx = meta.crossingIdx ?? null;
+            const squareSize = meta.squareSize ?? 0;
+
+            // SVG geometry constants
+            const svgW = 520, svgH = 280;
+            const pad = { top: 24, right: 20, bottom: 32, left: 44 };
+            const plotW = svgW - pad.left - pad.right;
+            const plotH = svgH - pad.top - pad.bottom;
+            const barGap = Math.max(2, Math.min(6, Math.floor(plotW / n * 0.12)));
+            const barW = Math.max(12, (plotW - barGap * (n - 1)) / n);
+            const scaleY = (v) => pad.top + plotH - (v / maxC) * plotH;
+            const scaleX = (i) => pad.left + i * (barW + barGap);
+
+            const sItemCount = n;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
+            const isSorted = meta.sorted !== false;
             let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">citations (sorted desc) — find h: the largest h where h papers have ≥ h citations</div>`;
+            html += `<div class="array-label">${isSorted ? 'citations (sorted desc) — find largest h×h Durfee square that fits under the bars' : 'citations (unsorted) — must sort descending first'}</div>`;
 
-            // Citation bars with threshold
-            html += `<div class="array-visualization price-chart-viz">`;
+            // ─── SVG chart ───
+            html += `<div class="hindex-svg-wrap">`;
+            html += `<svg class="hindex-svg" width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet">`;
+            html += `<defs>`;
+            html += `<pattern id="hatch-pass" patternUnits="userSpaceOnUse" width="6" height="6"><path d="M0,6 L6,0" stroke="rgba(16,185,129,0.25)" stroke-width="1"/></pattern>`;
+            html += `<pattern id="hatch-fail" patternUnits="userSpaceOnUse" width="6" height="6"><path d="M0,6 L6,0" stroke="rgba(239,68,68,0.25)" stroke-width="1"/></pattern>`;
+            html += `</defs>`;
+
+            // Y-axis gridlines + labels
+            const yTicks = [];
+            const tickStep = maxC <= 5 ? 1 : maxC <= 12 ? 2 : maxC <= 30 ? 5 : 10;
+            for (let t = 0; t <= maxC; t += tickStep) yTicks.push(t);
+            if (yTicks[yTicks.length - 1] !== maxC && maxC - yTicks[yTicks.length - 1] > tickStep * 0.3) yTicks.push(maxC);
+            yTicks.forEach(t => {
+                const y = scaleY(t);
+                html += `<line x1="${pad.left}" y1="${y}" x2="${svgW - pad.right}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+                html += `<text x="${pad.left - 8}" y="${y + 4}" text-anchor="end" class="hindex-axis-label">${t}</text>`;
+            });
+
+            // X-axis baseline
+            html += `<line x1="${pad.left}" y1="${scaleY(0)}" x2="${svgW - pad.right}" y2="${scaleY(0)}" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>`;
+
+            // ─── Durfee square overlay ───
+            const activeSquare = phase === 'done' ? hVal : (trySquare ?? squareSize);
+            if (activeSquare > 0) {
+                const sqLeft = scaleX(0);
+                const sqTop = scaleY(activeSquare);
+                const sqW = activeSquare * (barW + barGap) - barGap;
+                const sqH = (activeSquare / maxC) * plotH;
+                const sqPass = phase === 'done' || (trySquare && !failBars.includes(trySquare - 1));
+                const sqClass = sqPass ? 'hindex-square-pass' : 'hindex-square-fail';
+                html += `<rect class="${sqClass}" x="${sqLeft}" y="${sqTop}" width="${sqW}" height="${sqH}" rx="3"/>`;
+                // Square dimension label
+                html += `<text x="${sqLeft + sqW / 2}" y="${sqTop - 6}" text-anchor="middle" class="hindex-square-label">${activeSquare}×${activeSquare}</text>`;
+            }
+
+            // ─── y = x diagonal line ───
+            // In our coordinate system, y=x means: at bar index i, the y-value equals (i+1)
+            // We draw from (index 0, value 1) to (index n-1, value n) clipped to maxC
+            const diagStartX = scaleX(0) + barW / 2;
+            const diagStartY = scaleY(1);
+            const diagEndIdx = Math.min(n - 1, maxC - 1);
+            const diagEndX = scaleX(diagEndIdx) + barW / 2;
+            const diagEndY = scaleY(diagEndIdx + 1);
+            html += `<line class="hindex-diagonal" x1="${diagStartX}" y1="${diagStartY}" x2="${diagEndX}" y2="${diagEndY}"/>`;
+            // Diagonal label
+            html += `<text x="${diagEndX + 6}" y="${diagEndY - 2}" class="hindex-diag-label">y=x</text>`;
+
+            // ─── Threshold line ───
+            if (thresholdH !== null && thresholdH > 0 && phase !== 'sort') {
+                const thY = scaleY(thresholdH);
+                html += `<line class="hindex-threshold" x1="${pad.left}" y1="${thY}" x2="${svgW - pad.right}" y2="${thY}"/>`;
+                html += `<text x="${svgW - pad.right + 4}" y="${thY + 4}" class="hindex-threshold-label">h=${thresholdH}</text>`;
+            }
+
+            // ─── Citation bars ───
             citations.forEach((val, idx) => {
-                let classes = 'array-item price-bar';
-                let pointerLabels = '';
-                const barPct = (val / maxC) * 100;
-                const paperNum = idx + 1;
+                const x = scaleX(idx);
+                const y = scaleY(val);
+                const bH = (val / maxC) * plotH;
+                const isPass = passBars.includes(idx);
+                const isFail = failBars.includes(idx);
+                const isCurrent = idx === iPtr;
+                const isFinalH = isComplete && idx < hVal;
 
-                // Papers contributing to h-index (above threshold)
-                if (val >= paperNum) classes += ' hindex-pass';
-                else classes += ' hindex-fail';
-                if (isComplete && idx < hVal) classes += ' pointer-merge';
+                let barClass = 'hindex-bar';
+                if (phase === 'sort') barClass += ' hindex-bar-sort';
+                else if (isFinalH) barClass += ' hindex-bar-final';
+                else if (isPass) barClass += ' hindex-bar-pass';
+                else if (isFail) barClass += ' hindex-bar-fail';
+                if (isCurrent) barClass += ' hindex-bar-active';
 
-                if (idx === iPtr) {
-                    classes += ' pointer-1';
-                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                html += `<rect class="${barClass}" x="${x}" y="${y}" width="${barW}" height="${bH}" rx="2"/>`;
+                // Value label above bar
+                html += `<text x="${x + barW / 2}" y="${y - 5}" text-anchor="middle" class="hindex-bar-val">${val}</text>`;
+                // Index label below baseline (show "i" inline when active instead of a separate pointer)
+                if (isCurrent) {
+                    html += `<text x="${x + barW / 2}" y="${scaleY(0) + 15}" text-anchor="middle" class="hindex-pointer-i">▲ i=${idx}</text>`;
+                } else {
+                    html += `<text x="${x + barW / 2}" y="${scaleY(0) + 15}" text-anchor="middle" class="hindex-bar-idx">${idx}</text>`;
                 }
 
-                html += `<div class="${classes}" style="--bar-h:${barPct}%">`;
-                html += `<span class="price-val">${val}</span>`;
-                html += `${pointerLabels}<div class="array-index">#${paperNum}</div></div>`;
+                // Crossing mark
+                if (crossingIdx !== null && idx === crossingIdx) {
+                    html += `<line x1="${x}" y1="${y}" x2="${x + barW}" y2="${scaleY(0)}" stroke="var(--accent-red)" stroke-width="2" stroke-dasharray="4,3" opacity="0.6"/>`;
+                }
             });
-            html += `</div>`;
 
-            // Threshold bridge
-            if (iPtr >= 0 && iPtr < citations.length && !isComplete) {
+            html += `</svg>`;
+            html += `</div>`; // .hindex-svg-wrap
+
+            // ─── Explanation bridge ───
+            if (phase === 'scan' && iPtr >= 0 && iPtr < n && !isComplete) {
                 const val = citations[iPtr];
                 const need = iPtr + 1;
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--text-muted)">Paper #${need}: </span>`;
-                html += `<span style="color:var(--accent-blue);font-weight:600">${val} citations</span>`;
+                html += `<span style="color:var(--text-muted)">Try h=${need}: </span>`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">citations[${iPtr}] = ${val}</span>`;
                 if (val >= need) {
                     html += `<span style="color:var(--accent-green);margin:0 6px;font-weight:700">≥ ${need}</span>`;
-                    html += `<span style="color:var(--accent-green)">✓ h can be ${need}! (${need} papers with ≥ ${need} citations)</span>`;
+                    html += `<span style="color:var(--accent-green)">✓ the ${need}×${need} square fits! h grows to ${need}</span>`;
                 } else {
                     html += `<span style="color:var(--accent-red);margin:0 6px;font-weight:700">< ${need}</span>`;
-                    html += `<span style="color:var(--accent-red)">✗ Can't have ${need} papers with ≥ ${need} citations. Stop!</span>`;
+                    html += `<span style="color:var(--accent-red)">✗ the ${need}×${need} square overflows — stop!</span>`;
+                }
+                html += `</div></div>`;
+            } else if (phase === 'sort') {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (!isSorted) {
+                    html += `<span style="color:var(--accent-purple);font-weight:600">Unsorted input</span>`;
+                    html += `<span style="color:var(--text-muted)"> — bars are in their original order. We need to sort descending so the tallest bars land on the left.</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-green);font-weight:600">✓ Sorted descending</span>`;
+                    html += `<span style="color:var(--text-muted)"> — tallest bars on the left. Now we scan left-to-right and try to grow the Durfee square.</span>`;
                 }
                 html += `</div></div>`;
             } else if (isComplete) {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">✓ H-Index = ${hVal} — ${hVal} papers each have ≥ ${hVal} citations</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">✓ H-Index = ${hVal}</span>`;
+                html += `<span style="color:var(--text-muted)"> — the ${hVal}×${hVal} Durfee square is the largest that fits. ${hVal} papers each have ≥ ${hVal} citations.</span>`;
                 html += `</div></div>`;
             }
 
@@ -7128,11 +7927,19 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (paper)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">h-index</div>
                         <div class="pointer-detail-value p-merge">${hVal}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">phase</div>
+                        <div class="pointer-detail-value">${phase}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label">square</div>
+                        <div class="pointer-detail-value">${activeSquare > 0 ? `${activeSquare}×${activeSquare}` : '—'}</div>
                     </div>
                 </div>
             `;
@@ -7272,7 +8079,7 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">prefix ←</div>
@@ -7366,11 +8173,11 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (station)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">start ⛽</div>
-                        <div class="pointer-detail-value p-merge">${startStation}</div>
+                        <div class="pointer-detail-value p-merge">${startStation >= 0 ? `idx ${startStation}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">tank (currentSurplus)</div>
@@ -7481,7 +8288,7 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">pass</div>
@@ -7579,11 +8386,11 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">L (left)</div>
-                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? `idx ${lPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">R (right)</div>
-                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? `idx ${rPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">leftMax</div>
@@ -7675,7 +8482,7 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (← scanner)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">prev</div>
@@ -7774,7 +8581,7 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (table index)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">remaining num</div>
@@ -7851,7 +8658,7 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (← scanner)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">length</div>
@@ -7936,7 +8743,7 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">column</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">prefix</div>
@@ -8000,11 +8807,11 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">left</div>
-                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? `idx ${lPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">right</div>
-                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? `idx ${rPtr}` : '—'}</div>
                     </div>
                 </div>
             `;
@@ -8098,11 +8905,11 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (char index)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">curRow</div>
-                        <div class="pointer-detail-value p2">${curRow}</div>
+                        <div class="pointer-detail-value p2">row ${curRow}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">direction</div>
@@ -8199,7 +9006,7 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (window start)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">needle length</div>
@@ -8292,7 +9099,7 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (word)</div>
-                        <div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">current line words</div>
@@ -8381,11 +9188,11 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">L (left)</div>
-                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? `idx ${lPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">R (right)</div>
-                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? `idx ${rPtr}` : '—'}</div>
                     </div>
                 </div>
             `;
@@ -8468,11 +9275,11 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (s pointer)</div>
-                        <div class="pointer-detail-value p2">${iPtr >= 0 ? `${iPtr}/${sChars.length}` : '—'}</div>
+                        <div class="pointer-detail-value p2">${iPtr >= 0 ? `idx ${iPtr}/${sChars.length}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">j (t pointer)</div>
-                        <div class="pointer-detail-value p1">${jPtr >= 0 ? jPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${jPtr >= 0 ? `idx ${jPtr}` : '—'}</div>
                     </div>
                 </div>
             `;
@@ -8548,11 +9355,11 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">L (left)</div>
-                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? `idx ${lPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">R (right)</div>
-                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? `idx ${rPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">target</div>
@@ -8646,11 +9453,11 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">L (left)</div>
-                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? `idx ${lPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">R (right)</div>
-                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? `idx ${rPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">maxWater</div>
@@ -8734,15 +9541,15 @@ function render() {
                 <div class="pointer-info">
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">i (fixed)</div>
-                        <div class="pointer-detail-value p-merge">${iPtr >= 0 ? iPtr : '—'}</div>
+                        <div class="pointer-detail-value p-merge">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">L (left)</div>
-                        <div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div>
+                        <div class="pointer-detail-value p1">${lPtr >= 0 ? `idx ${lPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">R (right)</div>
-                        <div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div>
+                        <div class="pointer-detail-value p2">${rPtr >= 0 ? `idx ${rPtr}` : '—'}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">triplets</div>
@@ -8801,8 +9608,8 @@ function render() {
                 }
             }
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div></div>
-                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? `idx ${lPtr}` : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? `idx ${rPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">window sum</div><div class="pointer-detail-value p-purple">${total}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">target</div><div class="pointer-detail-value p-green">${target}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">best len</div><div class="pointer-detail-value p-merge">${res}</div></div>
@@ -8869,8 +9676,8 @@ function render() {
             html += `</div></div></div>`;
 
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div></div>
-                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? `idx ${lPtr}` : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? `idx ${rPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">best</div><div class="pointer-detail-value p-green">${res}</div></div>
             </div>`;
             html += `</div>`;
@@ -8943,8 +9750,8 @@ function render() {
             html += `</div></div></div>`;
 
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div></div>
-                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? `idx ${lPtr}` : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? `idx ${rPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">most freq</div><div class="pointer-detail-value p-purple">'${dominantChar}'×${maxf}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">replacements</div><div class="pointer-detail-value ${replacements <= k ? 'p-green' : 'p-merge'}">${replacements}/${k}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">best</div><div class="pointer-detail-value p-merge">${res}</div></div>
@@ -8999,8 +9806,8 @@ function render() {
                 html += `</div></div>`;
             }
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? lPtr : '—'}</div></div>
-                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? rPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">L</div><div class="pointer-detail-value p1">${lPtr >= 0 ? `idx ${lPtr}` : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">R</div><div class="pointer-detail-value p2">${rPtr >= 0 ? `idx ${rPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">matched</div><div class="pointer-detail-value p-purple">${have}/${total}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">best window</div><div class="pointer-detail-value p-green">${resStr ? `"${resStr}" (${res})` : '—'}</div></div>
             </div>`;
@@ -9061,7 +9868,7 @@ function render() {
             html += `</div></div>`;
 
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">action</div><div class="pointer-detail-value ${action === 'push' ? 'p1' : action === 'pop' ? 'p-green' : action === 'mismatch' ? 'p-merge' : ''}">${action || '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">stack size</div><div class="pointer-detail-value p-purple">${stack.length}</div></div>
             </div>`;
@@ -9395,7 +10202,7 @@ function render() {
             html += `</div></div></div>`;
 
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">phase</div><div class="pointer-detail-value p-green">${source === 'mag' ? 'counting magazine' : 'consuming for note'}</div></div>
             </div>`;
             html += `</div>`;
@@ -9479,7 +10286,7 @@ function render() {
             html += `</div></div></div>`;
 
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">checking</div><div class="pointer-detail-value p-purple">${charS ? `'${charS}' ↔ '${charT}'` : '—'}</div></div>
             </div>`;
             html += `</div>`;
@@ -9561,7 +10368,7 @@ function render() {
             html += `</div></div></div>`;
 
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">checking</div><div class="pointer-detail-value p-purple">${patChar ? `'${patChar}' ↔ "${word}"` : '—'}</div></div>
             </div>`;
             html += `</div>`;
@@ -9635,7 +10442,7 @@ function render() {
             html += `</div></div></div>`;
 
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">phase</div><div class="pointer-detail-value p-green">${source === 's' ? 'counting s (+1)' : 'verifying t (−1)'}</div></div>
             </div>`;
             html += `</div>`;
@@ -9709,7 +10516,7 @@ function render() {
             }
 
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">sort key</div><div class="pointer-detail-value p-purple">"${currentKey || '—'}"</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">groups</div><div class="pointer-detail-value p-green">${groupKeys.length}</div></div>
             </div>`;
@@ -9779,7 +10586,7 @@ function render() {
             html += `</div></div></div>`;
 
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">target</div><div class="pointer-detail-value p-green">${target}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">complement</div><div class="pointer-detail-value p-purple">${complement ?? '—'}</div></div>
             </div>`;
@@ -9926,7 +10733,7 @@ function render() {
             html += `</div></div></div>`;
 
             html += `<div class="pointer-info">
-                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? iPtr : '—'}</div></div>
+                <div class="pointer-detail"><div class="pointer-detail-label">i</div><div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">window</div><div class="pointer-detail-value p-purple">[${winStart}..${winEnd}]</div></div>
                 <div class="pointer-detail"><div class="pointer-detail-label">k</div><div class="pointer-detail-value p-green">${k}</div></div>
             </div>`;
@@ -10050,6 +10857,20 @@ function render() {
             </div>`;
             html += `</div>`;
             arrayContainer.innerHTML = html;
+        }
+
+        // ── Post-render: apply value-changed animation to mutated cells ──
+        if (changedIndices.size > 0) {
+            const items = arrayContainer.querySelectorAll('.array-item');
+            items.forEach(item => {
+                const idxEl = item.querySelector('.array-index');
+                if (idxEl) {
+                    const idx = parseInt(idxEl.textContent, 10);
+                    if (!isNaN(idx) && changedIndices.has(idx)) {
+                        item.classList.add('val-changed');
+                    }
+                }
+            });
         }
 
         return;
@@ -10309,6 +11130,7 @@ function init() {
     const engine = document.querySelector('.render-engine');
     
     baseCasesCount = 0;
+    prevArraySnapshot = null; // reset change-detection on re-init
 
     // Stop any autoplay
     if (autoPlayInterval) {
@@ -10434,14 +11256,14 @@ function init() {
     // Helper to populate a testcase <select>
     function populateTestcaseSelect(sel, labels) {
         sel.innerHTML = '';
-        const optNormal = document.createElement('option');
-        optNormal.value = 'normal';
-        optNormal.textContent = labels.normal;
-        sel.appendChild(optNormal);
-        const optEdge = document.createElement('option');
-        optEdge.value = 'edge';
-        optEdge.textContent = labels.edge;
-        sel.appendChild(optEdge);
+        Object.keys(labels).forEach(key => {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = labels[key];
+            sel.appendChild(opt);
+        });
+        // Ensure current selection is valid; if not, reset to 'normal'
+        if (!labels[currentTestCase]) currentTestCase = 'normal';
         sel.value = currentTestCase;
     }
 
@@ -10494,8 +11316,16 @@ function init() {
         }
         
         // Don't draw tree for array problems
+        // Dynamic testcase: look up generator by key (e.g. 'edge' → generateEdgeCaseHistory, 'tc2' → generateTc2History)
         if (currentTestCase === 'edge' && algorithm.generateEdgeCaseHistory) {
             history = algorithm.generateEdgeCaseHistory();
+        } else if (currentTestCase !== 'normal') {
+            const genKey = `generate${currentTestCase.charAt(0).toUpperCase() + currentTestCase.slice(1)}History`;
+            if (algorithm[genKey]) {
+                history = algorithm[genKey]();
+            } else {
+                history = algorithm.generateHistory();
+            }
         } else {
             history = algorithm.generateHistory();
         }
@@ -10633,6 +11463,13 @@ function init() {
     // Generate history based on algorithm
     if (currentTestCase === 'edge' && algorithm.generateEdgeCaseHistory) {
         history = algorithm.generateEdgeCaseHistory(activeTree);
+    } else if (currentTestCase !== 'normal') {
+        const genKey = `generate${currentTestCase.charAt(0).toUpperCase() + currentTestCase.slice(1)}History`;
+        if (algorithm[genKey]) {
+            history = algorithm[genKey](activeTree);
+        } else {
+            history = algorithm.generateHistory(activeTree);
+        }
     } else {
         history = algorithm.generateHistory(activeTree);
     }
