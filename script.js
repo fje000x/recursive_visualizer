@@ -1,3 +1,15 @@
+// ===== Theme Toggle (Light / Dark) — disabled for v1 =====
+// Kept for future use. Toggle buttons hidden via CSS.
+// (function initTheme() {
+//     const saved = localStorage.getItem('algoflowz-theme');
+//     if (saved === 'light') {
+//         document.documentElement.setAttribute('data-theme', 'light');
+//     }
+// })();
+// Clear any stale light-mode setting
+localStorage.removeItem('algoflowz-theme');
+document.documentElement.removeAttribute('data-theme');
+
 const problemDB = {
     "1": {
         name: "Shortest Path in Binary Tree",
@@ -462,7 +474,7 @@ const problemDB = {
         }
     },
     "10": {
-        name: "Best Moments to Trade",
+        name: "Best Moment to Trade II",
         alias: "Best Time to Buy and Sell Stock II",
         leetcodeNum: "122",
         inspiredBy: "Inspired by LeetCode Problem #122",
@@ -3124,6 +3136,7 @@ function generateBestTradesHistory() {
     const prices = [5, 2, 6, 1, 4, 7, 3, 8];
     const h = [];
     let totalProfit = 0;
+    const collectedGains = []; // [{buyIdx, sellIdx, gain}]
 
     function record(line, msg, pointers = {}, extra = {}) {
         h.push({
@@ -3132,7 +3145,7 @@ function generateBestTradesHistory() {
             pointers: { ...pointers },
             nums1: [...prices],
             nums2: [],
-            arrayMeta: { totalProfit, originalLength: prices.length },
+            arrayMeta: { totalProfit, originalLength: prices.length, collectedGains: [...collectedGains] },
             step: h.length,
             ...extra
         });
@@ -3146,14 +3159,23 @@ function generateBestTradesHistory() {
 
         if (prices[i] > prices[i - 1]) {
             const gain = prices[i] - prices[i - 1];
+            const prevTotalProfit = totalProfit;
             totalProfit += gain;
-            record(3, `prices[${i}] = ${prices[i]} > prices[${i - 1}] = ${prices[i - 1]} → gain = +${gain}. Collect it! totalProfit = ${totalProfit}.`, { i }, { isComparison: true });
+            collectedGains.push({ buyIdx: i - 1, sellIdx: i, gain });
+            record(3, `prices[${i}] = ${prices[i]} > prices[${i - 1}] = ${prices[i - 1]} → gain = +${gain}. Collect it! totalProfit = ${totalProfit}.`, { i }, {
+                isComparison: true,
+                isGain: true,
+                currentGain: gain,
+                prevTotalProfit,
+                buyIdx: i - 1,
+                sellIdx: i
+            });
         } else {
             record(3, `prices[${i}] = ${prices[i]} ≤ prices[${i - 1}] = ${prices[i - 1]} → no gain. Skip.`, { i }, { isComparison: true, isSkip: true });
         }
     }
 
-    record(5, `✓ Done! Total profit from all trades = ${totalProfit}.`, {}, { isComplete: true });
+    record(5, `Done! Total profit from all trades = ${totalProfit}.`, {}, { isComplete: true });
     return h;
 }
 
@@ -3183,17 +3205,34 @@ function generateCanReachEndHistory() {
         record(2, `Move to i = ${i}. nums[${i}] = ${nums[i]}. farthest = ${farthest}.`, { i });
 
         if (i > farthest) {
-            record(3, `i = ${i} > farthest = ${farthest} → we can't reach index ${i}!`, { i }, { isComparison: true });
-            record(4, `Return False — cannot reach the end.`, {}, { isComplete: true });
+            record(3, `i = ${i} > farthest = ${farthest} — can't reach this index!`, { i }, { isComparison: true, isFail: true });
+            record(4, `Return False — cannot reach the end.`, {}, { isComplete: true, result: false });
             return h;
         }
 
         const oldFarthest = farthest;
-        farthest = Math.max(farthest, i + nums[i]);
-        record(5, `farthest = max(${oldFarthest}, ${i} + ${nums[i]}) = max(${oldFarthest}, ${i + nums[i]}) = ${farthest}.`, { i }, { isComparison: true });
+        const iReachRaw = i + nums[i];
+        const iReach = Math.min(iReachRaw, nums.length - 1);
+        farthest = Math.max(farthest, iReach);
+        const expanded = farthest > oldFarthest;
+        let reachNote = '';
+        if (expanded && iReach >= nums.length - 1) {
+            reachNote = ' Reached the goal!';
+        } else if (!expanded) {
+            reachNote = ` No change — previous reach (${oldFarthest}) already farther.`;
+        }
+        const reachMsg = iReachRaw > nums.length - 1
+            ? `${iReach} capped`
+            : `${i} + ${nums[i]} = ${iReach}`;
+        record(5, `farthest = max(${oldFarthest}, ${reachMsg}) = ${farthest}.${reachNote}`, { i }, {
+            isComparison: true,
+            prevFarthest: oldFarthest,
+            iReach,
+            reachExpanded: expanded
+        });
     }
 
-    record(6, `✓ Done! Scanned all indices. farthest = ${farthest} ≥ last index ${nums.length - 1}. Return True — we can reach the end!`, {}, { isComplete: true });
+    record(6, `Done! Scanned all indices. farthest = ${farthest} >= last index ${nums.length - 1}. Return True — we can reach the end!`, {}, { isComplete: true, result: true });
     return h;
 }
 
@@ -3204,6 +3243,7 @@ function generateFewestJumpsHistory() {
     let jumps = 0;
     let curEnd = 0;
     let farthest = 0;
+    const levels = [{ start: 0, end: 0 }]; // track BFS level boundaries
 
     function record(line, msg, pointers = {}, extra = {}) {
         h.push({
@@ -3212,7 +3252,7 @@ function generateFewestJumpsHistory() {
             pointers: { ...pointers },
             nums1: [...nums],
             nums2: [],
-            arrayMeta: { jumps, curEnd, farthest, originalLength: nums.length },
+            arrayMeta: { jumps, curEnd, farthest, originalLength: nums.length, levels: JSON.parse(JSON.stringify(levels)) },
             step: h.length,
             ...extra
         });
@@ -3228,17 +3268,27 @@ function generateFewestJumpsHistory() {
 
         const oldFarthest = farthest;
         farthest = Math.max(farthest, i + nums[i]);
-        record(5, `farthest = max(${oldFarthest}, ${i} + ${nums[i]}) = ${farthest}.`, { i }, { isComparison: true });
+        record(5, `farthest = max(${oldFarthest}, ${i} + ${nums[i]}) = ${farthest}.`, { i }, {
+            isComparison: true,
+            prevFarthest: oldFarthest,
+            iReach: i + nums[i]
+        });
 
         if (i === curEnd) {
+            const prevCurEnd = curEnd;
             jumps++;
-            record(6, `i == curEnd (${curEnd}) → reached end of current level. jumps++ → jumps = ${jumps}.`, { i }, { isComparison: true });
             curEnd = farthest;
-            record(8, `Set curEnd = farthest = ${curEnd}. Now exploring next level.`, { i });
+            levels.push({ start: prevCurEnd + 1, end: curEnd });
+            record(6, `i == curEnd (${prevCurEnd}) — end of level ${jumps - 1}. Jump! jumps = ${jumps}. curEnd moves to ${curEnd}.`, { i }, {
+                isComparison: true,
+                isJump: true,
+                prevCurEnd,
+                prevJumps: jumps - 1
+            });
         }
     }
 
-    record(9, `✓ Done! Minimum jumps to reach end = ${jumps}.`, {}, { isComplete: true });
+    record(9, `Done! Minimum jumps to reach end = ${jumps}.`, {}, { isComplete: true });
     return h;
 }
 
@@ -5250,9 +5300,10 @@ function generateBestTradesEdgeHistory() {
     const prices = [3, 3, 3, 3, 3];
     const h = [];
     let totalProfit = 0;
+    const collectedGains = [];
 
     function record(line, msg, pointers = {}, extra = {}) {
-        h.push({ msg, line, pointers: { ...pointers }, nums1: [...prices], nums2: [], arrayMeta: { totalProfit, originalLength: prices.length }, step: h.length, ...extra });
+        h.push({ msg, line, pointers: { ...pointers }, nums1: [...prices], nums2: [], arrayMeta: { totalProfit, originalLength: prices.length, collectedGains: [...collectedGains] }, step: h.length, ...extra });
     }
 
     record(0, `Call bestTrades(prices=[${prices}]). Goal: maximize total profit (greedy).`);
@@ -5263,7 +5314,7 @@ function generateBestTradesEdgeHistory() {
         record(3, `prices[${i}] = ${prices[i]} ≤ prices[${i - 1}] = ${prices[i - 1]} → no gain. Skip.`, { i }, { isComparison: true, isSkip: true });
     }
 
-    record(5, `✓ Done! totalProfit = ${totalProfit}. Edge case: all prices equal → no trades possible!`, {}, { isComplete: true });
+    record(5, `Done! totalProfit = ${totalProfit}. Edge case: all prices equal, no trades possible.`, {}, { isComplete: true });
     return h;
 }
 
@@ -5283,16 +5334,23 @@ function generateCanReachEndEdgeHistory() {
     for (let i = 0; i < nums.length; i++) {
         record(2, `Move to i = ${i}. nums[${i}] = ${nums[i]}. farthest = ${farthest}.`, { i });
         if (i > farthest) {
-            record(3, `i = ${i} > farthest = ${farthest} → we can't reach index ${i}!`, { i }, { isComparison: true });
-            record(4, `Return False — cannot reach the end. Edge case: a 0 creates an impassable barrier!`, {}, { isComplete: true });
+            record(3, `i = ${i} > farthest = ${farthest} — can't reach this index!`, { i }, { isComparison: true, isFail: true });
+            record(4, `Return False — cannot reach the end. A zero creates an impassable barrier.`, {}, { isComplete: true, result: false });
             return h;
         }
         const oldFarthest = farthest;
-        farthest = Math.max(farthest, i + nums[i]);
-        record(5, `farthest = max(${oldFarthest}, ${i} + ${nums[i]}) = ${farthest}.`, { i }, { isComparison: true });
+        const iReachRaw = i + nums[i];
+        const iReach = Math.min(iReachRaw, nums.length - 1);
+        farthest = Math.max(farthest, iReach);
+        record(5, `farthest = max(${oldFarthest}, ${i} + ${nums[i]}) = ${farthest}.`, { i }, {
+            isComparison: true,
+            prevFarthest: oldFarthest,
+            iReach,
+            reachExpanded: farthest > oldFarthest
+        });
     }
 
-    record(6, `✓ Done! Return True.`, {}, { isComplete: true });
+    record(6, `Done! Return True.`, {}, { isComplete: true, result: true });
     return h;
 }
 
@@ -7480,42 +7538,77 @@ function render() {
             const meta = state.arrayMeta || {};
             const totalProfit = meta.totalProfit ?? 0;
             const isComplete = state.isComplete || false;
+            const isGain = state.isGain || false;
+            const isComparison = state.isComparison || false;
+            const isSkip = state.isSkip || false;
+            const currentGain = state.currentGain ?? 0;
+            const prevTotalProfit = state.prevTotalProfit ?? 0;
+            const buyIdx = state.buyIdx ?? -1;
+            const sellIdx = state.sellIdx ?? -1;
+            const collectedGains = meta.collectedGains || [];
             const prices = state.nums1;
             const maxP = Math.max(...prices, 1);
             
             const sItemCount = prices.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
-            let html = `<div class="array-inner array-dual${sDenseClass}">`;
+            let html = `<div class="array-inner array-dual${sDenseClass} stock-inner">`;
             html += `<div class="array-label">prices — collect every consecutive gain (greedy: buy low, sell high, repeat)</div>`;
 
+            // Build set of collected gain indices for highlighting
+            const gainBuySet = new Set();
+            const gainSellSet = new Set();
+            collectedGains.forEach(g => { gainBuySet.add(g.buyIdx); gainSellSet.add(g.sellIdx); });
+
             // Price chart with gain-coloring
-            html += `<div class="array-visualization price-chart-viz">`;
+            html += `<div class="array-visualization price-chart-viz" id="trades-chart-viz">`;
             prices.forEach((val, idx) => {
                 let classes = 'array-item price-bar';
                 let pointerLabels = '';
                 const barPct = (val / maxP) * 100;
 
-                // Green if this day is part of an upswing (gain collected)
-                if (idx > 0 && val > prices[idx - 1]) classes += ' price-gain';
-                // Red if this day is a decline
-                if (idx > 0 && val < prices[idx - 1]) classes += ' price-drop';
+                // Only color bars that have been scanned
+                if (idx <= iPtr || isComplete) {
+                    if (idx > 0 && val > prices[idx - 1]) classes += ' price-gain';
+                    if (idx > 0 && val < prices[idx - 1]) classes += ' price-drop';
+                }
 
-                if (idx === iPtr) {
+                // Highlight completed trade pairs
+                if (isComplete && gainSellSet.has(idx)) classes += ' price-sell';
+
+                if (idx === iPtr && !isComplete) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
 
-                html += `<div class="${classes}" style="--bar-h:${barPct}%">`;
+                // Profit gap block on current gain
+                let profitBlock = '';
+                if (isGain && idx === iPtr && !isComplete) {
+                    const prevPct = (prices[idx - 1] / maxP) * 100;
+                    profitBlock = `<div class="profit-gap-block profit-gap-best" style="--gap-bottom:${prevPct}%;--gap-top:${barPct}%"><span class="profit-gap-label">+$${currentGain}</span></div>`;
+                }
+                // Show all collected gain blocks on completion
+                if (isComplete) {
+                    const match = collectedGains.find(g => g.sellIdx === idx);
+                    if (match) {
+                        const prevPct = (prices[match.buyIdx] / maxP) * 100;
+                        profitBlock = `<div class="profit-gap-block profit-gap-best" style="--gap-bottom:${prevPct}%;--gap-top:${barPct}%"><span class="profit-gap-label">+$${match.gain}</span></div>`;
+                    }
+                }
+
+                html += `<div class="${classes}" style="--bar-h:${barPct}%" data-idx="${idx}">`;
                 html += `<span class="price-val">$${val}</span>`;
+                html += profitBlock;
                 html += `${pointerLabels}<div class="array-index">day ${idx}</div></div>`;
             });
             html += `</div>`;
 
-            // Gain/loss indicator row
+            // Gain/loss indicator row — only show scanned days
             html += `<div class="array-visualization" style="margin-top:4px;">`;
             prices.forEach((val, idx) => {
                 if (idx === 0) {
                     html += `<div class="array-item" style="opacity:0.3;font-size:10px">—</div>`;
+                } else if (idx > iPtr && !isComplete) {
+                    html += `<div class="array-item" style="opacity:0.15;font-size:10px">?</div>`;
                 } else {
                     const diff = val - prices[idx - 1];
                     const color = diff > 0 ? 'var(--accent-green)' : diff < 0 ? 'var(--accent-red)' : 'var(--text-muted)';
@@ -7526,31 +7619,41 @@ function render() {
             html += `</div>`;
 
             // Bridge: gain calculation
-            if (iPtr >= 1 && iPtr < prices.length && !isComplete) {
+            if (iPtr >= 1 && iPtr < prices.length && !isComplete && isComparison) {
                 const price = prices[iPtr];
                 const prev = prices[iPtr - 1];
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                if (price > prev) {
-                    const gain = price - prev;
+                if (isGain) {
                     html += `<span style="color:var(--accent-green);font-weight:600">sell $${price}</span>`;
-                    html += `<span class="sum-bridge-op">−</span>`;
+                    html += `<span class="sum-bridge-op">-</span>`;
                     html += `<span style="color:var(--accent-orange);font-weight:600">buy $${prev}</span>`;
                     html += `<span class="sum-bridge-eq">=</span>`;
-                    html += `<span style="color:var(--accent-green);font-weight:700">+$${gain} 📈</span>`;
-                    html += `<span style="color:var(--text-muted);margin-left:6px">→ collect! total = $${totalProfit}</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">+$${currentGain}</span>`;
+                    html += `<span style="color:var(--text-muted);margin-left:6px">collect! total = $${totalProfit}</span>`;
                 } else {
                     html += `<span style="color:var(--accent-red);font-weight:600">$${price}</span>`;
-                    html += `<span style="color:var(--accent-red);margin:0 6px">≤ $${prev}</span>`;
-                    html += `<span style="color:var(--text-muted)">→ no gain, skip 📉</span>`;
+                    html += `<span style="color:var(--accent-red);margin:0 6px">${price === prev ? '=' : '<'} $${prev}</span>`;
+                    html += `<span style="color:var(--text-muted)">no gain, skip</span>`;
                 }
                 html += `</div></div>`;
-            } else if (isComplete) {
-                // Count gains
-                let gainCount = 0;
-                for (let k = 1; k < prices.length; k++) { if (prices[k] > prices[k-1]) gainCount++; }
+            } else if (iPtr >= 1 && !isComplete && !isComparison) {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">✓ Collected ${gainCount} gains = $${totalProfit} total profit</span>`;
+                html += `<span style="color:var(--text-muted)">Scanning day ${iPtr}: prices[${iPtr}] = $${prices[iPtr]}</span>`;
                 html += `</div></div>`;
+            } else if (isComplete) {
+                const gainCount = collectedGains.length;
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-green);font-weight:700">Collected ${gainCount} gain${gainCount !== 1 ? 's' : ''} = $${totalProfit} total profit</span>`;
+                html += `</div></div>`;
+            }
+
+            // totalProfit box with flash animation on update
+            const tpFlashClass = isGain ? ' stock-mp-flash' : '';
+            let tpContent;
+            if (isGain) {
+                tpContent = `<span class="stock-mp-old">$${prevTotalProfit}</span><span class="stock-mp-new">$${totalProfit}</span>`;
+            } else {
+                tpContent = `$${totalProfit}`;
             }
 
             html += `
@@ -7559,188 +7662,485 @@ function render() {
                         <div class="pointer-detail-label">i (scanner)</div>
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
-                    <div class="pointer-detail">
-                        <div class="pointer-detail-label">totalProfit 💰</div>
-                        <div class="pointer-detail-value p-merge">$${totalProfit}</div>
+                    <div class="pointer-detail stock-mp-box${tpFlashClass}">
+                        <div class="pointer-detail-label">totalProfit</div>
+                        <div class="pointer-detail-value p-merge">${tpContent}</div>
                     </div>
                 </div>
             `;
             html += `</div>`;
             arrayContainer.innerHTML = html;
+
+            // Trade arc — connect buy bar to sell bar on gain steps
+            if (isGain && !isComplete && buyIdx >= 0 && sellIdx >= 0) {
+                const chartEl = arrayContainer.querySelector('#trades-chart-viz');
+                const buyBar = chartEl?.querySelector(`[data-idx="${buyIdx}"]`);
+                const sellBar = chartEl?.querySelector(`[data-idx="${sellIdx}"]`);
+                if (chartEl && buyBar && sellBar) {
+                    requestAnimationFrame(() => {
+                        const chartRect = chartEl.getBoundingClientRect();
+                        const buyBarRect = buyBar.getBoundingClientRect();
+                        const sellBarRect = sellBar.getBoundingClientRect();
+                        const buyPct = prices[buyIdx] / maxP;
+                        const sellPct = prices[sellIdx] / maxP;
+                        const x1 = buyBarRect.left + buyBarRect.width / 2 - chartRect.left;
+                        const x2 = sellBarRect.left + sellBarRect.width / 2 - chartRect.left;
+                        const y1 = buyBarRect.bottom - (buyBarRect.height * buyPct) - chartRect.top;
+                        const y2 = sellBarRect.bottom - (sellBarRect.height * sellPct) - chartRect.top;
+                        const midX = (x1 + x2) / 2;
+                        const arcHeight = Math.min(Math.abs(x2 - x1) * 0.15, 25) + 12;
+                        const midY = Math.min(y1, y2) - arcHeight;
+                        const arcPath = `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`;
+                        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                        svg.classList.add('trade-arc-svg');
+                        svg.setAttribute('width', chartRect.width);
+                        svg.setAttribute('height', chartRect.height);
+                        svg.setAttribute('viewBox', `0 0 ${chartRect.width} ${chartRect.height}`);
+                        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                        marker.setAttribute('id', 'trades-arrow');
+                        marker.setAttribute('viewBox', '0 0 10 10');
+                        marker.setAttribute('refX', '10');
+                        marker.setAttribute('refY', '5');
+                        marker.setAttribute('markerWidth', '6');
+                        marker.setAttribute('markerHeight', '6');
+                        marker.setAttribute('orient', 'auto-start-reverse');
+                        const arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+                        arrowPath.setAttribute('fill', 'rgba(16, 185, 129, 0.6)');
+                        marker.appendChild(arrowPath);
+                        defs.appendChild(marker);
+                        svg.appendChild(defs);
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', arcPath);
+                        path.classList.add('trade-arc-path');
+                        path.setAttribute('marker-end', 'url(#trades-arrow)');
+                        svg.appendChild(path);
+                        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        text.setAttribute('x', midX);
+                        text.setAttribute('y', midY - 4);
+                        text.classList.add('trade-arc-label');
+                        text.textContent = `+$${currentGain}`;
+                        svg.appendChild(text);
+                        chartEl.appendChild(svg);
+                    });
+                }
+            }
+
+            // On completion, draw all collected trade arcs
+            if (isComplete && collectedGains.length > 0) {
+                const chartEl = arrayContainer.querySelector('#trades-chart-viz');
+                if (chartEl) {
+                    requestAnimationFrame(() => {
+                        const chartRect = chartEl.getBoundingClientRect();
+                        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                        svg.classList.add('trade-arc-svg');
+                        svg.setAttribute('width', chartRect.width);
+                        svg.setAttribute('height', chartRect.height);
+                        svg.setAttribute('viewBox', `0 0 ${chartRect.width} ${chartRect.height}`);
+                        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                        marker.setAttribute('id', 'trades-arrow-final');
+                        marker.setAttribute('viewBox', '0 0 10 10');
+                        marker.setAttribute('refX', '10');
+                        marker.setAttribute('refY', '5');
+                        marker.setAttribute('markerWidth', '5');
+                        marker.setAttribute('markerHeight', '5');
+                        marker.setAttribute('orient', 'auto-start-reverse');
+                        const arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+                        arrowPath.setAttribute('fill', 'rgba(16, 185, 129, 0.7)');
+                        marker.appendChild(arrowPath);
+                        defs.appendChild(marker);
+                        svg.appendChild(defs);
+                        collectedGains.forEach(g => {
+                            const buyBar = chartEl.querySelector(`[data-idx="${g.buyIdx}"]`);
+                            const sellBar = chartEl.querySelector(`[data-idx="${g.sellIdx}"]`);
+                            if (!buyBar || !sellBar) return;
+                            const buyBarRect = buyBar.getBoundingClientRect();
+                            const sellBarRect = sellBar.getBoundingClientRect();
+                            const buyPct = prices[g.buyIdx] / maxP;
+                            const sellPct = prices[g.sellIdx] / maxP;
+                            const x1 = buyBarRect.left + buyBarRect.width / 2 - chartRect.left;
+                            const x2 = sellBarRect.left + sellBarRect.width / 2 - chartRect.left;
+                            const y1 = buyBarRect.bottom - (buyBarRect.height * buyPct) - chartRect.top;
+                            const y2 = sellBarRect.bottom - (sellBarRect.height * sellPct) - chartRect.top;
+                            const midX = (x1 + x2) / 2;
+                            const arcH = Math.min(Math.abs(x2 - x1) * 0.15, 25) + 12;
+                            const midY = Math.min(y1, y2) - arcH;
+                            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                            path.setAttribute('d', `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`);
+                            path.classList.add('trade-arc-path');
+                            path.setAttribute('marker-end', 'url(#trades-arrow-final)');
+                            svg.appendChild(path);
+                            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                            text.setAttribute('x', midX);
+                            text.setAttribute('y', midY - 4);
+                            text.classList.add('trade-arc-label');
+                            text.textContent = `+$${g.gain}`;
+                            svg.appendChild(text);
+                        });
+                        chartEl.appendChild(svg);
+                    });
+                }
+            }
         }
         
-        // Problem 11: Can You Reach the End? (Jump Game) — reachable zone + jump arcs
+        // Problem 11: Can You Reach the End? (Jump Game) — "Safe Zone" vs "Darkness"
         if (currentProbId === '11' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const farthest = meta.farthest ?? 0;
             const isComplete = state.isComplete || false;
+            const isComparison = state.isComparison || false;
+            const isFail = state.isFail || false;
+            const reachExpanded = state.reachExpanded || false;
+            const prevFarthest = state.prevFarthest ?? farthest;
+            const iReach = state.iReach ?? 0;
+            const result = state.result;
             const nums = state.nums1;
             const lastIdx = nums.length - 1;
             
             const sItemCount = nums.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
-            let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">nums — can we jump from index 0 to the last index? (each value = max jump distance)</div>`;
-            html += `<div class="array-visualization jump-viz">`;
+            let html = `<div class="array-inner${sDenseClass} jg1-inner">`;
+            html += `<div class="array-label">nums — can we reach the last index? Each value = max jump distance from that cell</div>`;
+            html += `<div class="array-visualization jump-viz jg1-viz" id="jg1-chart">`;
             
             nums.forEach((val, idx) => {
-                let classes = 'array-item';
+                let classes = 'array-item jg1-cell';
                 let pointerLabels = '';
+                let flagHtml = '';
                 
-                // Reachable zone: green tint for everything within farthest
+                // Safe zone (reachable) vs darkness (unreachable)
                 if (idx <= farthest) {
-                    classes += ' jump-reachable';
+                    classes += ' jg1-safe';
+                    // Highlight the newly expanded reach zone
+                    if (reachExpanded && idx > prevFarthest && idx <= farthest && !isComplete) {
+                        classes += ' jg1-new-reach';
+                    }
                 } else {
-                    classes += ' jump-unreachable';
+                    classes += ' jg1-dark';
                 }
-                // Goal index
-                if (idx === lastIdx) classes += ' jump-goal';
-                if (isComplete && idx <= farthest) classes += ' pointer-merge';
 
-                if (idx === iPtr) {
+                // Current reach contribution highlight
+                if (isComparison && !isFail && idx === iPtr && !isComplete) {
+                    classes += ' jg1-active';
+                }
+
+                // Goal cell
+                if (idx === lastIdx) {
+                    classes += ' jg1-goal';
+                    if (isComplete && result !== false) classes += ' jg1-goal-reached';
+                }
+
+                // Fail — i passed farthest
+                if (isFail && idx === iPtr) {
+                    classes += ' jg1-blocked';
+                }
+
+                // Complete success glow
+                if (isComplete && result !== false && idx <= farthest) {
+                    classes += ' jg1-won';
+                }
+
+                // Scanner pointer
+                if (idx === iPtr && !isComplete) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
-                
-                // Show jump reach arc: how far this index can reach
-                const reach = Math.min(idx + val, lastIdx);
-                const reachLabel = (idx === iPtr && val > 0 && !isComplete) ? 
-                    `<div class="jump-reach-label">→${reach}</div>` : '';
 
-                html += `<div class="${classes}">${val}${pointerLabels}${reachLabel}<div class="array-index">${idx}</div></div>`;
+                // Flag at farthest index (beside the index box)
+                if (idx === farthest && !isComplete) {
+                    flagHtml = `<div class="jg1-flag${reachExpanded ? ' jg1-flag-moved' : ''}">&#9873;</div>`;
+                }
+
+                html += `<div class="${classes}" data-idx="${idx}">${val}${pointerLabels}<div class="array-index">${idx}</div>${flagHtml}</div>`;
             });
             
             html += `</div>`;
 
-            // Farthest reach indicator bar
+            // Reach progress bar
             if (!isComplete) {
-                const pct = ((farthest + 1) / nums.length) * 100;
-                html += `<div class="reach-bar-container">`;
-                html += `<div class="reach-bar" style="width:${pct}%"></div>`;
-                html += `<span class="reach-bar-label">farthest reachable: index ${farthest}${farthest >= lastIdx ? ' ✓ GOAL!' : ''}</span>`;
+                const pct = Math.min(((farthest + 1) / nums.length) * 100, 100);
+                const goalReached = farthest >= lastIdx;
+                html += `<div class="jg1-reach-bar-wrap">`;
+                html += `<div class="jg1-reach-fill${goalReached ? ' jg1-reach-goal' : ''}" style="width:${pct}%"></div>`;
+                html += `<span class="jg1-reach-text">safe zone: 0..${farthest}${goalReached ? ' — GOAL REACHED' : ''} / goal: ${lastIdx}</span>`;
                 html += `</div>`;
             }
 
-            // Bridge: farthest reach calculation
-            if (iPtr >= 0 && iPtr < nums.length && !isComplete) {
+            // Reach highlight band (shows i → i+nums[i] span)
+            if (isComparison && !isFail && iPtr >= 0 && !isComplete && nums[iPtr] > 0) {
+                const reachEnd = Math.min(iPtr + nums[iPtr], lastIdx);
+                html += `<div class="jg1-reach-span">`;
+                html += `<span style="color:var(--accent-blue);font-weight:600">i=${iPtr}</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 4px">can reach up to</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:600">index ${reachEnd}</span>`;
+                if (reachExpanded) {
+                    html += `<span style="color:var(--accent-green);margin-left:6px;font-weight:700">Flag moves: ${prevFarthest} -> ${farthest}</span>`;
+                }
+                html += `</div>`;
+            }
+
+            // Bridge
+            if (iPtr >= 0 && iPtr < nums.length && !isComplete && isComparison) {
                 const val = nums[iPtr];
-                const reach = iPtr + val;
+                const reachRaw = iPtr + val;
+                const reach = Math.min(reachRaw, lastIdx);
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                if (iPtr > farthest) {
-                    html += `<span style="color:var(--accent-red);font-weight:700">🚫 i=${iPtr} > farthest=${farthest} — CAN'T REACH HERE!</span>`;
+                if (isFail) {
+                    html += `<span style="color:var(--accent-red);font-weight:700">i = ${iPtr} > farthest = ${farthest} — BLOCKED! Can't reach here.</span>`;
                 } else {
+                    const reachDisplay = reachRaw > lastIdx
+                        ? `${reach} <span style="color:var(--text-muted);font-size:0.85em;font-style:italic">capped</span>`
+                        : `${iPtr} + ${val} = ${reach}`;
                     html += `<span style="color:var(--text-muted)">farthest = max(</span>`;
-                    html += `<span style="color:var(--accent-purple);font-weight:600">${farthest}</span>`;
-                    html += `<span style="color:var(--text-muted)">,</span>`;
-                    html += `<span style="color:var(--accent-blue);font-weight:600;margin:0 4px">${iPtr}+${val}=${reach}</span>`;
-                    html += `<span style="color:var(--text-muted)">) =</span>`;
-                    html += `<span style="color:var(--accent-green);font-weight:700;margin-left:4px">${Math.max(farthest, reach)}</span>`;
-                    if (reach >= lastIdx) {
-                        html += `<span style="color:var(--accent-green);margin-left:6px;font-weight:700">≥ goal! ✅</span>`;
+                    html += `<span style="color:var(--accent-purple);font-weight:600">${prevFarthest}</span>`;
+                    html += `<span style="color:var(--text-muted)">, </span>`;
+                    html += `<span style="color:var(--accent-blue);font-weight:600">${reachDisplay}</span>`;
+                    html += `<span style="color:var(--text-muted)">) = </span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">${Math.max(prevFarthest, reach)}</span>`;
+                    if (reachExpanded && reach >= lastIdx) {
+                        html += `<span style="color:var(--accent-green);margin-left:6px;font-weight:700">>= goal!</span>`;
+                    } else if (!reachExpanded) {
+                        html += `<span style="color:var(--text-muted);margin-left:6px;font-style:italic">no change</span>`;
                     }
                 }
                 html += `</div></div>`;
             } else if (isComplete) {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">✓ farthest=${farthest} ≥ last index ${lastIdx} — can reach the end!</span>`;
+                if (result === false) {
+                    html += `<span style="color:var(--accent-red);font-weight:700">Cannot reach the end. Blocked at index ${iPtr}.</span>`;
+                } else {
+                    html += `<span style="color:var(--accent-green);font-weight:700">farthest = ${farthest} >= last index ${lastIdx} — can reach the end!</span>`;
+                }
                 html += `</div></div>`;
             }
+
+            // Farthest flash
+            const fFlash = reachExpanded ? ' stock-mp-flash' : '';
+            let fContent;
+            if (reachExpanded) {
+                fContent = `<span class="stock-mp-old">idx ${prevFarthest}</span><span class="stock-mp-new">idx ${farthest}</span>`;
+            } else {
+                fContent = `idx ${farthest}`;
+            }
+
+            const goalReached = isComplete && result !== false;
+            const goalColorClass = goalReached ? 'p-green' : 'p-purple';
 
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">i (current index)</div>
+                        <div class="pointer-detail-label">i (scanner)</div>
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
-                    <div class="pointer-detail">
-                        <div class="pointer-detail-label">farthest reachable</div>
-                        <div class="pointer-detail-value p-merge">idx ${farthest}</div>
+                    <div class="pointer-detail stock-mp-box${fFlash}">
+                        <div class="pointer-detail-label">farthest</div>
+                        <div class="pointer-detail-value p-merge">${fContent}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">goal (last index)</div>
-                        <div class="pointer-detail-value">idx ${lastIdx}</div>
+                        <div class="pointer-detail-label">goal</div>
+                        <div class="pointer-detail-value ${goalColorClass}">idx ${lastIdx}</div>
                     </div>
                 </div>
             `;
             html += `</div>`;
             arrayContainer.innerHTML = html;
+
+            // Draw reach arc from scanner to its max reach
+            if (isComparison && !isFail && iPtr >= 0 && !isComplete && nums[iPtr] > 0) {
+                const chartEl = arrayContainer.querySelector('#jg1-chart');
+                const fromCell = chartEl?.querySelector(`[data-idx="${iPtr}"]`);
+                const reachIdx = Math.min(iPtr + nums[iPtr], lastIdx);
+                const toCell = chartEl?.querySelector(`[data-idx="${reachIdx}"]`);
+                if (chartEl && fromCell && toCell && iPtr !== reachIdx) {
+                    requestAnimationFrame(() => {
+                        const chartRect = chartEl.getBoundingClientRect();
+                        const fromRect = fromCell.getBoundingClientRect();
+                        const toRect = toCell.getBoundingClientRect();
+                        const x1 = fromRect.left + fromRect.width / 2 - chartRect.left;
+                        const x2 = toRect.left + toRect.width / 2 - chartRect.left;
+                        const y = fromRect.top - chartRect.top - 2;
+                        const midX = (x1 + x2) / 2;
+                        const arcH = Math.min(Math.abs(x2 - x1) * 0.2, 28) + 10;
+                        const midY = y - arcH;
+                        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                        svg.classList.add('jg1-arc-svg');
+                        svg.setAttribute('width', chartRect.width);
+                        svg.setAttribute('height', chartRect.height);
+                        svg.setAttribute('viewBox', `0 0 ${chartRect.width} ${chartRect.height}`);
+                        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                        marker.setAttribute('id', 'jg1-arrow');
+                        marker.setAttribute('viewBox', '0 0 10 10');
+                        marker.setAttribute('refX', '10');
+                        marker.setAttribute('refY', '5');
+                        marker.setAttribute('markerWidth', '6');
+                        marker.setAttribute('markerHeight', '6');
+                        marker.setAttribute('orient', 'auto-start-reverse');
+                        const arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+                        arrowPath.setAttribute('fill', 'rgba(59, 130, 246, 0.6)');
+                        marker.appendChild(arrowPath);
+                        defs.appendChild(marker);
+                        svg.appendChild(defs);
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', `M ${x1} ${y} Q ${midX} ${midY} ${x2} ${y}`);
+                        path.classList.add('jg1-arc-path');
+                        path.setAttribute('marker-end', 'url(#jg1-arrow)');
+                        svg.appendChild(path);
+                        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        text.setAttribute('x', midX);
+                        text.setAttribute('y', midY - 3);
+                        text.classList.add('jg1-arc-label');
+                        text.textContent = `+${nums[iPtr]}`;
+                        svg.appendChild(text);
+                        chartEl.appendChild(svg);
+                    });
+                }
+            }
         }
         
-        // Problem 12: Fewest Jumps to End (Jump Game II) — BFS level zones
+        // Problem 12: Fewest Jumps to End (Jump Game II) — "BFS Level" stepping stones
         if (currentProbId === '12' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const jumps = meta.jumps ?? 0;
             const curEnd = meta.curEnd ?? 0;
             const farthest = meta.farthest ?? 0;
+            const levels = meta.levels || [{ start: 0, end: 0 }];
             const isComplete = state.isComplete || false;
+            const isComparison = state.isComparison || false;
+            const isJump = state.isJump || false;
+            const prevCurEnd = state.prevCurEnd ?? curEnd;
+            const prevJumps = state.prevJumps ?? jumps;
+            const prevFarthest = state.prevFarthest ?? farthest;
+            const iReach = state.iReach ?? 0;
             const nums = state.nums1;
             const lastIdx = nums.length - 1;
 
-            // Color palette for BFS levels
-            const levelColors = ['var(--accent-blue)', 'var(--accent-green)', 'var(--accent-purple)', 'var(--accent-orange)', 'var(--accent-red)'];
+            // Level color palette
+            const lvlColors = [
+                'rgba(59, 130, 246, 0.15)',   // blue
+                'rgba(16, 185, 129, 0.15)',   // green
+                'rgba(139, 92, 246, 0.15)',   // purple
+                'rgba(249, 115, 22, 0.15)',   // orange
+                'rgba(236, 72, 153, 0.15)'    // pink
+            ];
+            const lvlBorders = [
+                'var(--accent-blue)',
+                'var(--accent-green)',
+                'var(--accent-purple)',
+                'var(--accent-orange)',
+                'rgba(236, 72, 153, 0.8)'
+            ];
             
+            // Build level map: which level does each index belong to?
+            const idxLevel = new Array(nums.length).fill(-1);
+            levels.forEach((lv, lvIdx) => {
+                for (let k = lv.start; k <= Math.min(lv.end, lastIdx); k++) {
+                    idxLevel[k] = lvIdx;
+                }
+            });
+
             const sItemCount = nums.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
-            let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">nums — find minimum jumps (BFS: each "level" = one jump)</div>`;
-            html += `<div class="array-visualization jump-viz">`;
+            let html = `<div class="array-inner${sDenseClass} jg2-inner">`;
+            html += `<div class="array-label">nums — minimum jumps to last index (BFS: each "level" = one jump)</div>`;
+            html += `<div class="array-visualization jump-viz jg2-viz" id="jg2-chart">`;
             
             nums.forEach((val, idx) => {
-                let classes = 'array-item';
+                let classes = 'array-item jg2-cell';
                 let pointerLabels = '';
-                
-                if (isComplete) classes += ' pointer-merge';
-                // curEnd boundary marker
-                if (!isComplete && idx === curEnd) {
-                    classes += ' jump-boundary';
-                }
-                // Within current level
-                if (!isComplete && idx <= curEnd) {
-                    classes += ' jump-reachable';
-                }
-                // Goal
-                if (idx === lastIdx) classes += ' jump-goal';
+                const lvl = idxLevel[idx];
+                const lvlColor = lvl >= 0 ? lvlColors[lvl % lvlColors.length] : 'transparent';
+                const lvlBorder = lvl >= 0 ? lvlBorders[lvl % lvlBorders.length] : 'var(--border-subtle)';
+                let extraStyle = `background:${lvlColor};border-color:${lvlBorder}`;
 
-                if (idx === iPtr) {
+                // Goal cell
+                if (idx === lastIdx) classes += ' jg2-goal';
+
+                // Completed
+                if (isComplete) classes += ' jg2-done';
+
+                // curEnd boundary — solid wall
+                if (!isComplete && idx === curEnd) {
+                    classes += ' jg2-wall';
+                }
+
+                // Scanner
+                if (idx === iPtr && !isComplete) {
                     classes += ' pointer-1';
                     pointerLabels = `<div class="pointer-label p1">i</div>`;
                 }
-                
-                html += `<div class="${classes}">${val}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+
+                // Level badge
+                let lvlBadge = '';
+                if (lvl >= 0) {
+                    lvlBadge = `<div class="jg2-lvl-badge" style="color:${lvlBorders[lvl % lvlBorders.length]}">L${lvl}</div>`;
+                }
+
+                html += `<div class="${classes}" style="${extraStyle}" data-idx="${idx}">${val}${lvlBadge}${pointerLabels}<div class="array-index">${idx}</div></div>`;
             });
             
             html += `</div>`;
 
-            // BFS level indicator
+            // Boundary indicators
             if (!isComplete) {
-                html += `<div class="bfs-level-bar">`;
-                html += `<span class="bfs-level-label">Level ${jumps}</span>`;
-                html += `<span style="color:var(--text-muted);font-size:11px;margin-left:8px">indices 0..${curEnd}</span>`;
-                html += `<span style="color:var(--accent-purple);font-size:11px;margin-left:8px">→ next level reaches up to index ${farthest}</span>`;
+                html += `<div class="jg2-boundaries">`;
+                html += `<div class="jg2-boundary-item"><span class="jg2-wall-icon"></span><span>curEnd = ${curEnd}</span><span style="color:var(--text-muted);margin-left:4px">(solid wall — end of level ${jumps})</span></div>`;
+                html += `<div class="jg2-boundary-item"><span class="jg2-ghost-icon"></span><span>farthest = ${farthest}</span><span style="color:var(--text-muted);margin-left:4px">(ghost wall — next level reaches here)</span></div>`;
                 html += `</div>`;
             }
 
-            // Bridge: BFS level boundary
-            if (iPtr >= 0 && iPtr < nums.length && !isComplete) {
+            // Level brackets row
+            if (levels.length > 0) {
+                html += `<div class="jg2-levels-row">`;
+                levels.forEach((lv, lvIdx) => {
+                    const color = lvlBorders[lvIdx % lvlBorders.length];
+                    const bg = lvlColors[lvIdx % lvlColors.length];
+                    html += `<div class="jg2-level-bracket" style="border-color:${color};background:${bg}">`;
+                    html += `<span style="color:${color};font-weight:700;font-size:10px">Jump ${lvIdx}</span>`;
+                    html += `<span style="color:var(--text-muted);font-size:9px;margin-left:4px">[${lv.start}..${Math.min(lv.end, lastIdx)}]</span>`;
+                    html += `</div>`;
+                });
+                html += `</div>`;
+            }
+
+            // Bridge
+            if (iPtr >= 0 && iPtr < nums.length && !isComplete && isComparison) {
                 const val = nums[iPtr];
                 const reach = iPtr + val;
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--text-muted)">farthest = max(${farthest},</span>`;
-                html += `<span style="color:var(--accent-blue);font-weight:600;margin:0 4px">${iPtr}+${val}=${reach}</span>`;
-                html += `<span style="color:var(--text-muted)">) =</span>`;
-                html += `<span style="color:var(--accent-purple);font-weight:700;margin-left:4px">${Math.max(farthest, reach)}</span>`;
-                if (iPtr === curEnd) {
-                    html += `<span style="color:var(--accent-green);margin-left:8px;font-weight:700">i == curEnd=${curEnd} → JUMP! 🦘 (jump #${jumps})</span>`;
+                if (isJump) {
+                    html += `<span style="color:var(--accent-orange);font-weight:700">i == curEnd (${prevCurEnd})</span>`;
+                    html += `<span style="color:var(--text-muted);margin:0 6px">— end of level ${prevJumps}. Forced jump!</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">jumps = ${jumps}, curEnd moves to ${curEnd}</span>`;
                 } else {
-                    html += `<span style="color:var(--text-muted);margin-left:6px">exploring level ${jumps}…</span>`;
+                    html += `<span style="color:var(--text-muted)">farthest = max(</span>`;
+                    html += `<span style="color:var(--accent-purple);font-weight:600">${prevFarthest}</span>`;
+                    html += `<span style="color:var(--text-muted)">, </span>`;
+                    html += `<span style="color:var(--accent-blue);font-weight:600">${iPtr} + ${val} = ${reach}</span>`;
+                    html += `<span style="color:var(--text-muted)">) = </span>`;
+                    html += `<span style="color:var(--accent-purple);font-weight:700">${Math.max(prevFarthest, reach)}</span>`;
+                    html += `<span style="color:var(--text-muted);margin-left:6px">exploring level ${jumps}...</span>`;
                 }
                 html += `</div></div>`;
             } else if (isComplete) {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">✓ Minimum jumps = ${jumps} (BFS levels to reach end)</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">Minimum jumps = ${jumps} (${levels.length} BFS levels to reach end)</span>`;
                 html += `</div></div>`;
+            }
+
+            // Jump counter with flash
+            const jFlash = isJump ? ' stock-mp-flash' : '';
+            let jContent;
+            if (isJump) {
+                jContent = `<span class="stock-mp-old">${prevJumps}</span><span class="stock-mp-new">${jumps}</span>`;
+            } else {
+                jContent = `${jumps}`;
             }
 
             html += `
@@ -7749,22 +8149,82 @@ function render() {
                         <div class="pointer-detail-label">i (scanner)</div>
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
                     </div>
-                    <div class="pointer-detail">
-                        <div class="pointer-detail-label">jumps 🦘</div>
-                        <div class="pointer-detail-value p-merge">${jumps}</div>
+                    <div class="pointer-detail stock-mp-box${jFlash}">
+                        <div class="pointer-detail-label">jumps</div>
+                        <div class="pointer-detail-value p-merge">${jContent}</div>
                     </div>
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">curEnd (level boundary)</div>
+                        <div class="pointer-detail-label">curEnd</div>
                         <div class="pointer-detail-value p2">idx ${curEnd}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label">farthest</div>
-                        <div class="pointer-detail-value">idx ${farthest}</div>
+                        <div class="pointer-detail-value p-purple">idx ${farthest}</div>
                     </div>
                 </div>
             `;
             html += `</div>`;
             arrayContainer.innerHTML = html;
+
+            // Draw solid wall line at curEnd and dashed ghost at farthest
+            if (!isComplete) {
+                const chartEl = arrayContainer.querySelector('#jg2-chart');
+                if (chartEl) {
+                    requestAnimationFrame(() => {
+                        const chartRect = chartEl.getBoundingClientRect();
+                        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                        svg.classList.add('jg2-wall-svg');
+                        svg.setAttribute('width', chartRect.width);
+                        svg.setAttribute('height', chartRect.height);
+                        svg.setAttribute('viewBox', `0 0 ${chartRect.width} ${chartRect.height}`);
+
+                        // Solid wall at curEnd
+                        const curEndCell = chartEl.querySelector(`[data-idx="${curEnd}"]`);
+                        if (curEndCell) {
+                            const cellRect = curEndCell.getBoundingClientRect();
+                            const wallX = cellRect.right - chartRect.left + 2;
+                            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                            line.setAttribute('x1', wallX);
+                            line.setAttribute('y1', 0);
+                            line.setAttribute('x2', wallX);
+                            line.setAttribute('y2', chartRect.height);
+                            line.classList.add('jg2-solid-wall');
+                            svg.appendChild(line);
+                            // Label
+                            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                            text.setAttribute('x', wallX + 3);
+                            text.setAttribute('y', 10);
+                            text.classList.add('jg2-wall-label');
+                            text.textContent = 'curEnd';
+                            svg.appendChild(text);
+                        }
+
+                        // Dashed ghost wall at farthest (if different from curEnd)
+                        if (farthest > curEnd) {
+                            const farCell = chartEl.querySelector(`[data-idx="${Math.min(farthest, lastIdx)}"]`);
+                            if (farCell) {
+                                const fRect = farCell.getBoundingClientRect();
+                                const ghostX = fRect.right - chartRect.left + 2;
+                                const ghostLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                                ghostLine.setAttribute('x1', ghostX);
+                                ghostLine.setAttribute('y1', 0);
+                                ghostLine.setAttribute('x2', ghostX);
+                                ghostLine.setAttribute('y2', chartRect.height);
+                                ghostLine.classList.add('jg2-ghost-wall');
+                                svg.appendChild(ghostLine);
+                                const gText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                                gText.setAttribute('x', ghostX + 3);
+                                gText.setAttribute('y', 10);
+                                gText.classList.add('jg2-ghost-label');
+                                gText.textContent = 'farthest';
+                                svg.appendChild(gText);
+                            }
+                        }
+
+                        chartEl.appendChild(svg);
+                    });
+                }
+            }
         }
         
         // Problem 13: H-Index — Durfee-square geometric visualization (SVG)
@@ -7815,12 +8275,12 @@ function render() {
             if (yTicks[yTicks.length - 1] !== maxC && maxC - yTicks[yTicks.length - 1] > tickStep * 0.3) yTicks.push(maxC);
             yTicks.forEach(t => {
                 const y = scaleY(t);
-                html += `<line x1="${pad.left}" y1="${y}" x2="${svgW - pad.right}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+                html += `<line x1="${pad.left}" y1="${y}" x2="${svgW - pad.right}" y2="${y}" stroke="var(--grid-line)" stroke-width="1"/>`;
                 html += `<text x="${pad.left - 8}" y="${y + 4}" text-anchor="end" class="hindex-axis-label">${t}</text>`;
             });
 
             // X-axis baseline
-            html += `<line x1="${pad.left}" y1="${scaleY(0)}" x2="${svgW - pad.right}" y2="${scaleY(0)}" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>`;
+            html += `<line x1="${pad.left}" y1="${scaleY(0)}" x2="${svgW - pad.right}" y2="${scaleY(0)}" stroke="var(--grid-line-strong)" stroke-width="1"/>`;
 
             // ─── Durfee square overlay ───
             const activeSquare = phase === 'done' ? hVal : (trySquare ?? squareSize);
@@ -8450,7 +8910,7 @@ function render() {
             ['I','V','X','L','C','D','M'].forEach(sym => {
                 const v = romanMap[sym];
                 const isActive = iPtr >= 0 && state.nums1[iPtr] === sym;
-                html += `<span style="padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;${isActive ? 'background:var(--accent-blue);color:white;' : 'color:var(--text-muted);background:rgba(255,255,255,0.05);'}">${sym}=${v}</span>`;
+                html += `<span style="padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;${isActive ? 'background:var(--accent-blue);color:white;' : 'color:var(--text-muted);background:var(--overlay-light);'}">${sym}=${v}</span>`;
             });
             html += `</div>`;
 
@@ -8511,7 +8971,7 @@ function render() {
 
             // Compact lookup table — pill badges (like #19)
             html += `<div class="array-section"><div class="array-label">value → symbol lookup (greedy: pick largest that fits)</div>`;
-            html += `<div style="display:flex;justify-content:center;gap:5px;margin:8px 0;flex-wrap:wrap;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.06);">`;
+            html += `<div style="display:flex;justify-content:center;gap:5px;margin:8px 0;flex-wrap:wrap;padding:10px 12px;background:var(--overlay-subtle);border-radius:10px;border:1px solid var(--border-subtle);">`;
             state.nums1.forEach((val, idx) => {
                 const sym = (state.nums2 || [])[idx] || '';
                 const isActive = idx === iPtr;
@@ -8525,9 +8985,9 @@ function render() {
                 } else if (isActive) {
                     pillStyle += 'background:rgba(249,115,22,0.15);color:var(--accent-orange);border:1px solid rgba(249,115,22,0.35);';
                 } else if (isPassed) {
-                    pillStyle += 'opacity:0.35;color:var(--text-muted);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);';
+                    pillStyle += 'opacity:0.35;color:var(--text-muted);background:var(--overlay-subtle);border:1px solid var(--border-subtle);';
                 } else {
-                    pillStyle += 'color:var(--text-secondary);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);';
+                    pillStyle += 'color:var(--text-secondary);background:var(--overlay-light);border:1px solid var(--overlay-medium);';
                 }
                 html += `<span style="${pillStyle}"><strong>${sym}</strong><span style="font-size:10px;opacity:0.7;font-weight:400">${val}</span></span>`;
             });
@@ -9056,7 +9516,7 @@ function render() {
                 const spaceCount = currentLine.length - 1;
                 const totalWithSpaces = lineLen + spaceCount;
                 const remaining = maxWidth - totalWithSpaces;
-                html += `<div style="margin:8px 0;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border:1px solid rgba(255,255,255,0.08);">`;
+                html += `<div style="margin:8px 0;padding:8px 12px;background:var(--overlay-subtle);border-radius:6px;border:1px solid var(--overlay-medium);">`;
                 html += `<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">📝 Current line being packed:</div>`;
                 html += `<div style="font-family:monospace;font-size:13px;color:var(--accent-green);font-weight:600;">[${currentLine.join(' | ')}]</div>`;
                 // Width bar

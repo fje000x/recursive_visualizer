@@ -1364,6 +1364,11 @@ body {
     --shadow-xl: 0 13px 17px -3px rgb(0 0 0 / 0.1);
 }
 
+/* Theme toggle — hidden for v1 */
+.theme-toggle {
+    display: none;
+}
+
 
 * {
     box-sizing: border-box;
@@ -1395,7 +1400,7 @@ body {
     width: 100%;
     max-width: 100vw;
     flex-shrink: 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .nav-left {
@@ -1404,7 +1409,7 @@ body {
     gap: 11px;
     min-width: 0;
     flex: 1 1 0%;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .logo {
@@ -5422,34 +5427,262 @@ body.problem-page-active .action-bar {
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-/* ===== Jump Game Visualization ===== */
-.jump-viz .jump-reachable {
+/* ===== Jump Game I — "Safe Zone vs Darkness" ===== */
+.jg1-viz {
+    position: relative;
+}
+.jg1-cell {
+    position: relative;
+    transition: all 0.25s ease;
+}
+.jg1-safe {
     border-color: var(--accent-green) !important;
-    background: rgba(16, 185, 129, 0.1);
+    background: rgba(16, 185, 129, 0.08);
 }
-.jump-viz .jump-unreachable {
-    border-color: var(--accent-red) !important;
-    background: rgba(239, 68, 68, 0.05);
-    opacity: 0.5;
+.jg1-new-reach {
+    background: rgba(16, 185, 129, 0.22) !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    animation: jg1-expand-pulse 0.4s ease-out;
 }
-.jump-viz .jump-goal {
+@keyframes jg1-expand-pulse {
+    0% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+.jg1-dark {
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--text-muted);
+    opacity: 0.4;
+}
+.jg1-active {
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+.jg1-goal {
     border-color: var(--accent-purple) !important;
-    box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
 }
-.jump-viz .jump-boundary {
-    border-color: var(--accent-orange) !important;
-    box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
+.jg1-goal-reached {
+    border-color: var(--accent-green) !important;
+    background: rgba(16, 185, 129, 0.25) !important;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.5);
+    animation: jg1-goal-flash 0.5s ease-out;
 }
-.jump-reach-label {
+@keyframes jg1-goal-flash {
+    0% { transform: scale(1.15); box-shadow: 0 0 24px rgba(16, 185, 129, 0.8); }
+    100% { transform: scale(1); }
+}
+.jg1-blocked {
+    border-color: var(--accent-red) !important;
+    background: rgba(239, 68, 68, 0.2) !important;
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
+    animation: jg1-blocked-shake 0.4s ease;
+    opacity: 1 !important;
+}
+@keyframes jg1-blocked-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-3px); }
+    40% { transform: translateX(3px); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
+}
+.jg1-won {
+    border-color: var(--accent-green) !important;
+    background: rgba(16, 185, 129, 0.12) !important;
+}
+/* Flag at farthest — beside the index box, no border */
+.jg1-flag {
     position: absolute;
-    top: -18px;
-    right: -4px;
-    font-size: 9px;
-    font-weight: 700;
-    color: var(--accent-blue);
-    white-space: nowrap;
+    bottom: -28px;
+    left: calc(50% + 18px);
+    font-size: 11px;
+    line-height: 1;
+    padding: 3px 0;
+    color: var(--accent-green);
+    filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.5));
+    z-index: 2;
+    pointer-events: none;
+}
+.jg1-flag-moved {
+    animation: jg1-flag-bounce 0.35s ease-out;
+}
+@keyframes jg1-flag-bounce {
+    0% { transform: translateY(-4px); opacity: 0.5; }
+    60% { transform: translateY(1px); }
+    100% { transform: translateY(0); opacity: 1; }
 }
 /* Reach progress bar */
+.jg1-reach-bar-wrap {
+    position: relative;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 9px;
+    margin: 6px 0;
+    overflow: hidden;
+}
+.jg1-reach-fill {
+    height: 100%;
+    background: var(--accent-green);
+    border-radius: 9px;
+    transition: width 0.3s ease;
+    opacity: 0.3;
+}
+.jg1-reach-goal {
+    opacity: 0.5;
+    background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+}
+.jg1-reach-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+/* Reach span info */
+.jg1-reach-span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 3px 10px;
+    font-size: 11px;
+    background: rgba(59, 130, 246, 0.06);
+    border-radius: 5px;
+    margin: 3px 0;
+}
+/* Reach arc */
+.jg1-arc-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+.jg1-arc-path {
+    fill: none;
+    stroke: rgba(59, 130, 246, 0.5);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 3;
+}
+.jg1-arc-label {
+    fill: rgba(59, 130, 246, 0.8);
+    font-size: 10px;
+    font-weight: 700;
+    text-anchor: middle;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ===== Jump Game II — "BFS Levels / Stepping Stones" ===== */
+.jg2-viz {
+    position: relative;
+}
+.jg2-cell {
+    position: relative;
+    transition: all 0.25s ease;
+}
+.jg2-goal {
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+}
+.jg2-done {
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+/* Solid wall at curEnd */
+.jg2-wall {
+    border-right: 3px solid var(--accent-orange) !important;
+}
+/* Level badge inside cell */
+.jg2-lvl-badge {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+/* Boundaries row */
+.jg2-boundaries {
+    display: flex;
+    gap: 16px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 3px 0;
+}
+.jg2-boundary-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.jg2-wall-icon {
+    display: inline-block;
+    width: 3px;
+    height: 12px;
+    background: var(--accent-orange);
+    border-radius: 1px;
+}
+.jg2-ghost-icon {
+    display: inline-block;
+    width: 3px;
+    height: 12px;
+    border: 1px dashed var(--accent-purple);
+    border-radius: 1px;
+}
+/* Level brackets row */
+.jg2-levels-row {
+    display: flex;
+    gap: 4px;
+    padding: 3px 0;
+    flex-wrap: wrap;
+}
+.jg2-level-bracket {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 8px;
+    border: 1px solid;
+    border-radius: 4px;
+}
+/* SVG wall lines */
+.jg2-wall-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+.jg2-solid-wall {
+    stroke: var(--accent-orange);
+    stroke-width: 2.5;
+    opacity: 0.7;
+}
+.jg2-wall-label {
+    fill: var(--accent-orange);
+    font-size: 9px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    opacity: 0.8;
+}
+.jg2-ghost-wall {
+    stroke: var(--accent-purple);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 3;
+    opacity: 0.5;
+}
+.jg2-ghost-label {
+    fill: var(--accent-purple);
+    font-size: 9px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    opacity: 0.6;
+}
+
+/* ===== Shared progress bar (used by multiple problems) ===== */
 .reach-bar-container {
     position: relative;
     height: 18px;
@@ -5474,21 +5707,6 @@ body.problem-page-active .action-bar {
     font-weight: 600;
     color: var(--text-secondary);
     white-space: nowrap;
-}
-/* BFS level bar */
-.bfs-level-bar {
-    display: flex;
-    align-items: center;
-    padding: 4px 12px;
-    background: rgba(139, 92, 246, 0.08);
-    border-radius: 6px;
-    margin: 4px 0;
-    border-left: 3px solid var(--accent-purple);
-}
-.bfs-level-label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--accent-purple);
 }
 
 /* ===== Candy Comparison Row ===== */
@@ -8002,6 +8220,7 @@ body > main > section.module.viz-module > div.module-header:empty {
 
 /* ===== Report / Feedback Modal ===== */
 .report-fab {
+    display: none !important; /* Toggle: remove this line to enable the report button */
     position: fixed;
     bottom: 24px;
     right: 24px;
@@ -8013,7 +8232,6 @@ body > main > section.module.viz-module > div.module-header:empty {
     background: var(--bg-card, #1e293b);
     color: var(--text-secondary, #94a3b8);
     cursor: pointer;
-    display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 12px rgba(0,0,0,0.3);
