@@ -12256,11 +12256,13 @@ function init() {
     // Show prerequisite knowledge check banner for harder problems
     renderPrereqBanner(currentProbId);
 
-    // Update algorithm selector (desktop + mobile + popover)
+    // Update algorithm selector (desktop nav + action bar + mobile + popover)
     const algorithmSelect = document.getElementById('algorithmSelect');
+    const actionBarAlgoSelect = document.getElementById('actionBarAlgoSelect');
     const mobileAlgorithmSelect = document.getElementById('mobileAlgorithmSelect');
     const popAlgoSelect = document.getElementById('popAlgoSelect');
     algorithmSelect.innerHTML = '';
+    if (actionBarAlgoSelect) actionBarAlgoSelect.innerHTML = '';
     if (mobileAlgorithmSelect) mobileAlgorithmSelect.innerHTML = '';
     if (popAlgoSelect) popAlgoSelect.innerHTML = '';
     
@@ -12273,6 +12275,10 @@ function init() {
         }
         algorithmSelect.appendChild(option);
 
+        // Clone for action bar
+        if (actionBarAlgoSelect) {
+            actionBarAlgoSelect.appendChild(option.cloneNode(true));
+        }
         // Clone for mobile
         if (mobileAlgorithmSelect) {
             mobileAlgorithmSelect.appendChild(option.cloneNode(true));
@@ -12285,6 +12291,7 @@ function init() {
 
     // Explicitly set the value on all selects
     algorithmSelect.value = currentAlgorithm;
+    if (actionBarAlgoSelect) actionBarAlgoSelect.value = currentAlgorithm;
     if (mobileAlgorithmSelect) mobileAlgorithmSelect.value = currentAlgorithm;
     if (popAlgoSelect) popAlgoSelect.value = currentAlgorithm;
 
@@ -12555,20 +12562,31 @@ function toggleCodePanel() {
     }, 350);
 }
 
-// Stack panel toggle (mobile only)
+// Stack panel toggle (works on mobile and desktop)
 function toggleStackPanel() {
     const toggleBtn = document.getElementById('stackToggleBtn');
     const stackModule = document.querySelector('.stack-module');
+    const appLayout = document.querySelector('.app-layout');
     const isTrueMobile = window.matchMedia('(pointer: coarse)').matches;
 
-    if (!isTrueMobile) return; // only works on mobile
-
-    const nowVisible = stackModule.classList.toggle('mobile-visible');
-    toggleBtn.classList.toggle('collapsed', nowVisible);
+    if (isTrueMobile) {
+        // Mobile: toggle overlay visibility
+        const nowVisible = stackModule.classList.toggle('mobile-visible');
+        toggleBtn.classList.toggle('collapsed', nowVisible);
+    } else {
+        // Desktop: collapse/expand the stack column
+        const isNowHidden = appLayout.classList.toggle('hide-right-panel');
+        toggleBtn.classList.toggle('collapsed', isNowHidden);
+        if (isNowHidden) {
+            stackModule.style.display = 'none';
+        } else {
+            stackModule.style.display = '';
+        }
+    }
 
     // Re-scale tree canvas after layout transition completes
     setTimeout(() => {
-        if (isArrayProblem()) return; // array problem, no tree to scale
+        if (isArrayProblem()) return;
         const engine = document.querySelector('.render-engine');
         const treeCanvas = document.getElementById('treeCanvas');
         if (engine && treeCanvas) {
@@ -12669,7 +12687,9 @@ function setupEventListeners() {
     
     document.getElementById('algorithmSelect').addEventListener('change', (e) => {
         currentAlgorithm = e.target.value;
-        // Sync mobile + popover selectors
+        // Sync all other algo selectors
+        const actionBarAlgo = document.getElementById('actionBarAlgoSelect');
+        if (actionBarAlgo) actionBarAlgo.value = currentAlgorithm;
         const mobileSelect = document.getElementById('mobileAlgorithmSelect');
         if (mobileSelect) mobileSelect.value = currentAlgorithm;
         const popAlgo = document.getElementById('popAlgoSelect');
@@ -12677,6 +12697,23 @@ function setupEventListeners() {
         currentTestCase = "normal"; // Reset test case when switching algorithms
         init();
     });
+
+    // Action bar algorithm selector (desktop)
+    const actionBarAlgoSelect = document.getElementById('actionBarAlgoSelect');
+    if (actionBarAlgoSelect) {
+        actionBarAlgoSelect.addEventListener('change', (e) => {
+            currentAlgorithm = e.target.value;
+            // Sync all other algo selectors
+            const navAlgo = document.getElementById('algorithmSelect');
+            if (navAlgo) navAlgo.value = currentAlgorithm;
+            const mobileSelect = document.getElementById('mobileAlgorithmSelect');
+            if (mobileSelect) mobileSelect.value = currentAlgorithm;
+            const popAlgo = document.getElementById('popAlgoSelect');
+            if (popAlgo) popAlgo.value = currentAlgorithm;
+            currentTestCase = "normal";
+            init();
+        });
+    }
 
     // Test case selector (desktop — in action bar)
     const testcaseSelectEl = document.getElementById('testcaseSelect');
@@ -12945,13 +12982,32 @@ function updateAuthUI() {
         if (drawerAvatar) drawerAvatar.textContent = initial;
         if (drawerName) drawerName.textContent = displayName;
         if (drawerEmail) drawerEmail.textContent = auth.user.email || '';
-        // Landing page auth button
+        // Landing page auth button — just circle with initial when logged in
         const landingAuthBtn = document.getElementById('landingAuthBtn');
-        const landingAuthLabel = document.getElementById('landingAuthLabel');
+        const landingAvatar = document.getElementById('landingAvatar');
         if (landingAuthBtn) {
             landingAuthBtn.classList.add('logged-in');
-            if (landingAuthLabel) landingAuthLabel.textContent = displayName;
+            if (landingAvatar) landingAvatar.textContent = initial;
         }
+        // Landing dropdown
+        const landingDdAvatar = document.getElementById('landingDdAvatar');
+        const landingDdName = document.getElementById('landingDdName');
+        const landingDdEmail = document.getElementById('landingDdEmail');
+        if (landingDdAvatar) landingDdAvatar.textContent = initial;
+        if (landingDdName) landingDdName.textContent = displayName;
+        if (landingDdEmail) landingDdEmail.textContent = auth.user.email || '';
+        // Problem page auth button + dropdown
+        const ppAuthBtn = document.getElementById('ppAuthBtn');
+        if (ppAuthBtn) {
+            ppAuthBtn.classList.add('logged-in');
+            ppAuthBtn.innerHTML = initial;
+        }
+        const ppDdAvatar = document.getElementById('ppDdAvatar');
+        const ppDdName = document.getElementById('ppDdName');
+        const ppDdEmail = document.getElementById('ppDdEmail');
+        if (ppDdAvatar) ppDdAvatar.textContent = initial;
+        if (ppDdName) ppDdName.textContent = displayName;
+        if (ppDdEmail) ppDdEmail.textContent = auth.user.email || '';
     } else {
         // Desktop nav button
         if (navBtn) {
@@ -12966,11 +13022,20 @@ function updateAuthUI() {
         if (drawerLoggedIn) drawerLoggedIn.style.display = 'none';
         // Landing page auth button
         const landingAuthBtn = document.getElementById('landingAuthBtn');
-        const landingAuthLabel = document.getElementById('landingAuthLabel');
+        const landingAvatar = document.getElementById('landingAvatar');
         if (landingAuthBtn) {
             landingAuthBtn.classList.remove('logged-in');
-            if (landingAuthLabel) landingAuthLabel.textContent = 'Log in';
+            if (landingAvatar) landingAvatar.innerHTML = '<i class="fas fa-user"></i>';
         }
+        // Close landing dropdown if open
+        closeLandingAuthDropdown();
+        // Problem page auth button
+        const ppAuthBtn = document.getElementById('ppAuthBtn');
+        if (ppAuthBtn) {
+            ppAuthBtn.classList.remove('logged-in');
+            ppAuthBtn.innerHTML = '<i class="fas fa-user"></i>';
+        }
+        closePpAuthDropdown();
     }
 }
 
@@ -13304,7 +13369,15 @@ function setNotebookSaveStatus(status, msg) {
 }
 
 // ---- Open / close ----
+function syncNavHeight() {
+    const nav = document.querySelector('.global-nav');
+    if (nav) {
+        document.documentElement.style.setProperty('--nav-height', nav.offsetHeight + 'px');
+    }
+}
+
 function openNotebook() {
+    syncNavHeight();
     const panel = document.getElementById('notebookPanel');
     if (!panel) return;
     panel.classList.add('open');
@@ -13313,6 +13386,7 @@ function openNotebook() {
 
 // Open notebook and jump straight to the editor for the current problem
 function openNotebookForCurrentProblem() {
+    syncNavHeight();
     const panel = document.getElementById('notebookPanel');
     if (!panel) return;
     panel.classList.add('open');
@@ -13378,14 +13452,14 @@ function renderNotesList() {
                 <span class="nb-list-empty-hint">Your notes are saved automatically</span>
             </div>`;
     } else {
-        html += '<div class="nb-list-section-label" style="padding:10px 14px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);opacity:0.5;">Your Notes</div>';
+        html += '<div class="nb-list-section-label" style="padding:12px 16px 4px;font-size:11px;font-weight:500;color:var(--text-muted);opacity:0.5;">Notes</div>';
         for (const { id, note } of withNotes) {
             html += buildNoteCard(id, note, true);
         }
     }
 
     // Show all problems (without notes) as available to open
-    html += '<div class="nb-list-section-label" style="padding:14px 14px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);opacity:0.5;">All Problems</div>';
+    html += '<div class="nb-list-section-label" style="padding:12px 16px 4px;font-size:11px;font-weight:500;color:var(--text-muted);opacity:0.5;">Problems</div>';
     for (const { id } of withoutNotes) {
         html += buildNoteCard(id, null, false);
     }
@@ -13404,20 +13478,15 @@ function renderNotesList() {
 function buildNoteCard(problemId, note, hasContent) {
     const prob = problemDB[problemId];
     if (!prob) return '';
-    const diffClass = prob.difficulty === 'easy' ? 'diff-easy' : prob.difficulty === 'medium' ? 'diff-medium' : 'diff-hard';
-    const num = prob.leetcodeNum || problemId;
 
     let preview = '';
     if (hasContent && note && note.text_content) {
-        // Strip HTML to get plain text preview
         const tmp = document.createElement('div');
         tmp.innerHTML = note.text_content;
-        preview = tmp.textContent.trim().slice(0, 100);
-        if (preview.length === 100) preview += '…';
+        preview = tmp.textContent.trim().slice(0, 80);
+        if (preview.length === 80) preview += '…';
     } else if (hasContent) {
-        preview = '🎨 Drawing';
-    } else {
-        preview = 'No notes yet — tap to start';
+        preview = 'Drawing';
     }
 
     let meta = '';
@@ -13436,14 +13505,12 @@ function buildNoteCard(problemId, note, hasContent) {
     }
 
     return `
-        <div class="nb-note-card" data-problem-id="${problemId}">
-            <div class="nb-note-num ${diffClass}">${num}</div>
+        <div class="nb-note-card${hasContent ? '' : ' nb-note-empty'}" data-problem-id="${problemId}">
             <div class="nb-note-info">
-                <div class="nb-note-name">${prob.name}</div>
-                <div class="nb-note-preview">${preview}</div>
-                ${meta ? `<div class="nb-note-meta"><i class="fas fa-clock"></i> ${meta}</div>` : ''}
+                <div class="nb-note-name"><span class="nb-note-id">${problemId}.</span> ${prob.name}</div>
+                ${preview ? `<div class="nb-note-preview">${preview}</div>` : ''}
+                ${meta ? `<div class="nb-note-meta">${meta}</div>` : ''}
             </div>
-            <div class="nb-note-arrow"><i class="fas fa-chevron-right"></i></div>
         </div>`;
 }
 
@@ -13453,6 +13520,19 @@ function openNoteEditor(problemId) {
     const editorView = document.getElementById('notebookEditorView');
     if (listView) listView.style.display = 'none';
     if (editorView) editorView.style.display = 'flex';
+
+    // Dismiss any overlays so we land in the app
+    const landingOverlay = document.getElementById('landingOverlay');
+    if (landingOverlay && !landingOverlay.classList.contains('landing-hidden')) {
+        landingOverlay.classList.add('landing-hidden');
+        sessionStorage.setItem('algoflowz_landed', '1');
+    }
+    if (typeof closeProblemModal === 'function') closeProblemModal();
+
+    // Also switch the visualizer to this problem
+    if (problemId !== currentProbId && problemDB[problemId]) {
+        selectProblem(problemId);
+    }
     // Set the active problem for notes
     notebookActiveProblemId = problemId;
     loadNotebookForProblem(problemId);
@@ -13743,7 +13823,7 @@ function clearNotebookCanvas() {
 function setupNotebook() {
     // Open button (nav) — opens list view
     const navBtn = document.getElementById('navNotesBtn');
-    if (navBtn) navBtn.addEventListener('click', openNotebook);
+    if (navBtn) navBtn.addEventListener('click', openNotebookForCurrentProblem);
 
     // Close button (list view)
     const closeBtn = document.getElementById('notebookClose');
@@ -13762,17 +13842,46 @@ function setupNotebook() {
         });
     }
 
-    // Landing page auth button
+    // Landing page auth button — dropdown when logged in, modal when not
     const landingAuthBtn = document.getElementById('landingAuthBtn');
     if (landingAuthBtn) {
-        landingAuthBtn.addEventListener('click', () => {
+        landingAuthBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const auth = getStoredAuth();
             if (auth) {
-                // Logged in — open notes
-                openNotebook();
+                toggleLandingAuthDropdown();
             } else {
                 openAuthModal('login');
             }
+        });
+    }
+
+    // Landing dropdown: Notes button — dismiss landing, open notes overlay
+    const landingDdNotesBtn = document.getElementById('landingDdNotesBtn');
+    if (landingDdNotesBtn) {
+        landingDdNotesBtn.addEventListener('click', () => {
+            closeLandingAuthDropdown();
+            document.getElementById('landingOverlay').classList.add('landing-hidden');
+            sessionStorage.setItem('algoflowz_landed', '1');
+            openNotebook();
+        });
+    }
+
+    // Landing dropdown: Feedback button
+    const landingDdFeedbackBtn = document.getElementById('landingDdFeedbackBtn');
+    if (landingDdFeedbackBtn) {
+        landingDdFeedbackBtn.addEventListener('click', () => {
+            closeLandingAuthDropdown();
+            openReportModal();
+        });
+    }
+
+    // Landing dropdown: Logout button
+    const landingDdLogoutBtn = document.getElementById('landingDdLogoutBtn');
+    if (landingDdLogoutBtn) {
+        landingDdLogoutBtn.addEventListener('click', () => {
+            closeLandingAuthDropdown();
+            handleLogout();
         });
     }
 
@@ -13861,12 +13970,41 @@ function setupNotebookResize() {
 
     document.addEventListener('mousemove', (e) => {
         if (!dragging) return;
-        // Dragging left edge: moving left increases width
-        const delta = startX - e.clientX;
-        const maxW = Math.min(MAX_WIDTH, window.innerWidth * 0.85);
-        const newWidth = Math.max(MIN_WIDTH, Math.min(maxW, startWidth + delta));
+        const isLeft = panel.classList.contains('notebook-left');
+        const vw = window.innerWidth;
+        const handleX = e.clientX;
+
+        // Detect side flip: if handle crosses the center, snap to opposite side
+        if (!isLeft && handleX < vw * 0.35) {
+            panel.classList.add('notebook-left');
+            // Reset width to default on flip
+            panel.style.setProperty('--notebook-width', '440px');
+            startX = e.clientX;
+            startWidth = 440;
+            initNotebookCanvas();
+            return;
+        } else if (isLeft && handleX > vw * 0.65) {
+            panel.classList.remove('notebook-left');
+            panel.style.setProperty('--notebook-width', '440px');
+            startX = e.clientX;
+            startWidth = 440;
+            initNotebookCanvas();
+            return;
+        }
+
+        // Normal resize
+        const maxW = Math.min(MAX_WIDTH, vw * 0.85);
+        let newWidth;
+        if (isLeft) {
+            // Left side: dragging right edge → moving right increases width
+            const delta = e.clientX - startX;
+            newWidth = Math.max(MIN_WIDTH, Math.min(maxW, startWidth + delta));
+        } else {
+            // Right side: dragging left edge → moving left increases width
+            const delta = startX - e.clientX;
+            newWidth = Math.max(MIN_WIDTH, Math.min(maxW, startWidth + delta));
+        }
         panel.style.setProperty('--notebook-width', newWidth + 'px');
-        // Reinit canvas on resize
         initNotebookCanvas();
     });
 
@@ -13908,6 +14046,8 @@ function closeHamburgerDrawer() {
 function toggleAuthDropdown() {
     const dd = document.getElementById('navAuthDropdown');
     if (!dd) return;
+    closeLandingAuthDropdown();
+    closePpAuthDropdown();
     dd.classList.toggle('show');
 }
 
@@ -13916,6 +14056,33 @@ function closeAuthDropdown() {
     if (dd) dd.classList.remove('show');
 }
 
+// Landing auth dropdown
+function toggleLandingAuthDropdown() {
+    const dd = document.getElementById('landingAuthDropdown');
+    if (!dd) return;
+    closeAuthDropdown();
+    closePpAuthDropdown();
+    dd.classList.toggle('show');
+}
+
+function closeLandingAuthDropdown() {
+    const dd = document.getElementById('landingAuthDropdown');
+    if (dd) dd.classList.remove('show');
+}
+
+// Problem page auth dropdown
+function togglePpAuthDropdown() {
+    const dd = document.getElementById('ppAuthDropdown');
+    if (!dd) return;
+    closeAuthDropdown();
+    closeLandingAuthDropdown();
+    dd.classList.toggle('show');
+}
+
+function closePpAuthDropdown() {
+    const dd = document.getElementById('ppAuthDropdown');
+    if (dd) dd.classList.remove('show');
+}
 function setupAuthAndHamburger() {
     // Auth: nav button — opens modal if logged out, toggles dropdown if logged in
     const navAuthBtn = document.getElementById('navAuthBtn');
@@ -13933,10 +14100,23 @@ function setupAuthAndHamburger() {
 
     // Auth dropdown: close when clicking outside
     document.addEventListener('click', (e) => {
+        // App nav dropdown
         const dd = document.getElementById('navAuthDropdown');
         const wrapper = document.querySelector('.nav-auth-wrapper');
         if (dd && dd.classList.contains('show') && wrapper && !wrapper.contains(e.target)) {
             dd.classList.remove('show');
+        }
+        // Landing dropdown
+        const ldd = document.getElementById('landingAuthDropdown');
+        const lwrapper = document.querySelector('.landing-auth-wrapper');
+        if (ldd && ldd.classList.contains('show') && lwrapper && !lwrapper.contains(e.target)) {
+            ldd.classList.remove('show');
+        }
+        // Problem page dropdown
+        const ppdd = document.getElementById('ppAuthDropdown');
+        const ppwrapper = document.querySelector('.pp-auth-wrapper');
+        if (ppdd && ppdd.classList.contains('show') && ppwrapper && !ppwrapper.contains(e.target)) {
+            ppdd.classList.remove('show');
         }
     });
 
@@ -13949,11 +14129,61 @@ function setupAuthAndHamburger() {
         });
     }
 
+    // Auth dropdown: Feedback button → open report/feedback modal
+    const authDdFeedbackBtn = document.getElementById('authDdFeedbackBtn');
+    if (authDdFeedbackBtn) {
+        authDdFeedbackBtn.addEventListener('click', () => {
+            closeAuthDropdown();
+            openReportModal();
+        });
+    }
+
     // Auth dropdown: Logout button
     const authDdLogoutBtn = document.getElementById('authDdLogoutBtn');
     if (authDdLogoutBtn) {
         authDdLogoutBtn.addEventListener('click', () => {
             closeAuthDropdown();
+            handleLogout();
+        });
+    }
+
+    // ── Problem page: auth button ──
+    const ppAuthBtn = document.getElementById('ppAuthBtn');
+    if (ppAuthBtn) {
+        ppAuthBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const auth = getStoredAuth();
+            if (auth) {
+                togglePpAuthDropdown();
+            } else {
+                openAuthModal('login');
+            }
+        });
+    }
+
+    // Problem page dropdown: Notes — open notebook overlay (list view)
+    const ppDdNotesBtn = document.getElementById('ppDdNotesBtn');
+    if (ppDdNotesBtn) {
+        ppDdNotesBtn.addEventListener('click', () => {
+            closePpAuthDropdown();
+            openNotebook();
+        });
+    }
+
+    // Problem page dropdown: Feedback
+    const ppDdFeedbackBtn = document.getElementById('ppDdFeedbackBtn');
+    if (ppDdFeedbackBtn) {
+        ppDdFeedbackBtn.addEventListener('click', () => {
+            closePpAuthDropdown();
+            openReportModal();
+        });
+    }
+
+    // Problem page dropdown: Logout
+    const ppDdLogoutBtn = document.getElementById('ppDdLogoutBtn');
+    if (ppDdLogoutBtn) {
+        ppDdLogoutBtn.addEventListener('click', () => {
+            closePpAuthDropdown();
             handleLogout();
         });
     }
@@ -14029,6 +14259,36 @@ function setupAuthAndHamburger() {
     const drawerLogoutBtn = document.getElementById('drawerLogoutBtn');
     if (drawerLogoutBtn) {
         drawerLogoutBtn.addEventListener('click', handleLogout);
+    }
+
+    // Drawer utility buttons
+    const drawerHomeBtn = document.getElementById('drawerHomeBtn');
+    if (drawerHomeBtn) {
+        drawerHomeBtn.addEventListener('click', () => {
+            closeHamburgerDrawer();
+            if (typeof window.showLanding === 'function') window.showLanding();
+        });
+    }
+    const drawerNotesBtn = document.getElementById('drawerNotesBtn');
+    if (drawerNotesBtn) {
+        drawerNotesBtn.addEventListener('click', () => {
+            closeHamburgerDrawer();
+            openNotebook();
+        });
+    }
+    const drawerYoutubeBtn = document.getElementById('drawerYoutubeBtn');
+    if (drawerYoutubeBtn) {
+        drawerYoutubeBtn.addEventListener('click', () => {
+            closeHamburgerDrawer();
+            openYouTubeModal();
+        });
+    }
+    const drawerFeedbackBtn = document.getElementById('drawerFeedbackBtn');
+    if (drawerFeedbackBtn) {
+        drawerFeedbackBtn.addEventListener('click', () => {
+            closeHamburgerDrawer();
+            openReportModal();
+        });
     }
 
     // Escape key to close drawer + modal
