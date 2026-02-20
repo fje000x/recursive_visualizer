@@ -4,11 +4,13 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const Database = require('better-sqlite3');
-const nodemailer = require('nodemailer');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Trust proxy — required on Render (behind a reverse proxy)
+app.set('trust proxy', 1);
 
 // ── Database setup (SQLite — zero config, file-based) ──
 const db = new Database(path.join(__dirname, 'data.db'));
@@ -71,40 +73,37 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// ── Email transporter ──
-let transporter = null;
-if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-  transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.EMAIL_PORT) || 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-  // Verify connection
-  transporter.verify().then(() => {
-    console.log('✓ Email transporter ready');
-  }).catch(err => {
-    console.warn('⚠ Email transporter failed to verify:', err.message);
-    console.warn('  Reports will still be saved to the database.');
-  });
-} else {
-  console.warn('⚠ No EMAIL_USER/EMAIL_PASS set. Email notifications disabled.');
+// ── Email via Resend API (HTTP-based, works on Render free tier) ──
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const EMAIL_TO = process.env.EMAIL_TO;
+if (!RESEND_API_KEY) {
+  console.warn('⚠ No RESEND_API_KEY set. Email notifications disabled.');
   console.warn('  Reports will still be saved to the database.');
+} else {
+  console.log('✓ Resend API key detected — email notifications enabled');
 }
 
-// ── Helper: send notification email ──
+// ── Helper: send notification email via Resend ──
 async function sendNotification(subject, html) {
-  if (!transporter) return;
+  if (!RESEND_API_KEY) return;
   try {
-    await transporter.sendMail({
-      from: `"AlgoFlowz" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_TO || process.env.EMAIL_USER,
-      subject,
-      html
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'AlgoFlowz <onboarding@resend.dev>',
+        to: [EMAIL_TO || 'delivered@resend.dev'],
+        subject,
+        html
+      })
     });
+    if (!resp.ok) {
+      const errBody = await resp.text();
+      console.error('Resend API error:', resp.status, errBody);
+    }
   } catch (err) {
     console.error('Email send failed:', err.message);
   }
