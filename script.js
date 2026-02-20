@@ -1974,11 +1974,29 @@ document.addEventListener('DOMContentLoaded', () => {
 function openReportModal() {
     const modal = document.getElementById('reportModal');
     const problemField = document.getElementById('reportProblem');
+    const typeField = document.getElementById('reportType');
     if (problemField) problemField.value = currentProbId || '';
+    // Update problem field based on type
+    updateReportProblemField(typeField?.value);
     document.getElementById('reportStatus').textContent = '';
     document.getElementById('reportStatus').className = 'report-status';
     document.getElementById('reportSubmitBtn').disabled = false;
     modal.classList.add('show');
+}
+
+function updateReportProblemField(type) {
+    const field = document.getElementById('reportProblem');
+    const label = document.querySelector('#reportProblemField label');
+    if (!field) return;
+    if (type === 'problem-request') {
+        field.value = '';
+        field.placeholder = 'LeetCode # (e.g. 121)';
+        if (label) label.textContent = 'LeetCode # to add';
+    } else {
+        if (!field.value) field.value = currentProbId || '';
+        field.placeholder = 'e.g. 9';
+        if (label) label.textContent = 'Problem / LeetCode #';
+    }
 }
 
 function closeReportModal() {
@@ -1989,6 +2007,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // FAB button opens modal
     const fab = document.getElementById('reportFab');
     if (fab) fab.addEventListener('click', openReportModal);
+
+    // Type change → update problem field
+    const typeField = document.getElementById('reportType');
+    if (typeField) typeField.addEventListener('change', (e) => updateReportProblemField(e.target.value));
 
     // Close button
     const closeBtn = document.getElementById('reportModalClose');
@@ -12417,15 +12439,26 @@ function setupEventListeners() {
     
     
     document.addEventListener('keydown', (e) => {
+        // Don't capture keys when typing in inputs, textareas, selects, or when report modal is open
+        const active = document.activeElement;
+        const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT' || active.isContentEditable);
+        const reportModal = document.getElementById('reportModal');
+        const reportOpen = reportModal && reportModal.classList.contains('show');
+
+        if (e.key === 'Escape') {
+            closeYouTubeModal();
+            closeProblemModal();
+            if (typeof closeReportModal === 'function') closeReportModal();
+            return;
+        }
+
+        if (isTyping || reportOpen) return;
+
         if (e.key === 'ArrowLeft') changeStep(-1);
         if (e.key === 'ArrowRight') changeStep(1);
         if (e.key === ' ') {
             e.preventDefault();
             toggleAutoPlay();
-        }
-        if (e.key === 'Escape') {
-            closeYouTubeModal();
-            closeProblemModal();
         }
         if (e.key === 'y' || e.key === 'Y') {
             e.preventDefault();
