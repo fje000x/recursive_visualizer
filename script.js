@@ -2021,28 +2021,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Prerequisite Knowledge Check ──
 // Shows a friendly banner asking "Familiar with X?" when a harder problem is loaded.
-// If they click "No", an embedded YT video opens right there. Uses localStorage to not re-ask.
+// If they click "No", an embedded YT video opens right there.
+// Knowledge is tracked PER TOPIC globally — learn it once, never asked again on any problem.
+// "Don't show again" hides banners forever.
 
-function getPrereqDismissals() {
+function getPrereqData() {
     try {
         return JSON.parse(localStorage.getItem('algoflowz-prereqs') || '{}');
     } catch { return {}; }
 }
 
-function setPrereqDismissed(probId, topic) {
-    const data = getPrereqDismissals();
-    if (!data[probId]) data[probId] = [];
-    if (!data[probId].includes(topic)) data[probId].push(topic);
+function savePrereqData(data) {
     localStorage.setItem('algoflowz-prereqs', JSON.stringify(data));
 }
 
-function isPrereqDismissed(probId, topic) {
-    const data = getPrereqDismissals();
-    return data[probId]?.includes(topic) || false;
+function isPrereqGloballyDisabled() {
+    return getPrereqData()._disabled === true;
+}
+
+function disablePrereqGlobally() {
+    const data = getPrereqData();
+    data._disabled = true;
+    savePrereqData(data);
+}
+
+function isTopicKnown(topic) {
+    const data = getPrereqData();
+    return data._knownTopics?.includes(topic) || false;
+}
+
+function markTopicKnown(topic) {
+    const data = getPrereqData();
+    if (!data._knownTopics) data._knownTopics = [];
+    if (!data._knownTopics.includes(topic)) data._knownTopics.push(topic);
+    savePrereqData(data);
 }
 
 /**
- * Renders the prerequisite banner inside the render-engine area.
+ * Renders the prerequisite banner above the render-engine area.
  * Called from init() whenever a problem with prerequisites is loaded.
  */
 function renderPrereqBanner(probId) {
@@ -2050,11 +2066,14 @@ function renderPrereqBanner(probId) {
     const old = document.getElementById('prereqBanner');
     if (old) old.remove();
 
+    // Bail if user said "don't show again"
+    if (isPrereqGloballyDisabled()) return;
+
     const prob = problemDB[probId];
     if (!prob?.prerequisites?.length) return;
 
-    // Filter out already-dismissed topics
-    const unseen = prob.prerequisites.filter(p => !isPrereqDismissed(probId, p.topic));
+    // Filter out globally-known topics
+    const unseen = prob.prerequisites.filter(p => !isTopicKnown(p.topic));
     if (!unseen.length) return;
 
     const engine = document.querySelector('.render-engine');
@@ -2064,63 +2083,68 @@ function renderPrereqBanner(probId) {
     banner.id = 'prereqBanner';
     banner.className = 'prereq-banner';
 
-    // Build pills for each prerequisite
+    const topicCount = unseen.length;
+
     banner.innerHTML = `
         <div class="prereq-banner-inner">
-            <span class="prereq-icon">📚</span>
-            <span class="prereq-label">Before you start — are you comfortable with:</span>
+            <span class="prereq-label">Prerequisite${topicCount > 1 ? 's' : ''}:</span>
             <div class="prereq-topics">
                 ${unseen.map((p, i) => `
                     <div class="prereq-topic" data-idx="${i}">
                         <span class="prereq-topic-name">${p.topic}</span>
-                        <button class="prereq-btn prereq-yes" data-topic="${p.topic}" title="I know this">Yes</button>
-                        <button class="prereq-btn prereq-no" data-topic="${p.topic}" data-ytid="${p.ytId}" title="Show me a quick video">No, show me</button>
+                        <button class="prereq-btn prereq-yes" data-topic="${p.topic}">I know this</button>
+                        <button class="prereq-btn prereq-no" data-topic="${p.topic}" data-ytid="${p.ytId}">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            Refresher
+                        </button>
                     </div>
                 `).join('')}
             </div>
-            <button class="prereq-dismiss-all" title="Dismiss all">Skip all</button>
+            <button class="prereq-dismiss-all" title="Never show prerequisite checks again">Don't show again</button>
         </div>
     `;
 
     // Wire up buttons
     banner.querySelectorAll('.prereq-yes').forEach(btn => {
         btn.addEventListener('click', () => {
-            setPrereqDismissed(probId, btn.dataset.topic);
+            markTopicKnown(btn.dataset.topic);
             const topicEl = btn.closest('.prereq-topic');
             topicEl.classList.add('prereq-done');
-            topicEl.innerHTML = `<span class="prereq-topic-name">${btn.dataset.topic}</span> <span class="prereq-check">✓</span>`;
-            checkAllDismissed();
+            topicEl.innerHTML = `<span class="prereq-topic-name">${btn.dataset.topic}</span><span class="prereq-check">✓</span>`;
+            checkAllDone();
         });
     });
 
     banner.querySelectorAll('.prereq-no').forEach(btn => {
         btn.addEventListener('click', () => {
-            openPrereqVideo(btn.dataset.topic, btn.dataset.ytid, probId);
+            openPrereqVideo(btn.dataset.topic, btn.dataset.ytid);
         });
     });
 
     banner.querySelector('.prereq-dismiss-all').addEventListener('click', () => {
-        unseen.forEach(p => setPrereqDismissed(probId, p.topic));
+        disablePrereqGlobally();
         banner.classList.add('prereq-hiding');
         setTimeout(() => banner.remove(), 350);
     });
 
-    function checkAllDismissed() {
+    function checkAllDone() {
         const remaining = banner.querySelectorAll('.prereq-topic:not(.prereq-done)');
         if (!remaining.length) {
-            banner.classList.add('prereq-hiding');
-            setTimeout(() => banner.remove(), 350);
+            setTimeout(() => {
+                banner.classList.add('prereq-hiding');
+                setTimeout(() => banner.remove(), 350);
+            }, 600);
         }
     }
 
-    // Insert at the top of the render-engine
-    engine.prepend(banner);
+    // Insert above the render-engine (sibling, not child)
+    engine.parentNode.insertBefore(banner, engine);
 }
 
 /**
- * Opens the prereq video modal — a clean embedded YT player.
+ * Opens the prereq video modal — clean embedded YT player.
  */
-function openPrereqVideo(topic, ytId, probId) {
+function openPrereqVideo(topic, ytId) {
     // Pause autoplay if running
     if (autoPlayInterval) {
         clearInterval(autoPlayInterval);
@@ -2137,8 +2161,13 @@ function openPrereqVideo(topic, ytId, probId) {
         modal.innerHTML = `
             <div class="prereq-video-content">
                 <div class="prereq-video-header">
-                    <h3 id="prereqVideoTitle"></h3>
-                    <button class="prereq-video-close" type="button">✕</button>
+                    <div class="prereq-video-title-group">
+                        <span class="prereq-video-badge">Refresher</span>
+                        <h3 id="prereqVideoTitle"></h3>
+                    </div>
+                    <button class="prereq-video-close" type="button">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </button>
                 </div>
                 <div class="prereq-video-body">
                     <div class="prereq-video-wrapper">
@@ -2148,7 +2177,7 @@ function openPrereqVideo(topic, ytId, probId) {
                     </div>
                 </div>
                 <div class="prereq-video-footer">
-                    <button class="prereq-video-got-it" type="button">Got it, let's go!</button>
+                    <button class="prereq-video-got-it" type="button">I'm ready, let's go</button>
                 </div>
             </div>
         `;
@@ -2163,14 +2192,12 @@ function openPrereqVideo(topic, ytId, probId) {
     }
 
     // Set video
-    modal.querySelector('#prereqVideoTitle').innerHTML =
-        `<i class="fab fa-youtube" style="color:#ff0000;margin-right:8px;"></i> Quick Refresher: ${topic}`;
+    modal.querySelector('#prereqVideoTitle').textContent = topic;
     modal.querySelector('#prereqVideoFrame').src =
         `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
 
     // Store context for dismissal on close
     modal._currentTopic = topic;
-    modal._currentProbId = probId;
 
     modal.classList.add('show');
 }
@@ -2181,9 +2208,9 @@ function closePrereqVideo() {
     modal.classList.remove('show');
     // Stop video
     modal.querySelector('#prereqVideoFrame').src = '';
-    // Mark as dismissed
-    if (modal._currentTopic && modal._currentProbId) {
-        setPrereqDismissed(modal._currentProbId, modal._currentTopic);
+    // Mark topic as known globally
+    if (modal._currentTopic) {
+        markTopicKnown(modal._currentTopic);
         // Update banner if still visible
         const banner = document.getElementById('prereqBanner');
         if (banner) {
@@ -2191,13 +2218,15 @@ function closePrereqVideo() {
             topicBtns.forEach(btn => {
                 const topicEl = btn.closest('.prereq-topic');
                 topicEl.classList.add('prereq-done');
-                topicEl.innerHTML = `<span class="prereq-topic-name">${modal._currentTopic}</span> <span class="prereq-check">✓</span>`;
+                topicEl.innerHTML = `<span class="prereq-topic-name">${modal._currentTopic}</span><span class="prereq-check">✓</span>`;
             });
             // Check if all done
             const remaining = banner.querySelectorAll('.prereq-topic:not(.prereq-done)');
             if (!remaining.length) {
-                banner.classList.add('prereq-hiding');
-                setTimeout(() => banner.remove(), 350);
+                setTimeout(() => {
+                    banner.classList.add('prereq-hiding');
+                    setTimeout(() => banner.remove(), 350);
+                }, 600);
             }
         }
     }
@@ -12227,11 +12256,13 @@ function init() {
     // Show prerequisite knowledge check banner for harder problems
     renderPrereqBanner(currentProbId);
 
-    // Update algorithm selector (desktop + mobile)
+    // Update algorithm selector (desktop + mobile + popover)
     const algorithmSelect = document.getElementById('algorithmSelect');
     const mobileAlgorithmSelect = document.getElementById('mobileAlgorithmSelect');
+    const popAlgoSelect = document.getElementById('popAlgoSelect');
     algorithmSelect.innerHTML = '';
     if (mobileAlgorithmSelect) mobileAlgorithmSelect.innerHTML = '';
+    if (popAlgoSelect) popAlgoSelect.innerHTML = '';
     
     Object.keys(prob.algorithms).forEach(algoKey => {
         const option = document.createElement('option');
@@ -12246,17 +12277,24 @@ function init() {
         if (mobileAlgorithmSelect) {
             mobileAlgorithmSelect.appendChild(option.cloneNode(true));
         }
+        // Clone for popover
+        if (popAlgoSelect) {
+            popAlgoSelect.appendChild(option.cloneNode(true));
+        }
     });
 
-    // Explicitly set the value on both selects
+    // Explicitly set the value on all selects
     algorithmSelect.value = currentAlgorithm;
     if (mobileAlgorithmSelect) mobileAlgorithmSelect.value = currentAlgorithm;
+    if (popAlgoSelect) popAlgoSelect.value = currentAlgorithm;
 
     // Show/hide testcase selector and populate with problem-specific labels
     const testcaseSelector = document.getElementById('testcaseSelector');
     const testcaseSelect = document.getElementById('testcaseSelect');
     const mobileTestcaseSelector = document.getElementById('mobileTestcaseSelector');
     const mobileTestcaseSelect = document.getElementById('mobileTestcaseSelect');
+    const popTestcaseRow = document.getElementById('popTestcaseRow');
+    const popTestcaseSelect = document.getElementById('popTestcaseSelect');
     const hasEdgeCase = algorithm.generateEdgeCaseHistory || prob.edgeCaseTree;
 
     // Helper to populate a testcase <select>
@@ -12275,11 +12313,13 @@ function init() {
 
     if (testcaseSelector) testcaseSelector.style.display = hasEdgeCase ? '' : 'none';
     if (mobileTestcaseSelector) mobileTestcaseSelector.style.display = hasEdgeCase ? '' : 'none';
+    if (popTestcaseRow) popTestcaseRow.style.display = hasEdgeCase ? '' : 'none';
 
     if (hasEdgeCase) {
         const labels = prob.testCaseLabels || { normal: 'Example', edge: 'Edge Case' };
         if (testcaseSelect) populateTestcaseSelect(testcaseSelect, labels);
         if (mobileTestcaseSelect) populateTestcaseSelect(mobileTestcaseSelect, labels);
+        if (popTestcaseSelect) populateTestcaseSelect(popTestcaseSelect, labels);
     }
     
     // Update code editor with proper indentation
@@ -12629,9 +12669,11 @@ function setupEventListeners() {
     
     document.getElementById('algorithmSelect').addEventListener('change', (e) => {
         currentAlgorithm = e.target.value;
-        // Sync mobile selector
+        // Sync mobile + popover selectors
         const mobileSelect = document.getElementById('mobileAlgorithmSelect');
         if (mobileSelect) mobileSelect.value = currentAlgorithm;
+        const popAlgo = document.getElementById('popAlgoSelect');
+        if (popAlgo) popAlgo.value = currentAlgorithm;
         currentTestCase = "normal"; // Reset test case when switching algorithms
         init();
     });
@@ -12641,9 +12683,11 @@ function setupEventListeners() {
     if (testcaseSelectEl) {
         testcaseSelectEl.addEventListener('change', (e) => {
             currentTestCase = e.target.value;
-            // Sync mobile testcase selector
+            // Sync mobile + popover testcase selector
             const mobileTc = document.getElementById('mobileTestcaseSelect');
             if (mobileTc) mobileTc.value = currentTestCase;
+            const popTc = document.getElementById('popTestcaseSelect');
+            if (popTc) popTc.value = currentTestCase;
             init();
         });
     }
@@ -12653,9 +12697,11 @@ function setupEventListeners() {
     if (mobileTestcaseSelectEl) {
         mobileTestcaseSelectEl.addEventListener('change', (e) => {
             currentTestCase = e.target.value;
-            // Sync desktop testcase selector
+            // Sync desktop + popover testcase selector
             const desktopTc = document.getElementById('testcaseSelect');
             if (desktopTc) desktopTc.value = currentTestCase;
+            const popTc = document.getElementById('popTestcaseSelect');
+            if (popTc) popTc.value = currentTestCase;
             init();
         });
     }
@@ -12664,8 +12710,10 @@ function setupEventListeners() {
     if (mobileAlgoSelect) {
         mobileAlgoSelect.addEventListener('change', (e) => {
             currentAlgorithm = e.target.value;
-            // Sync desktop selector
+            // Sync desktop + popover selector
             document.getElementById('algorithmSelect').value = currentAlgorithm;
+            const popAlgo = document.getElementById('popAlgoSelect');
+            if (popAlgo) popAlgo.value = currentAlgorithm;
             currentTestCase = "normal"; // Reset test case when switching algorithms
             init();
         });
@@ -12683,16 +12731,20 @@ function setupEventListeners() {
         const reportOpen = reportModal && reportModal.classList.contains('show');
         const prereqVideoModal = document.getElementById('prereqVideoModal');
         const prereqVideoOpen = prereqVideoModal && prereqVideoModal.classList.contains('show');
+        const authModal = document.getElementById('authModal');
+        const authOpen = authModal && authModal.classList.contains('show');
 
         if (e.key === 'Escape') {
             closeYouTubeModal();
             closeProblemModal();
             if (typeof closeReportModal === 'function') closeReportModal();
             if (typeof closePrereqVideo === 'function') closePrereqVideo();
+            if (typeof closeAuthModal === 'function') closeAuthModal();
+            if (typeof closeHamburgerDrawer === 'function') closeHamburgerDrawer();
             return;
         }
 
-        if (isTyping || reportOpen || prereqVideoOpen) return;
+        if (isTyping || reportOpen || prereqVideoOpen || authOpen) return;
 
         if (e.key === 'ArrowLeft') changeStep(-1);
         if (e.key === 'ArrowRight') changeStep(1);
@@ -12836,9 +12888,477 @@ function resetVisualization() {
     init();
 }
 
+// ═══════════════════════════════════════════
+// Auth System — Login / Signup / Session
+// ═══════════════════════════════════════════
+const AUTH_API = 'https://recursive-visualizer.onrender.com';
+const AUTH_TOKEN_KEY = 'algoflowz-token';
+const AUTH_USER_KEY = 'algoflowz-user';
+
+function getStoredAuth() {
+    try {
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        const user = JSON.parse(localStorage.getItem(AUTH_USER_KEY) || 'null');
+        return token && user ? { token, user } : null;
+    } catch { return null; }
+}
+
+function setStoredAuth(token, user) {
+    localStorage.setItem(AUTH_TOKEN_KEY, token);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+}
+
+function clearStoredAuth() {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(AUTH_USER_KEY);
+}
+
+function updateAuthUI() {
+    const auth = getStoredAuth();
+    const navBtn = document.getElementById('navAuthBtn');
+    const drawerLoggedOut = document.getElementById('drawerAuthLoggedOut');
+    const drawerLoggedIn = document.getElementById('drawerAuthLoggedIn');
+    const drawerAvatar = document.getElementById('drawerUserAvatar');
+    const drawerName = document.getElementById('drawerUserName');
+    const drawerEmail = document.getElementById('drawerUserEmail');
+
+    if (auth && auth.user) {
+        const initial = (auth.user.display_name || auth.user.username || 'U').charAt(0).toUpperCase();
+        // Desktop nav button
+        if (navBtn) {
+            navBtn.classList.add('logged-in');
+            navBtn.innerHTML = initial;
+            navBtn.title = auth.user.username;
+        }
+        // Drawer
+        if (drawerLoggedOut) drawerLoggedOut.style.display = 'none';
+        if (drawerLoggedIn) drawerLoggedIn.style.display = 'block';
+        if (drawerAvatar) drawerAvatar.textContent = initial;
+        if (drawerName) drawerName.textContent = auth.user.display_name || auth.user.username;
+        if (drawerEmail) drawerEmail.textContent = auth.user.email || '';
+    } else {
+        // Desktop nav button
+        if (navBtn) {
+            navBtn.classList.remove('logged-in');
+            navBtn.innerHTML = '<i class="fas fa-user"></i>';
+            navBtn.title = 'Account';
+        }
+        // Drawer
+        if (drawerLoggedOut) drawerLoggedOut.style.display = 'block';
+        if (drawerLoggedIn) drawerLoggedIn.style.display = 'none';
+    }
+}
+
+// Open / close auth modal
+function openAuthModal(tab) {
+    const modal = document.getElementById('authModal');
+    if (!modal) return;
+    modal.classList.add('show');
+    switchAuthTab(tab || 'login');
+    clearAllAuthErrors();
+}
+
+function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.remove('show');
+}
+
+function switchAuthTab(tab) {
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const title = document.querySelector('.auth-modal-title');
+    if (tab === 'login') {
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+        if (title) title.textContent = 'Log in or sign up';
+    } else {
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'block';
+        if (title) title.textContent = 'Create your account';
+    }
+    clearAllAuthErrors();
+}
+
+// ---- Inline field-level validation helpers ----
+function setFieldError(fieldId, errorId, msg) {
+    const field = document.getElementById(fieldId);
+    const errEl = document.getElementById(errorId);
+    if (field) field.classList.add('has-error');
+    if (errEl) { errEl.textContent = msg; }
+}
+
+function clearFieldError(fieldId, errorId) {
+    const field = document.getElementById(fieldId);
+    const errEl = document.getElementById(errorId);
+    if (field) field.classList.remove('has-error');
+    if (errEl) { errEl.textContent = ''; }
+}
+
+function clearAllAuthErrors() {
+    document.querySelectorAll('.auth-field.has-error').forEach(f => f.classList.remove('has-error'));
+    document.querySelectorAll('.auth-field-error').forEach(e => e.textContent = '');
+}
+
+// Safe JSON parse from fetch response (handles HTML error pages from Render)
+async function safeParseJSON(res) {
+    const text = await res.text();
+    try {
+        return JSON.parse(text);
+    } catch {
+        // Server returned non-JSON (HTML page, e.g. Render cold-start or error)
+        throw new Error('Server is waking up — please try again in a few seconds.');
+    }
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+    clearAllAuthErrors();
+
+    const btn = document.getElementById('loginSubmitBtn');
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    // Client-side validation
+    let valid = true;
+    if (!username) {
+        setFieldError('loginUsernameField', 'loginUsernameError', 'Please enter your username or email');
+        valid = false;
+    }
+    if (!password) {
+        setFieldError('loginPasswordField', 'loginPasswordError', 'Please enter your password');
+        valid = false;
+    }
+    if (!valid) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Logging in…';
+
+    try {
+        const res = await fetch(`${AUTH_API}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ login: username, password })
+        });
+        const data = await safeParseJSON(res);
+        if (!res.ok) {
+            const errMsg = data.error || 'Login failed';
+            // Try to map server error to specific field
+            if (/credentials|not found|invalid/i.test(errMsg)) {
+                setFieldError('loginPasswordField', 'loginPasswordError', errMsg);
+            } else {
+                setFieldError('loginUsernameField', 'loginUsernameError', errMsg);
+            }
+            return;
+        }
+
+        setStoredAuth(data.token, data.user);
+        updateAuthUI();
+        closeAuthModal();
+        closeHamburgerDrawer();
+    } catch (err) {
+        setFieldError('loginUsernameField', 'loginUsernameError', err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Continue';
+    }
+}
+
+async function handleSignup(e) {
+    e.preventDefault();
+    clearAllAuthErrors();
+
+    const btn = document.getElementById('signupSubmitBtn');
+    const username = document.getElementById('signupUsername').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+
+    // Client-side validation
+    let valid = true;
+    if (!username || username.length < 3) {
+        setFieldError('signupUsernameField', 'signupUsernameError', 'Username must be at least 3 characters');
+        valid = false;
+    } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        setFieldError('signupUsernameField', 'signupUsernameError', 'Only letters, numbers, and underscores');
+        valid = false;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setFieldError('signupEmailField', 'signupEmailError', 'Please enter a valid email address');
+        valid = false;
+    }
+    if (!password || password.length < 8) {
+        setFieldError('signupPasswordField', 'signupPasswordError', 'Password must be at least 8 characters');
+        valid = false;
+    }
+    if (!valid) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Creating account…';
+
+    try {
+        const res = await fetch(`${AUTH_API}/api/auth/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
+        });
+        const data = await safeParseJSON(res);
+        if (!res.ok) {
+            const errMsg = data.error || 'Signup failed';
+            // Map server error to the right field
+            if (/username/i.test(errMsg)) {
+                setFieldError('signupUsernameField', 'signupUsernameError', errMsg);
+            } else if (/email/i.test(errMsg)) {
+                setFieldError('signupEmailField', 'signupEmailError', errMsg);
+            } else if (/password/i.test(errMsg)) {
+                setFieldError('signupPasswordField', 'signupPasswordError', errMsg);
+            } else {
+                setFieldError('signupUsernameField', 'signupUsernameError', errMsg);
+            }
+            return;
+        }
+
+        setStoredAuth(data.token, data.user);
+        updateAuthUI();
+        closeAuthModal();
+        closeHamburgerDrawer();
+    } catch (err) {
+        setFieldError('signupUsernameField', 'signupUsernameError', err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create account';
+    }
+}
+
+function handleLogout() {
+    clearStoredAuth();
+    updateAuthUI();
+    closeHamburgerDrawer();
+}
+
+// Validate stored token on load
+async function validateAuth() {
+    const auth = getStoredAuth();
+    if (!auth) return;
+    try {
+        const res = await fetch(`${AUTH_API}/api/auth/me`, {
+            headers: { 'Authorization': `Bearer ${auth.token}` }
+        });
+        if (!res.ok) throw new Error('Invalid token');
+        const data = await safeParseJSON(res);
+        // Refresh user data
+        setStoredAuth(auth.token, data.user);
+    } catch {
+        clearStoredAuth();
+    }
+    updateAuthUI();
+}
+
+// ═══════════════════════════════════════════
+// Mobile More (⋯) Popover
+// ═══════════════════════════════════════════
+function closeMobileMorePopover() {
+    const pop = document.getElementById('mobileMorePopover');
+    if (pop) pop.classList.remove('show');
+}
+
+function toggleMobileMorePopover() {
+    const pop = document.getElementById('mobileMorePopover');
+    if (!pop) return;
+    pop.classList.toggle('show');
+}
+
+function setupMobileMorePopover() {
+    const btn = document.getElementById('mobileMoreBtn');
+    if (btn) btn.addEventListener('click', toggleMobileMorePopover);
+
+    // Close popover when tapping outside
+    document.addEventListener('click', (e) => {
+        const pop = document.getElementById('mobileMorePopover');
+        const btn2 = document.getElementById('mobileMoreBtn');
+        if (pop && pop.classList.contains('show') &&
+            !pop.contains(e.target) && e.target !== btn2) {
+            closeMobileMorePopover();
+        }
+    });
+
+    // Popover Code toggle
+    const popCodeBtn = document.getElementById('popCodeBtn');
+    if (popCodeBtn) {
+        popCodeBtn.addEventListener('click', () => {
+            closeMobileMorePopover();
+            toggleCodePanel();
+        });
+    }
+
+    // Popover Stack toggle
+    const popStackBtn = document.getElementById('popStackBtn');
+    if (popStackBtn) {
+        popStackBtn.addEventListener('click', () => {
+            closeMobileMorePopover();
+            toggleStackPanel();
+        });
+    }
+
+    // Popover Algorithm select
+    const popAlgoSelect = document.getElementById('popAlgoSelect');
+    if (popAlgoSelect) {
+        popAlgoSelect.addEventListener('change', (e) => {
+            currentAlgorithm = e.target.value;
+            // Sync desktop + mobile selectors
+            const desktopSel = document.getElementById('algorithmSelect');
+            const mobileSel = document.getElementById('mobileAlgorithmSelect');
+            if (desktopSel) desktopSel.value = currentAlgorithm;
+            if (mobileSel) mobileSel.value = currentAlgorithm;
+            currentTestCase = 'normal';
+            closeMobileMorePopover();
+            init();
+        });
+    }
+
+    // Popover Testcase select
+    const popTestcaseSelect = document.getElementById('popTestcaseSelect');
+    if (popTestcaseSelect) {
+        popTestcaseSelect.addEventListener('change', (e) => {
+            currentTestCase = e.target.value;
+            // Sync desktop + mobile selectors
+            const desktopTc = document.getElementById('testcaseSelect');
+            const mobileTc = document.getElementById('mobileTestcaseSelect');
+            if (desktopTc) desktopTc.value = currentTestCase;
+            if (mobileTc) mobileTc.value = currentTestCase;
+            closeMobileMorePopover();
+            init();
+        });
+    }
+}
+
+// ═══════════════════════════════════════════
+// Hamburger Drawer
+// ═══════════════════════════════════════════
+function openHamburgerDrawer() {
+    const overlay = document.getElementById('hamburgerOverlay');
+    const drawer = document.getElementById('hamburgerDrawer');
+    const btn = document.getElementById('hamburgerBtn');
+    if (overlay) overlay.classList.add('show');
+    if (drawer) drawer.classList.add('open');
+    if (btn) btn.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeHamburgerDrawer() {
+    const overlay = document.getElementById('hamburgerOverlay');
+    const drawer = document.getElementById('hamburgerDrawer');
+    const btn = document.getElementById('hamburgerBtn');
+    if (overlay) overlay.classList.remove('show');
+    if (drawer) drawer.classList.remove('open');
+    if (btn) btn.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function setupAuthAndHamburger() {
+    // Auth modal controls
+    const navAuthBtn = document.getElementById('navAuthBtn');
+    if (navAuthBtn) {
+        navAuthBtn.addEventListener('click', () => {
+            const auth = getStoredAuth();
+            if (auth) {
+                if (confirm('Log out?')) handleLogout();
+            } else {
+                openAuthModal('login');
+            }
+        });
+    }
+
+    const authModalClose = document.getElementById('authModalClose');
+    if (authModalClose) authModalClose.addEventListener('click', closeAuthModal);
+
+    const authModal = document.getElementById('authModal');
+    if (authModal) {
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) closeAuthModal();
+        });
+    }
+
+    // Switch between login/signup forms
+    const switchToSignup = document.getElementById('switchToSignup');
+    const switchToLogin = document.getElementById('switchToLogin');
+    if (switchToSignup) switchToSignup.addEventListener('click', () => switchAuthTab('signup'));
+    if (switchToLogin) switchToLogin.addEventListener('click', () => switchAuthTab('login'));
+
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    if (loginForm) loginForm.addEventListener('submit', handleLogin);
+    if (signupForm) signupForm.addEventListener('submit', handleSignup);
+
+    // Clear field errors on input
+    document.querySelectorAll('.auth-field input').forEach(input => {
+        input.addEventListener('input', () => {
+            const field = input.closest('.auth-field');
+            if (field) field.classList.remove('has-error');
+            const errEl = field ? field.querySelector('.auth-field-error') : null;
+            if (errEl) errEl.textContent = '';
+        });
+    });
+
+    const authExploreBtn = document.getElementById('authExploreBtn');
+    if (authExploreBtn) authExploreBtn.addEventListener('click', closeAuthModal);
+
+    // Hamburger controls
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    if (hamburgerBtn) {
+        hamburgerBtn.addEventListener('click', () => {
+            const drawer = document.getElementById('hamburgerDrawer');
+            if (drawer && drawer.classList.contains('open')) {
+                closeHamburgerDrawer();
+            } else {
+                openHamburgerDrawer();
+            }
+        });
+    }
+
+    const drawerClose = document.getElementById('drawerClose');
+    if (drawerClose) drawerClose.addEventListener('click', closeHamburgerDrawer);
+
+    const hamburgerOverlay = document.getElementById('hamburgerOverlay');
+    if (hamburgerOverlay) hamburgerOverlay.addEventListener('click', closeHamburgerDrawer);
+
+    // Drawer auth buttons
+    const drawerLoginBtn = document.getElementById('drawerLoginBtn');
+    if (drawerLoginBtn) {
+        drawerLoginBtn.addEventListener('click', () => {
+            closeHamburgerDrawer();
+            openAuthModal('login');
+        });
+    }
+    const drawerSignupBtn = document.getElementById('drawerSignupBtn');
+    if (drawerSignupBtn) {
+        drawerSignupBtn.addEventListener('click', () => {
+            closeHamburgerDrawer();
+            openAuthModal('signup');
+        });
+    }
+    const drawerLogoutBtn = document.getElementById('drawerLogoutBtn');
+    if (drawerLogoutBtn) {
+        drawerLogoutBtn.addEventListener('click', handleLogout);
+    }
+
+    // Escape key to close drawer + modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeHamburgerDrawer();
+            closeAuthModal();
+        }
+    });
+
+    // Init auth UI
+    updateAuthUI();
+    // Validate token in background
+    validateAuth();
+}
+
 // Initialize on load
 window.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
+    setupMobileMorePopover();
+    setupAuthAndHamburger();
     init();
 });
 

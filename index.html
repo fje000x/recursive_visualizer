@@ -335,8 +335,121 @@
                 <select id="algorithmSelect" class="modern-select">
                 </select>
             </div>
+            <!-- Auth: user avatar or login button (desktop) -->
+            <button id="navAuthBtn" class="nav-auth-btn" type="button" title="Account">
+                <i class="fas fa-user"></i>
+            </button>
+            <!-- Hamburger menu button (mobile only) -->
+            <button id="hamburgerBtn" class="hamburger-btn" type="button" title="Menu" aria-label="Menu">
+                <span class="hamburger-icon">
+                    <span></span><span></span><span></span>
+                </span>
+            </button>
         </div>
     </header>
+
+    <!-- Hamburger slide-out drawer (mobile) -->
+    <div id="hamburgerOverlay" class="hamburger-overlay"></div>
+    <div id="hamburgerDrawer" class="hamburger-drawer">
+        <div class="drawer-header">
+            <span class="drawer-title">Menu</span>
+            <button id="drawerClose" class="drawer-close" type="button" aria-label="Close menu">✕</button>
+        </div>
+        <nav class="drawer-nav">
+            <!-- Auth section in drawer -->
+            <div id="drawerAuthSection" class="drawer-auth-section">
+                <div id="drawerAuthLoggedOut" class="drawer-auth-logged-out">
+                    <button id="drawerLoginBtn" class="drawer-item drawer-auth-item" type="button">
+                        <i class="fas fa-sign-in-alt"></i> Log In
+                    </button>
+                    <button id="drawerSignupBtn" class="drawer-item drawer-auth-item" type="button">
+                        <i class="fas fa-user-plus"></i> Sign Up
+                    </button>
+                </div>
+                <div id="drawerAuthLoggedIn" class="drawer-auth-logged-in" style="display:none;">
+                    <div class="drawer-user-info">
+                        <div class="drawer-user-avatar" id="drawerUserAvatar">U</div>
+                        <div class="drawer-user-details">
+                            <span class="drawer-user-name" id="drawerUserName">User</span>
+                            <span class="drawer-user-email" id="drawerUserEmail">user@example.com</span>
+                        </div>
+                    </div>
+                    <button id="drawerLogoutBtn" class="drawer-item drawer-logout" type="button">
+                        <i class="fas fa-sign-out-alt"></i> Log Out
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Auth Modal (Airbnb-style) -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-modal-content">
+            <div class="auth-modal-header">
+                <button id="authModalClose" class="auth-modal-close" type="button" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <span class="auth-modal-title">Log in or sign up</span>
+                <span class="auth-modal-header-spacer"></span>
+            </div>
+
+            <div class="auth-modal-body">
+                <h2 class="auth-welcome">Welcome to AlgoFlowz</h2>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <div class="auth-fieldset">
+                        <div class="auth-field auth-field-top" id="loginUsernameField">
+                            <input type="text" id="loginUsername" name="username" placeholder=" " required autocomplete="username">
+                            <label for="loginUsername">Username or email</label>
+                            <span class="auth-field-error" id="loginUsernameError"></span>
+                        </div>
+                        <div class="auth-field auth-field-bottom" id="loginPasswordField">
+                            <input type="password" id="loginPassword" name="password" placeholder=" " required autocomplete="current-password">
+                            <label for="loginPassword">Password</label>
+                            <span class="auth-field-error" id="loginPasswordError"></span>
+                        </div>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" id="loginSubmitBtn">Continue</button>
+                    <div class="auth-divider"><span>or</span></div>
+                    <button type="button" id="switchToSignup" class="auth-alt-btn">
+                        <i class="fas fa-user-plus"></i> Sign up with email
+                    </button>
+                </form>
+
+                <!-- Signup Form -->
+                <form id="signupForm" class="auth-form" style="display:none;">
+                    <div class="auth-fieldset">
+                        <div class="auth-field auth-field-top" id="signupUsernameField">
+                            <input type="text" id="signupUsername" name="username" placeholder=" " required autocomplete="username" minlength="3" maxlength="30">
+                            <label for="signupUsername">Username</label>
+                            <span class="auth-field-error" id="signupUsernameError"></span>
+                        </div>
+                        <div class="auth-field auth-field-mid" id="signupEmailField">
+                            <input type="email" id="signupEmail" name="email" placeholder=" " required autocomplete="email">
+                            <label for="signupEmail">Email</label>
+                            <span class="auth-field-error" id="signupEmailError"></span>
+                        </div>
+                        <div class="auth-field auth-field-bottom" id="signupPasswordField">
+                            <input type="password" id="signupPassword" name="password" placeholder=" " required autocomplete="new-password" minlength="8">
+                            <label for="signupPassword">Password</label>
+                            <span class="auth-field-error" id="signupPasswordError"></span>
+                        </div>
+                    </div>
+                    <p class="auth-password-hint">Password must be at least 8 characters</p>
+                    <button type="submit" class="auth-submit-btn" id="signupSubmitBtn">Create account</button>
+                    <div class="auth-divider"><span>or</span></div>
+                    <button type="button" id="switchToLogin" class="auth-alt-btn">
+                        <i class="fas fa-sign-in-alt"></i> Log in with existing account
+                    </button>
+                </form>
+
+                <div class="auth-explore">
+                    <button type="button" id="authExploreBtn" class="auth-explore-btn">Just explore — no account needed</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Problem Selection Page — Full Screen -->
     <div id="problemModal" class="problem-page">
@@ -478,6 +591,28 @@
             <div class="mobile-testcase-selector" id="mobileTestcaseSelector" style="display:none;">
                 <select id="mobileTestcaseSelect" class="mobile-algo-select">
                 </select>
+            </div>
+
+            <!-- ⋯ Mobile More Button + Popover (replaces floating controls on mobile) -->
+            <button id="mobileMoreBtn" class="mobile-more-btn" title="More options" aria-label="More options">⋯</button>
+            <div id="mobileMorePopover" class="mobile-more-popover">
+                <div class="more-pop-select-row">
+                    <span class="more-pop-select-label">Algo</span>
+                    <select id="popAlgoSelect" class="more-pop-select"></select>
+                </div>
+                <div class="more-pop-select-row" id="popTestcaseRow" style="display:none;">
+                    <span class="more-pop-select-label">Testcase</span>
+                    <select id="popTestcaseSelect" class="more-pop-select"></select>
+                </div>
+                <div class="more-pop-divider"></div>
+                <button class="more-pop-item" id="popCodeBtn">
+                    <i class="fas fa-code"></i>
+                    <span class="more-pop-label">Toggle Code</span>
+                </button>
+                <button class="more-pop-item" id="popStackBtn">
+                    <i class="fas fa-layer-group"></i>
+                    <span class="more-pop-label">Toggle Stack</span>
+                </button>
             </div>
             <div id="canvas" class="render-engine">
                 <div id="treeCanvas" class="tree-canvas">
