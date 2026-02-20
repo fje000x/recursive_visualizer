@@ -38,15 +38,19 @@ app.use(express.json({ limit: '10kb' }));
 
 // CORS — allow your frontend
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'https://algoflowz.com',
+  'https://algoflowz.com',
+  'https://www.algoflowz.com',
+  'https://fje000x.github.io',
+  process.env.FRONTEND_URL,
   'http://localhost:8765',
   'http://127.0.0.1:8765',
   'http://localhost:5500',
   'http://127.0.0.1:5500',
   'http://localhost:5501',
   'http://127.0.0.1:5501',
-  'http://localhost:3000'
-];
+  'http://localhost:3000',
+  'http://localhost:8080'
+].filter(Boolean);
 app.use(cors({
   origin: (origin, cb) => {
     // Allow requests with no origin (curl, Postman, server-to-server)
