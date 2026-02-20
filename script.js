@@ -517,6 +517,9 @@ const problemDB = {
         topics: ["array", "greedy"],
         interview150: true,
         testCaseLabels: { normal: "Reachable ✓", edge: "Stuck at Zero ✗" },
+        prerequisites: [
+            { topic: "Greedy Algorithms", ytId: "bC7o8P_Ste4" }
+        ],
         tree: null,
         algorithms: {
             greedy: {
@@ -551,6 +554,10 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "greedy"],
         interview150: true,
+        prerequisites: [
+            { topic: "Greedy Algorithms", ytId: "bC7o8P_Ste4" },
+            { topic: "BFS (Breadth-First Search)", ytId: "HZ5YTanv5QE" }
+        ],
         tree: null,
         algorithms: {
             greedy: {
@@ -586,6 +593,9 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "sorting"],
         interview150: true,
+        prerequisites: [
+            { topic: "Sorting Algorithms", ytId: "MtQL_ll5KhQ" }
+        ],
         testCaseLabels: { normal: "[3,0,6,1,5] → h=3", edge: "[0,0,0] → h=0", tc2: "[100,100] → h=2", tc3: "[10] → h=1" },
         tree: null,
         algorithms: {
@@ -629,6 +639,9 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "hash-table", "design"],
         interview150: true,
+        prerequisites: [
+            { topic: "Hash Maps (Dictionaries)", ytId: "KyUTuwz_b7Q" }
+        ],
         tree: null,
         algorithms: {
             design: {
@@ -671,6 +684,9 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "prefix-sum"],
         interview150: true,
+        prerequisites: [
+            { topic: "Prefix Sums", ytId: "7pJo_rM0z_s" }
+        ],
         tree: null,
         algorithms: {
             prefixSuffix: {
@@ -707,6 +723,9 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "greedy"],
         interview150: true,
+        prerequisites: [
+            { topic: "Greedy Algorithms", ytId: "bC7o8P_Ste4" }
+        ],
         tree: null,
         algorithms: {
             greedy: {
@@ -742,6 +761,9 @@ const problemDB = {
         difficulty: "hard",
         topics: ["array", "greedy"],
         interview150: true,
+        prerequisites: [
+            { topic: "Greedy Algorithms", ytId: "bC7o8P_Ste4" }
+        ],
         tree: null,
         algorithms: {
             twoPass: {
@@ -776,6 +798,9 @@ const problemDB = {
         difficulty: "hard",
         topics: ["array", "two-pointers", "dynamic-programming"],
         interview150: true,
+        prerequisites: [
+            { topic: "Two Pointers Technique", ytId: "On03HWe2tZM" }
+        ],
         testCaseLabels: { normal: "Varied Heights", edge: "Flat Surface (No Water)" },
         tree: null,
         algorithms: {
@@ -1052,6 +1077,9 @@ const problemDB = {
         difficulty: "hard",
         topics: ["string"],
         interview150: true,
+        prerequisites: [
+            { topic: "Greedy Algorithms", ytId: "bC7o8P_Ste4" }
+        ],
         tree: null,
         algorithms: {
             greedy: {
@@ -1202,6 +1230,9 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "two-pointers", "greedy"],
         interview150: true,
+        prerequisites: [
+            { topic: "Two Pointers Technique", ytId: "On03HWe2tZM" }
+        ],
         tree: null,
         algorithms: {
             twoPointers: {
@@ -1237,6 +1268,9 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "two-pointers", "sorting"],
         interview150: true,
+        prerequisites: [
+            { topic: "Two Pointers Technique", ytId: "On03HWe2tZM" }
+        ],
         tree: null,
         algorithms: {
             sortAndScan: {
@@ -1276,6 +1310,9 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "sliding-window"],
         interview150: true,
+        prerequisites: [
+            { topic: "Sliding Window Technique", ytId: "p-ss2JNynmw" }
+        ],
         tree: null,
         algorithms: {
             slidingWindow: {
@@ -1309,6 +1346,9 @@ const problemDB = {
         difficulty: "medium",
         topics: ["string", "sliding-window", "hash-table"],
         interview150: true,
+        prerequisites: [
+            { topic: "Sliding Window Technique", ytId: "p-ss2JNynmw" }
+        ],
         tree: null,
         algorithms: {
             slidingWindow: {
@@ -1343,6 +1383,9 @@ const problemDB = {
         difficulty: "medium",
         topics: ["string", "sliding-window"],
         interview150: true,
+        prerequisites: [
+            { topic: "Sliding Window Technique", ytId: "p-ss2JNynmw" }
+        ],
         tree: null,
         algorithms: {
             slidingWindow: {
@@ -1378,6 +1421,10 @@ const problemDB = {
         difficulty: "hard",
         topics: ["string", "sliding-window", "hash-table"],
         interview150: true,
+        prerequisites: [
+            { topic: "Sliding Window Technique", ytId: "p-ss2JNynmw" },
+            { topic: "Hash Maps (Dictionaries)", ytId: "KyUTuwz_b7Q" }
+        ],
         tree: null,
         algorithms: {
             slidingWindow: {
@@ -1866,6 +1913,9 @@ const problemDB = {
         difficulty: "medium",
         topics: ["array", "hash-table"],
         interview150: true,
+        prerequisites: [
+            { topic: "Hash Maps (Dictionaries)", ytId: "KyUTuwz_b7Q" }
+        ],
         tree: null,
         algorithms: {
             hashSet: {
@@ -1968,6 +2018,190 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// ── Prerequisite Knowledge Check ──
+// Shows a friendly banner asking "Familiar with X?" when a harder problem is loaded.
+// If they click "No", an embedded YT video opens right there. Uses localStorage to not re-ask.
+
+function getPrereqDismissals() {
+    try {
+        return JSON.parse(localStorage.getItem('algoflowz-prereqs') || '{}');
+    } catch { return {}; }
+}
+
+function setPrereqDismissed(probId, topic) {
+    const data = getPrereqDismissals();
+    if (!data[probId]) data[probId] = [];
+    if (!data[probId].includes(topic)) data[probId].push(topic);
+    localStorage.setItem('algoflowz-prereqs', JSON.stringify(data));
+}
+
+function isPrereqDismissed(probId, topic) {
+    const data = getPrereqDismissals();
+    return data[probId]?.includes(topic) || false;
+}
+
+/**
+ * Renders the prerequisite banner inside the render-engine area.
+ * Called from init() whenever a problem with prerequisites is loaded.
+ */
+function renderPrereqBanner(probId) {
+    // Remove any old banner
+    const old = document.getElementById('prereqBanner');
+    if (old) old.remove();
+
+    const prob = problemDB[probId];
+    if (!prob?.prerequisites?.length) return;
+
+    // Filter out already-dismissed topics
+    const unseen = prob.prerequisites.filter(p => !isPrereqDismissed(probId, p.topic));
+    if (!unseen.length) return;
+
+    const engine = document.querySelector('.render-engine');
+    if (!engine) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'prereqBanner';
+    banner.className = 'prereq-banner';
+
+    // Build pills for each prerequisite
+    banner.innerHTML = `
+        <div class="prereq-banner-inner">
+            <span class="prereq-icon">📚</span>
+            <span class="prereq-label">Before you start — are you comfortable with:</span>
+            <div class="prereq-topics">
+                ${unseen.map((p, i) => `
+                    <div class="prereq-topic" data-idx="${i}">
+                        <span class="prereq-topic-name">${p.topic}</span>
+                        <button class="prereq-btn prereq-yes" data-topic="${p.topic}" title="I know this">Yes</button>
+                        <button class="prereq-btn prereq-no" data-topic="${p.topic}" data-ytid="${p.ytId}" title="Show me a quick video">No, show me</button>
+                    </div>
+                `).join('')}
+            </div>
+            <button class="prereq-dismiss-all" title="Dismiss all">Skip all</button>
+        </div>
+    `;
+
+    // Wire up buttons
+    banner.querySelectorAll('.prereq-yes').forEach(btn => {
+        btn.addEventListener('click', () => {
+            setPrereqDismissed(probId, btn.dataset.topic);
+            const topicEl = btn.closest('.prereq-topic');
+            topicEl.classList.add('prereq-done');
+            topicEl.innerHTML = `<span class="prereq-topic-name">${btn.dataset.topic}</span> <span class="prereq-check">✓</span>`;
+            checkAllDismissed();
+        });
+    });
+
+    banner.querySelectorAll('.prereq-no').forEach(btn => {
+        btn.addEventListener('click', () => {
+            openPrereqVideo(btn.dataset.topic, btn.dataset.ytid, probId);
+        });
+    });
+
+    banner.querySelector('.prereq-dismiss-all').addEventListener('click', () => {
+        unseen.forEach(p => setPrereqDismissed(probId, p.topic));
+        banner.classList.add('prereq-hiding');
+        setTimeout(() => banner.remove(), 350);
+    });
+
+    function checkAllDismissed() {
+        const remaining = banner.querySelectorAll('.prereq-topic:not(.prereq-done)');
+        if (!remaining.length) {
+            banner.classList.add('prereq-hiding');
+            setTimeout(() => banner.remove(), 350);
+        }
+    }
+
+    // Insert at the top of the render-engine
+    engine.prepend(banner);
+}
+
+/**
+ * Opens the prereq video modal — a clean embedded YT player.
+ */
+function openPrereqVideo(topic, ytId, probId) {
+    // Pause autoplay if running
+    if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+        updatePlayButtons(false);
+    }
+
+    // Reuse or create modal
+    let modal = document.getElementById('prereqVideoModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'prereqVideoModal';
+        modal.className = 'prereq-video-modal';
+        modal.innerHTML = `
+            <div class="prereq-video-content">
+                <div class="prereq-video-header">
+                    <h3 id="prereqVideoTitle"></h3>
+                    <button class="prereq-video-close" type="button">✕</button>
+                </div>
+                <div class="prereq-video-body">
+                    <div class="prereq-video-wrapper">
+                        <iframe id="prereqVideoFrame"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div class="prereq-video-footer">
+                    <button class="prereq-video-got-it" type="button">Got it, let's go!</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Close handlers
+        modal.querySelector('.prereq-video-close').addEventListener('click', () => closePrereqVideo());
+        modal.querySelector('.prereq-video-got-it').addEventListener('click', () => closePrereqVideo());
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closePrereqVideo();
+        });
+    }
+
+    // Set video
+    modal.querySelector('#prereqVideoTitle').innerHTML =
+        `<i class="fab fa-youtube" style="color:#ff0000;margin-right:8px;"></i> Quick Refresher: ${topic}`;
+    modal.querySelector('#prereqVideoFrame').src =
+        `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
+
+    // Store context for dismissal on close
+    modal._currentTopic = topic;
+    modal._currentProbId = probId;
+
+    modal.classList.add('show');
+}
+
+function closePrereqVideo() {
+    const modal = document.getElementById('prereqVideoModal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    // Stop video
+    modal.querySelector('#prereqVideoFrame').src = '';
+    // Mark as dismissed
+    if (modal._currentTopic && modal._currentProbId) {
+        setPrereqDismissed(modal._currentProbId, modal._currentTopic);
+        // Update banner if still visible
+        const banner = document.getElementById('prereqBanner');
+        if (banner) {
+            const topicBtns = banner.querySelectorAll(`.prereq-no[data-topic="${modal._currentTopic}"]`);
+            topicBtns.forEach(btn => {
+                const topicEl = btn.closest('.prereq-topic');
+                topicEl.classList.add('prereq-done');
+                topicEl.innerHTML = `<span class="prereq-topic-name">${modal._currentTopic}</span> <span class="prereq-check">✓</span>`;
+            });
+            // Check if all done
+            const remaining = banner.querySelectorAll('.prereq-topic:not(.prereq-done)');
+            if (!remaining.length) {
+                banner.classList.add('prereq-hiding');
+                setTimeout(() => banner.remove(), 350);
+            }
+        }
+    }
+}
 
 // ── Report / Feedback Modal ──
 
@@ -11990,6 +12224,9 @@ function init() {
         inspiredByEl.style.display = 'none';
     }
 
+    // Show prerequisite knowledge check banner for harder problems
+    renderPrereqBanner(currentProbId);
+
     // Update algorithm selector (desktop + mobile)
     const algorithmSelect = document.getElementById('algorithmSelect');
     const mobileAlgorithmSelect = document.getElementById('mobileAlgorithmSelect');
@@ -12444,15 +12681,18 @@ function setupEventListeners() {
         const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT' || active.isContentEditable);
         const reportModal = document.getElementById('reportModal');
         const reportOpen = reportModal && reportModal.classList.contains('show');
+        const prereqVideoModal = document.getElementById('prereqVideoModal');
+        const prereqVideoOpen = prereqVideoModal && prereqVideoModal.classList.contains('show');
 
         if (e.key === 'Escape') {
             closeYouTubeModal();
             closeProblemModal();
             if (typeof closeReportModal === 'function') closeReportModal();
+            if (typeof closePrereqVideo === 'function') closePrereqVideo();
             return;
         }
 
-        if (isTyping || reportOpen) return;
+        if (isTyping || reportOpen || prereqVideoOpen) return;
 
         if (e.key === 'ArrowLeft') changeStep(-1);
         if (e.key === 'ArrowRight') changeStep(1);
