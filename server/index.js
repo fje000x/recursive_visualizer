@@ -52,11 +52,22 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    problem_id TEXT NOT NULL,
+    text_content TEXT DEFAULT '',
+    drawing_data TEXT DEFAULT '',
+    updated_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(user_id, problem_id)
+  );
 `);
 
 // ── Middleware ──
 app.use(helmet());
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '600kb' }));
 
 // CORS — allow your frontend
 const allowedOrigins = [
@@ -391,6 +402,66 @@ app.post('/api/signup', (req, res) => {
   }
 });
 
+// ── Notes API ──
+
+// GET /api/notes/:problemId — get note for a specific problem
+app.get('/api/notes/:problemId', authenticate, (req, res) => {
+  const { problemId } = req.params;
+  const note = db.prepare(
+    'SELECT text_content, drawing_data, updated_at FROM notes WHERE user_id = ? AND problem_id = ?'
+  ).get(req.user.id, problemId);
+
+  res.json({
+    note: note || { text_content: '', drawing_data: '', updated_at: null }
+  });
+});
+
+// PUT /api/notes/:problemId — save/update note for a specific problem
+app.put('/api/notes/:problemId', authenticate, (req, res) => {
+  const { problemId } = req.params;
+  const { text_content, drawing_data } = req.body;
+
+  if (text_content !== undefined && typeof text_content !== 'string') {
+    return res.status(400).json({ error: 'text_content must be a string.' });
+  }
+  if (drawing_data !== undefined && typeof drawing_data !== 'string') {
+    return res.status(400).json({ error: 'drawing_data must be a string.' });
+  }
+
+  // Limit sizes: 50KB text, 500KB drawing
+  if (text_content && text_content.length > 50000) {
+    return res.status(400).json({ error: 'Note text too long (max 50KB).' });
+  }
+  if (drawing_data && drawing_data.length > 500000) {
+    return res.status(400).json({ error: 'Drawing data too large (max 500KB).' });
+  }
+
+  const existing = db.prepare(
+    'SELECT id FROM notes WHERE user_id = ? AND problem_id = ?'
+  ).get(req.user.id, problemId);
+
+  if (existing) {
+    db.prepare(
+      `UPDATE notes SET text_content = COALESCE(?, text_content), drawing_data = COALESCE(?, drawing_data), updated_at = datetime('now') WHERE id = ?`
+    ).run(text_content ?? null, drawing_data ?? null, existing.id);
+  } else {
+    db.prepare(
+      'INSERT INTO notes (user_id, problem_id, text_content, drawing_data) VALUES (?, ?, ?, ?)'
+    ).run(req.user.id, problemId, text_content || '', drawing_data || '');
+  }
+
+  res.json({ success: true });
+});
+
+// GET /api/notes — get all notes for the logged-in user
+app.get('/api/notes', authenticate, (req, res) => {
+  const notes = db.prepare(
+    'SELECT problem_id, text_content, drawing_data, updated_at FROM notes WHERE user_id = ? ORDER BY updated_at DESC'
+  ).all(req.user.id);
+
+  res.json({ notes });
+});
+
 // GET /api/stats — basic counts (optional, for your dashboard)
 app.get('/api/stats', (req, res) => {
   const reports = db.prepare('SELECT COUNT(*) as count FROM reports').get();
@@ -417,6 +488,9 @@ app.listen(PORT, () => {
   console.log(`   POST /api/auth/signup  — create account`);
   console.log(`   POST /api/auth/login   — log in`);
   console.log(`   GET  /api/auth/me      — current user`);
+  console.log(`   GET  /api/notes/:id    — get note for problem`);
+  console.log(`   PUT  /api/notes/:id    — save note for problem`);
+  console.log(`   GET  /api/notes        — get all notes`);
   console.log(`   POST /api/report       — submit bug/feedback`);
   console.log(`   POST /api/signup       — email signup`);
   console.log(`   GET  /api/health       — health check`);

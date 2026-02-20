@@ -12921,20 +12921,29 @@ function updateAuthUI() {
     const drawerAvatar = document.getElementById('drawerUserAvatar');
     const drawerName = document.getElementById('drawerUserName');
     const drawerEmail = document.getElementById('drawerUserEmail');
+    // Dropdown elements
+    const ddAvatar = document.getElementById('authDdAvatar');
+    const ddName = document.getElementById('authDdName');
+    const ddEmail = document.getElementById('authDdEmail');
 
     if (auth && auth.user) {
-        const initial = (auth.user.display_name || auth.user.username || 'U').charAt(0).toUpperCase();
+        const displayName = auth.user.displayName || auth.user.display_name || auth.user.username || 'User';
+        const initial = displayName.charAt(0).toUpperCase();
         // Desktop nav button
         if (navBtn) {
             navBtn.classList.add('logged-in');
             navBtn.innerHTML = initial;
             navBtn.title = auth.user.username;
         }
+        // Desktop dropdown
+        if (ddAvatar) ddAvatar.textContent = initial;
+        if (ddName) ddName.textContent = displayName;
+        if (ddEmail) ddEmail.textContent = auth.user.email || '';
         // Drawer
         if (drawerLoggedOut) drawerLoggedOut.style.display = 'none';
         if (drawerLoggedIn) drawerLoggedIn.style.display = 'block';
         if (drawerAvatar) drawerAvatar.textContent = initial;
-        if (drawerName) drawerName.textContent = auth.user.display_name || auth.user.username;
+        if (drawerName) drawerName.textContent = displayName;
         if (drawerEmail) drawerEmail.textContent = auth.user.email || '';
     } else {
         // Desktop nav button
@@ -12943,6 +12952,8 @@ function updateAuthUI() {
             navBtn.innerHTML = '<i class="fas fa-user"></i>';
             navBtn.title = 'Account';
         }
+        // Close dropdown if open
+        closeAuthDropdown();
         // Drawer
         if (drawerLoggedOut) drawerLoggedOut.style.display = 'block';
         if (drawerLoggedIn) drawerLoggedIn.style.display = 'none';
@@ -13228,6 +13239,467 @@ function setupMobileMorePopover() {
             init();
         });
     }
+
+    // Popover Notes button
+    const popNotesBtn = document.getElementById('popNotesBtn');
+    if (popNotesBtn) {
+        popNotesBtn.addEventListener('click', () => {
+            closeMobileMorePopover();
+            openNotebook();
+        });
+    }
+}
+
+// ═══════════════════════════════════════════
+// Notebook / Notes System
+// ═══════════════════════════════════════════
+const NOTES_LOCAL_KEY = 'algoflowz-notes';
+let notebookDrawing = false;
+let notebookErasing = false;
+let notebookCtx = null;
+let notebookPaths = [];   // array of stroke objects: { points, color, size }
+let notebookCurrentPath = null;
+let notebookSaveTimer = null;
+let notebookDirty = false;
+
+// ---- Local storage helpers ----
+function getLocalNotes() {
+    try {
+        return JSON.parse(localStorage.getItem(NOTES_LOCAL_KEY) || '{}');
+    } catch { return {}; }
+}
+
+function setLocalNote(problemId, data) {
+    const notes = getLocalNotes();
+    notes[problemId] = { ...data, updated_at: new Date().toISOString() };
+    localStorage.setItem(NOTES_LOCAL_KEY, JSON.stringify(notes));
+}
+
+function getLocalNote(problemId) {
+    const notes = getLocalNotes();
+    return notes[problemId] || { text_content: '', drawing_data: '' };
+}
+
+// ---- Save status UI ----
+function setNotebookSaveStatus(status, msg) {
+    const el = document.getElementById('notebookSaveStatus');
+    if (!el) return;
+    el.className = 'notebook-save-status ' + status;
+    const icons = { saving: 'fa-spinner fa-spin', saved: 'fa-check-circle', error: 'fa-exclamation-circle', 'local-only': 'fa-hdd' };
+    el.innerHTML = `<i class="fas ${icons[status] || 'fa-check-circle'}"></i> ${msg || status}`;
+}
+
+// ---- Open / close ----
+function openNotebook() {
+    const panel = document.getElementById('notebookPanel');
+    if (!panel) return;
+    panel.classList.add('open');
+    loadNotebookForCurrentProblem();
+    // Init canvas after transition completes
+    setTimeout(() => initNotebookCanvas(), 300);
+}
+
+function closeNotebook() {
+    const panel = document.getElementById('notebookPanel');
+    if (panel) panel.classList.remove('open');
+    saveNotebookNote(); // save on close
+}
+
+// ---- Load note for current problem ----
+async function loadNotebookForCurrentProblem() {
+    const prob = problemDB[currentProbId];
+    const nameEl = document.getElementById('notebookProblemName');
+    const pageInfo = document.getElementById('notebookPageInfo');
+    const editor = document.getElementById('notebookEditor');
+    const loginPrompt = document.getElementById('notebookLoginPrompt');
+
+    if (nameEl) nameEl.textContent = prob ? prob.name : 'Notes';
+
+    // Page info
+    const ids = Object.keys(problemDB);
+    const idx = ids.indexOf(currentProbId);
+    if (pageInfo) pageInfo.textContent = `Problem ${idx + 1} of ${ids.length}`;
+
+    // Show login prompt if not logged in
+    const auth = getStoredAuth();
+    if (loginPrompt) loginPrompt.style.display = auth ? 'none' : 'flex';
+
+    // Load from local first (instant)
+    const local = getLocalNote(currentProbId);
+    if (editor) editor.innerHTML = local.text_content || '';
+    loadDrawingData(local.drawing_data);
+
+    // If logged in, try to fetch from server (merge: server wins if newer)
+    if (auth) {
+        try {
+            const res = await fetch(`${AUTH_API}/api/notes/${currentProbId}`, {
+                headers: { 'Authorization': `Bearer ${auth.token}` }
+            });
+            if (res.ok) {
+                const data = await safeParseJSON(res);
+                const serverNote = data.note;
+                // Server is source of truth if it has content
+                if (serverNote && serverNote.updated_at) {
+                    const serverTime = new Date(serverNote.updated_at).getTime();
+                    const localTime = local.updated_at ? new Date(local.updated_at).getTime() : 0;
+                    if (serverTime >= localTime) {
+                        if (editor && serverNote.text_content) editor.innerHTML = serverNote.text_content;
+                        if (serverNote.drawing_data) loadDrawingData(serverNote.drawing_data);
+                        // Update local cache
+                        setLocalNote(currentProbId, {
+                            text_content: serverNote.text_content,
+                            drawing_data: serverNote.drawing_data,
+                            updated_at: serverNote.updated_at
+                        });
+                    }
+                }
+                setNotebookSaveStatus('saved', 'Synced');
+            }
+        } catch {
+            // Server unavailable — just use local
+            setNotebookSaveStatus('local-only', 'Local only');
+        }
+    } else {
+        setNotebookSaveStatus('local-only', 'Local only');
+    }
+}
+
+// ---- Save note ----
+function scheduleNotebookSave() {
+    notebookDirty = true;
+    setNotebookSaveStatus('saving', 'Saving…');
+    clearTimeout(notebookSaveTimer);
+    notebookSaveTimer = setTimeout(() => saveNotebookNote(), 1200);
+}
+
+async function saveNotebookNote() {
+    if (!notebookDirty) return;
+    notebookDirty = false;
+
+    const editor = document.getElementById('notebookEditor');
+    const textContent = editor ? editor.innerHTML : '';
+    const drawingData = getDrawingData();
+
+    // Always save locally
+    setLocalNote(currentProbId, { text_content: textContent, drawing_data: drawingData });
+
+    // If logged in, sync to server
+    const auth = getStoredAuth();
+    if (auth) {
+        try {
+            const res = await fetch(`${AUTH_API}/api/notes/${currentProbId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${auth.token}`
+                },
+                body: JSON.stringify({ text_content: textContent, drawing_data: drawingData })
+            });
+            if (res.ok) {
+                setNotebookSaveStatus('saved', 'Saved');
+            } else {
+                // Server rejected but local save succeeded
+                setNotebookSaveStatus('local-only', 'Saved locally');
+            }
+        } catch {
+            setNotebookSaveStatus('local-only', 'Saved locally');
+        }
+    } else {
+        setNotebookSaveStatus('local-only', 'Saved locally');
+    }
+}
+
+// ---- Drawing canvas ----
+function initNotebookCanvas() {
+    const canvas = document.getElementById('notebookCanvas');
+    if (!canvas) return;
+    const body = document.querySelector('.notebook-body');
+    if (body) {
+        canvas.width = body.clientWidth;
+        canvas.height = body.clientHeight;
+    }
+    notebookCtx = canvas.getContext('2d');
+    redrawCanvas();
+}
+
+function getDrawingData() {
+    return JSON.stringify(notebookPaths);
+}
+
+function loadDrawingData(data) {
+    try {
+        notebookPaths = data ? JSON.parse(data) : [];
+    } catch {
+        notebookPaths = [];
+    }
+    redrawCanvas();
+}
+
+function redrawCanvas() {
+    if (!notebookCtx) return;
+    const canvas = document.getElementById('notebookCanvas');
+    notebookCtx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const path of notebookPaths) {
+        if (path.points.length < 2) continue;
+        notebookCtx.beginPath();
+        notebookCtx.strokeStyle = path.color;
+        notebookCtx.lineWidth = path.size;
+        notebookCtx.lineCap = 'round';
+        notebookCtx.lineJoin = 'round';
+        notebookCtx.moveTo(path.points[0].x, path.points[0].y);
+        for (let i = 1; i < path.points.length; i++) {
+            notebookCtx.lineTo(path.points[i].x, path.points[i].y);
+        }
+        notebookCtx.stroke();
+    }
+}
+
+function getCanvasPoint(e) {
+    const canvas = document.getElementById('notebookCanvas');
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+        x: (clientX - rect.left) * (canvas.width / rect.width),
+        y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+}
+
+function startStroke(e) {
+    if (!notebookDrawing && !notebookErasing) return;
+    e.preventDefault();
+    const pt = getCanvasPoint(e);
+
+    if (notebookErasing) {
+        // Erase strokes near this point
+        eraseAt(pt);
+        return;
+    }
+
+    const color = document.getElementById('nbPenColor')?.value || '#3b82f6';
+    const size = parseInt(document.getElementById('nbPenSize')?.value || '4');
+    notebookCurrentPath = { points: [pt], color, size };
+}
+
+function moveStroke(e) {
+    if (!notebookCurrentPath && !notebookErasing) return;
+    e.preventDefault();
+    const pt = getCanvasPoint(e);
+
+    if (notebookErasing) {
+        eraseAt(pt);
+        return;
+    }
+
+    if (notebookCurrentPath) {
+        notebookCurrentPath.points.push(pt);
+        // Live preview
+        if (notebookCtx) {
+            const pts = notebookCurrentPath.points;
+            notebookCtx.beginPath();
+            notebookCtx.strokeStyle = notebookCurrentPath.color;
+            notebookCtx.lineWidth = notebookCurrentPath.size;
+            notebookCtx.lineCap = 'round';
+            notebookCtx.lineJoin = 'round';
+            if (pts.length >= 2) {
+                notebookCtx.moveTo(pts[pts.length - 2].x, pts[pts.length - 2].y);
+                notebookCtx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+            }
+            notebookCtx.stroke();
+        }
+    }
+}
+
+function endStroke() {
+    if (notebookCurrentPath && notebookCurrentPath.points.length >= 2) {
+        notebookPaths.push(notebookCurrentPath);
+        scheduleNotebookSave();
+    }
+    notebookCurrentPath = null;
+}
+
+function eraseAt(pt) {
+    const eraseRadius = 15;
+    const before = notebookPaths.length;
+    notebookPaths = notebookPaths.filter(path => {
+        return !path.points.some(p => {
+            const dx = p.x - pt.x, dy = p.y - pt.y;
+            return Math.sqrt(dx * dx + dy * dy) < eraseRadius;
+        });
+    });
+    if (notebookPaths.length !== before) {
+        redrawCanvas();
+        scheduleNotebookSave();
+    }
+}
+
+function toggleDrawMode() {
+    const canvas = document.getElementById('notebookCanvas');
+    const btn = document.getElementById('nbDrawToggle');
+    const eraserBtn = document.getElementById('nbEraserBtn');
+
+    if (notebookErasing) {
+        // Turn off eraser first
+        notebookErasing = false;
+        if (eraserBtn) eraserBtn.classList.remove('active');
+        if (canvas) canvas.classList.remove('eraser-active');
+    }
+
+    notebookDrawing = !notebookDrawing;
+    if (btn) btn.classList.toggle('active', notebookDrawing);
+    if (canvas) {
+        canvas.classList.toggle('draw-active', notebookDrawing);
+        canvas.classList.remove('eraser-active');
+    }
+}
+
+function toggleEraserMode() {
+    const canvas = document.getElementById('notebookCanvas');
+    const btn = document.getElementById('nbEraserBtn');
+    const drawBtn = document.getElementById('nbDrawToggle');
+
+    if (notebookDrawing) {
+        // Turn off draw first
+        notebookDrawing = false;
+        if (drawBtn) drawBtn.classList.remove('active');
+        if (canvas) canvas.classList.remove('draw-active');
+    }
+
+    notebookErasing = !notebookErasing;
+    if (btn) btn.classList.toggle('active', notebookErasing);
+    if (canvas) {
+        canvas.classList.toggle('eraser-active', notebookErasing);
+        canvas.classList.toggle('draw-active', notebookErasing); // enable pointer events
+    }
+}
+
+function clearNotebookCanvas() {
+    if (!confirm('Clear all drawings on this page?')) return;
+    notebookPaths = [];
+    redrawCanvas();
+    scheduleNotebookSave();
+}
+
+// ---- Setup notebook ----
+function setupNotebook() {
+    // Open button (nav)
+    const navBtn = document.getElementById('navNotesBtn');
+    if (navBtn) navBtn.addEventListener('click', openNotebook);
+
+    // Close button
+    const closeBtn = document.getElementById('notebookClose');
+    if (closeBtn) closeBtn.addEventListener('click', closeNotebook);
+
+    // Login prompt button
+    const nbLoginBtn = document.getElementById('nbLoginBtn');
+    if (nbLoginBtn) {
+        nbLoginBtn.addEventListener('click', () => {
+            closeNotebook();
+            openAuthModal('login');
+        });
+    }
+
+    // Toolbar: text formatting
+    document.querySelectorAll('.nb-tool-btn[data-cmd]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const cmd = btn.getAttribute('data-cmd');
+            const val = btn.getAttribute('data-value') || null;
+            document.execCommand(cmd, false, val);
+            document.getElementById('notebookEditor')?.focus();
+        });
+    });
+
+    // Toolbar: draw toggle
+    const drawToggle = document.getElementById('nbDrawToggle');
+    if (drawToggle) drawToggle.addEventListener('click', toggleDrawMode);
+
+    // Toolbar: eraser
+    const eraserBtn = document.getElementById('nbEraserBtn');
+    if (eraserBtn) eraserBtn.addEventListener('click', toggleEraserMode);
+
+    // Toolbar: clear canvas
+    const clearBtn = document.getElementById('nbClearCanvas');
+    if (clearBtn) clearBtn.addEventListener('click', clearNotebookCanvas);
+
+    // Editor: auto-save on input
+    const editor = document.getElementById('notebookEditor');
+    if (editor) {
+        editor.addEventListener('input', () => {
+            scheduleNotebookSave();
+        });
+    }
+
+    // Canvas: drawing events
+    const canvas = document.getElementById('notebookCanvas');
+    if (canvas) {
+        canvas.addEventListener('mousedown', startStroke);
+        canvas.addEventListener('mousemove', moveStroke);
+        canvas.addEventListener('mouseup', endStroke);
+        canvas.addEventListener('mouseleave', endStroke);
+        canvas.addEventListener('touchstart', startStroke, { passive: false });
+        canvas.addEventListener('touchmove', moveStroke, { passive: false });
+        canvas.addEventListener('touchend', endStroke);
+        canvas.addEventListener('touchcancel', endStroke);
+    }
+
+    // Resize canvas when window resizes
+    window.addEventListener('resize', () => {
+        if (document.getElementById('notebookPanel')?.classList.contains('open')) {
+            initNotebookCanvas();
+        }
+    });
+
+    // Escape to close
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.getElementById('notebookPanel')?.classList.contains('open')) {
+            closeNotebook();
+        }
+    });
+
+    // ---- Desktop resize handle ----
+    setupNotebookResize();
+}
+
+// ---- Notebook resize (desktop drag handle) ----
+function setupNotebookResize() {
+    const handle = document.getElementById('notebookResizeHandle');
+    const panel = document.getElementById('notebookPanel');
+    if (!handle || !panel) return;
+
+    let dragging = false;
+    let startX = 0;
+    let startWidth = 0;
+    const MIN_WIDTH = 320;
+    const MAX_WIDTH = Math.min(900, window.innerWidth * 0.85);
+
+    handle.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        dragging = true;
+        startX = e.clientX;
+        startWidth = panel.offsetWidth;
+        handle.classList.add('dragging');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        // Dragging left edge: moving left increases width
+        const delta = startX - e.clientX;
+        const maxW = Math.min(MAX_WIDTH, window.innerWidth * 0.85);
+        const newWidth = Math.max(MIN_WIDTH, Math.min(maxW, startWidth + delta));
+        panel.style.setProperty('--notebook-width', newWidth + 'px');
+        // Reinit canvas on resize
+        initNotebookCanvas();
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (!dragging) return;
+        dragging = false;
+        handle.classList.remove('dragging');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+    });
 }
 
 // ═══════════════════════════════════════════
@@ -13253,17 +13725,59 @@ function closeHamburgerDrawer() {
     document.body.style.overflow = '';
 }
 
+// ═══════════════════════════════════════════
+// Auth Dropdown (desktop — logged-in avatar menu)
+// ═══════════════════════════════════════════
+function toggleAuthDropdown() {
+    const dd = document.getElementById('navAuthDropdown');
+    if (!dd) return;
+    dd.classList.toggle('show');
+}
+
+function closeAuthDropdown() {
+    const dd = document.getElementById('navAuthDropdown');
+    if (dd) dd.classList.remove('show');
+}
+
 function setupAuthAndHamburger() {
-    // Auth modal controls
+    // Auth: nav button — opens modal if logged out, toggles dropdown if logged in
     const navAuthBtn = document.getElementById('navAuthBtn');
     if (navAuthBtn) {
-        navAuthBtn.addEventListener('click', () => {
+        navAuthBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const auth = getStoredAuth();
             if (auth) {
-                if (confirm('Log out?')) handleLogout();
+                toggleAuthDropdown();
             } else {
                 openAuthModal('login');
             }
+        });
+    }
+
+    // Auth dropdown: close when clicking outside
+    document.addEventListener('click', (e) => {
+        const dd = document.getElementById('navAuthDropdown');
+        const wrapper = document.querySelector('.nav-auth-wrapper');
+        if (dd && dd.classList.contains('show') && wrapper && !wrapper.contains(e.target)) {
+            dd.classList.remove('show');
+        }
+    });
+
+    // Auth dropdown: Notes button
+    const authDdNotesBtn = document.getElementById('authDdNotesBtn');
+    if (authDdNotesBtn) {
+        authDdNotesBtn.addEventListener('click', () => {
+            closeAuthDropdown();
+            openNotebook();
+        });
+    }
+
+    // Auth dropdown: Logout button
+    const authDdLogoutBtn = document.getElementById('authDdLogoutBtn');
+    if (authDdLogoutBtn) {
+        authDdLogoutBtn.addEventListener('click', () => {
+            closeAuthDropdown();
+            handleLogout();
         });
     }
 
@@ -13358,6 +13872,7 @@ function setupAuthAndHamburger() {
 window.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     setupMobileMorePopover();
+    setupNotebook();
     setupAuthAndHamburger();
     init();
 });
