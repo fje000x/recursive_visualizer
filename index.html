@@ -612,6 +612,80 @@
         </div>
     </div>
 
+    <!-- Insight modal for Problem 12 — Jump Game II -->
+    <div id="insightModal12" class="insight-modal">
+        <div class="insight-modal-content">
+            <div class="insight-modal-header">
+                <h3>Why Greedy BFS Works</h3>
+                <button class="insight-modal-close" type="button" onclick="closeInsightModal('insightModal12')">✕</button>
+            </div>
+            <div class="insight-modal-body">
+                <p class="insight-core-idea">This isn't a sliding window. It's a <strong>BFS layer expansion</strong> disguised as a greedy algorithm.</p>
+                <p class="insight-core-idea">Imagine you're standing on a number line. Each position tells you how far you can jump. You want to reach the end in the <strong>fewest jumps</strong>.</p>
+
+                <div class="insight-example-header">
+                    <span class="insight-example-label">The Key Insight</span>
+                    <span class="insight-example-array">Think of it like ripples in a pond — each "jump" expands your reachable zone</span>
+                </div>
+
+                <div class="insight-step">
+                    <div class="insight-step-num">1</div>
+                    <div class="insight-step-body">
+                        <strong>Two loops, two jobs</strong>
+                        <p>The <span style="color:var(--accent-blue)">outer loop</span> (<code style="color:var(--accent-blue)">while r &lt; len(nums) - 1</code>) handles <strong>jumps</strong> — each iteration = one jump.</p>
+                        <p>The <span style="color:var(--accent-green)">inner loop</span> (<code style="color:var(--accent-green)">for i in range(l, r+1)</code>) scans every cell in the current reachable zone to find the <strong>farthest</strong> any of them can reach.</p>
+                    </div>
+                </div>
+
+                <div class="insight-step">
+                    <div class="insight-step-num">2</div>
+                    <div class="insight-step-body">
+                        <strong>What [L, R] actually means</strong>
+                        <p><span style="color:#fb923c"><strong>L</strong></span> and <span style="color:#f472b6"><strong>R</strong></span> define the <strong>current reachable zone</strong> — all indices you can land on using exactly the current number of jumps.</p>
+                        <p>This is identical to how BFS processes one "level" at a time. L is the start of the level, R is the end.</p>
+                    </div>
+                </div>
+
+                <div class="insight-step">
+                    <div class="insight-step-num">3</div>
+                    <div class="insight-step-body">
+                        <strong>Why we track <code style="color:var(--accent-purple)">farthest</code></strong>
+                        <p>Each cell in the zone offers a "launch pad." <code style="color:var(--accent-purple)">farthest = max(farthest, i + nums[i])</code> remembers the best one.</p>
+                        <p>We don't need to know <em>which</em> cell was best — only <em>how far</em> the best one reaches. That becomes the right edge of the next zone.</p>
+                    </div>
+                </div>
+
+                <div class="insight-step">
+                    <div class="insight-step-num">4</div>
+                    <div class="insight-step-body">
+                        <strong>The jump: expanding to the next zone</strong>
+                        <p>After scanning every cell in [L, R]:</p>
+                        <span class="insight-transform">L = R + 1 &nbsp;&nbsp;(start of new zone)<br>R = farthest &nbsp;(end of new zone)<br>jumps += 1</span>
+                        <p>The old zone fades out. The new zone lights up. Each jump = one BFS level deeper.</p>
+                    </div>
+                </div>
+
+                <div class="insight-step">
+                    <div class="insight-step-num">5</div>
+                    <div class="insight-step-body">
+                        <strong>Why this is optimal</strong>
+                        <p>BFS guarantees the shortest path. By always expanding to the farthest reachable index, we cover the maximum ground per jump — so we'll never use more jumps than necessary.</p>
+                        <p>Greedy works here because reaching farther is <em>always</em> better. There's no case where a shorter jump now leads to fewer total jumps later.</p>
+                    </div>
+                </div>
+
+                <div class="insight-key">
+                    <strong>Mental model:</strong> Each zone = "everything reachable in exactly N jumps." The inner loop finds the frontier of the <em>next</em> zone. When you step forward, you're committing to one more jump and unlocking a bigger region. BFS guarantees this is optimal.
+                </div>
+
+                <div class="insight-complexity">
+                    <span><strong>Time:</strong> O(n) — each index visited once</span>
+                    <span><strong>Space:</strong> O(1) — just L, R, farthest, jumps</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Mobile bottom floating pill -->
     <nav class="mobile-bottom-nav">
         <button onclick="changeStep(-1)" id="mobilePrevBtn" class="control-btn">

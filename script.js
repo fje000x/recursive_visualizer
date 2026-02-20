@@ -558,16 +558,17 @@ const problemDB = {
                 code: [
                     "def fewestJumps(nums):",
                     "    jumps = 0",
-                    "    curEnd = 0",
+                    "    l = r = 0",
                     "    farthest = 0",
-                    "    for i in range(len(nums) - 1):",
-                    "        farthest = max(farthest, i + nums[i])",
-                    "        if i == curEnd:",
-                    "            jumps += 1",
-                    "            curEnd = farthest",
+                    "    while r < len(nums) - 1:",
+                    "        for i in range(l, r + 1):",
+                    "            farthest = max(farthest, i + nums[i])",
+                    "        jumps += 1",
+                    "        l = r + 1",
+                    "        r = farthest",
                     "    return jumps"
                 ],
-                indentation: [0, 1, 1, 1, 1, 2, 2, 3, 3, 1],
+                indentation: [0, 1, 1, 1, 1, 2, 3, 2, 2, 2, 1],
                 timeComplexity: "O(n)",
                 spaceComplexity: "O(1)",
                 generateHistory: function() {
@@ -1939,26 +1940,33 @@ function closeYouTubeModal() {
     modal.classList.remove('show');
 }
 
-// Insight Modal (Problem 8 — why 3 reverses work)
-function openInsightModal() {
-    const modal = document.getElementById('insightModal');
-    modal.classList.add('show');
+// Insight Modal (generic — works for any problem's insight modal)
+function openInsightModal(modalId) {
+    const id = modalId || 'insightModal';
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.add('show');
 }
 
-function closeInsightModal() {
-    const modal = document.getElementById('insightModal');
-    modal.classList.remove('show');
+function closeInsightModal(modalId) {
+    const id = modalId || 'insightModal';
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.remove('show');
 }
 
-// Close insight modal on backdrop click or close button
+// Close insight modals on backdrop click or close button
 document.addEventListener('DOMContentLoaded', () => {
-    const insightModal = document.getElementById('insightModal');
-    if (insightModal) {
-        document.getElementById('insightModalClose').addEventListener('click', closeInsightModal);
-        insightModal.addEventListener('click', (e) => {
-            if (e.target === insightModal) closeInsightModal();
+    // Set up all insight modals
+    document.querySelectorAll('.insight-modal').forEach(modal => {
+        // Close button
+        const closeBtn = modal.querySelector('.insight-modal-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+        }
+        // Backdrop click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('show');
         });
-    }
+    });
 });
 
 // ── Report / Feedback Modal ──
@@ -2002,9 +2010,37 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById('reportSubmitBtn');
             const status = document.getElementById('reportStatus');
             btn.disabled = true;
+            status.textContent = 'Sending...';
+            status.className = 'report-status';
 
-            status.textContent = 'Currently not working, check back soon.';
-            status.className = 'report-status error';
+            const API_URL = 'https://recursive-visualizer.onrender.com';
+
+            try {
+                const type = form.querySelector('[name="type"]')?.value || 'feedback';
+                const email = form.querySelector('[name="email"]')?.value || '';
+                const message = form.querySelector('[name="message"]')?.value || '';
+                const problemId = typeof currentProbId !== 'undefined' ? currentProbId : '';
+
+                const res = await fetch(`${API_URL}/api/report`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, email, message, problemId })
+                });
+
+                if (res.ok) {
+                    status.textContent = 'Sent! Thank you for your feedback.';
+                    status.className = 'report-status success';
+                    form.reset();
+                    setTimeout(() => closeReportModal(), 1800);
+                } else {
+                    const data = await res.json().catch(() => ({}));
+                    status.textContent = data.error || 'Something went wrong. Please try again.';
+                    status.className = 'report-status error';
+                }
+            } catch (err) {
+                status.textContent = 'Network error — please try again later.';
+                status.className = 'report-status error';
+            }
 
             setTimeout(() => { btn.disabled = false; }, 1200);
         });
@@ -3241,9 +3277,16 @@ function generateFewestJumpsHistory() {
     const nums = [2, 3, 1, 1, 4];
     const h = [];
     let jumps = 0;
-    let curEnd = 0;
+    let l = 0, r = 0;          // current window [l, r]
     let farthest = 0;
-    const levels = [{ start: 0, end: 0 }]; // track BFS level boundaries
+    let farthestIdx = 0;       // which index achieved farthest (for winner highlight)
+
+    // windows: array of { l, r, jumpNum } — completed windows
+    const windows = [];
+    // arcs: what to draw on screen
+    let arcs = [];
+    // scannedInWindow: arcs accumulated during this window's scan
+    let scannedArcs = [];
 
     function record(line, msg, pointers = {}, extra = {}) {
         h.push({
@@ -3252,43 +3295,127 @@ function generateFewestJumpsHistory() {
             pointers: { ...pointers },
             nums1: [...nums],
             nums2: [],
-            arrayMeta: { jumps, curEnd, farthest, originalLength: nums.length, levels: JSON.parse(JSON.stringify(levels)) },
+            arrayMeta: {
+                jumps, l, r, farthest, farthestIdx,
+                windows: JSON.parse(JSON.stringify(windows)),
+                arcs: JSON.parse(JSON.stringify(arcs)),
+                activeWindow: { l, r }
+            },
             step: h.length,
             ...extra
         });
     }
 
-    record(0, `Call fewestJumps(nums=[${nums}]). Goal: find the minimum number of jumps to reach the last index.`);
-    record(1, `Initialize jumps = 0.`);
-    record(2, `Initialize curEnd = 0 (right boundary of current "level").`);
-    record(3, `Initialize farthest = 0 (farthest reachable from this level).`);
+    // ── Intro steps ──
+    record(0, `Goal: reach the last index in the fewest jumps. Each cell's value = how far you can jump from it.`, {}, {
+        humanMsg: `We want to get from the first cell to the last cell. Each cell tells us the maximum distance we can jump forward.`
+    });
+    record(1, `jumps = 0 — no jumps taken yet.`, {}, {
+        humanMsg: `We haven't jumped yet — starting fresh.`
+    });
+    record(2, `Starting reach is just index 0 — the cells we can currently reach.`, {}, {
+        showWindow: true,
+        humanMsg: `Right now we can only reach index 0 (where we're standing). This shaded zone is everything reachable in 0 jumps.`
+    });
+    record(3, `farthest = 0 — we'll track the best reach from any cell in this zone.`, {}, {
+        humanMsg: `As we check each cell in the current zone, we'll remember the farthest any of them can reach.`
+    });
 
-    for (let i = 0; i < nums.length - 1; i++) {
-        record(4, `Move to i = ${i}. nums[${i}] = ${nums[i]}. curEnd = ${curEnd}, farthest = ${farthest}.`, { i });
+    // The BFS-level loop using [l, r] window
+    let jumpLevel = 0;
+    while (r < nums.length - 1) {
+        jumpLevel++;
+        // Beginning of a new window scan
+        scannedArcs = [];
 
-        const oldFarthest = farthest;
-        farthest = Math.max(farthest, i + nums[i]);
-        record(5, `farthest = max(${oldFarthest}, ${i} + ${nums[i]}) = ${farthest}.`, { i }, {
-            isComparison: true,
-            prevFarthest: oldFarthest,
-            iReach: i + nums[i]
+        for (let i = l; i <= r; i++) {
+            const reach = i + nums[i];
+            const clampedReach = Math.min(reach, nums.length - 1);
+            const oldFarthest = farthest;
+
+            // ── Scan step: show one arc from cell i to its reach ──
+            arcs = [{ from: i, to: clampedReach, type: 'scan', label: `${i} + ${nums[i]} = ${reach}` }];
+
+            // Also show previous arcs from this window as dim context
+            const contextArcs = scannedArcs.map(a => ({ ...a, type: 'context' }));
+            arcs = [...contextArcs, ...arcs];
+
+            record(5, `Scan index ${i}: value ${nums[i]} → can reach ${i} + ${nums[i]} = ${reach}.`, { i }, {
+                humanMsg: `Looking at index ${i} (value ${nums[i]}). From here we could jump as far as index ${reach}. Let's see if that's better than our current best.`
+            });
+
+            // ── Update farthest: show the max() comparison ──
+            farthest = Math.max(farthest, reach);
+            if (reach > oldFarthest) farthestIdx = i;
+
+            const reachDisplay = reach > nums.length - 1
+                ? `${clampedReach} (capped)`
+                : `${i}+${nums[i]}=${reach}`;
+
+            if (reach > oldFarthest) {
+                // This arc becomes the new "best" — highlight it
+                const bestArc = { from: i, to: clampedReach, type: 'best', label: `${i}+${nums[i]}=${reach}` };
+                arcs = [...contextArcs, bestArc];
+                record(6, `farthest = max(${oldFarthest}, ${reachDisplay}) = ${farthest}. New best!`, { i }, {
+                    reachExpanded: true,
+                    prevFarthest: oldFarthest,
+                    iReach: reach,
+                    iReachDisplay: reachDisplay,
+                    humanMsg: `Index ${i} can reach farther (${reach}) than our previous best (${oldFarthest}). It's the new best launch pad!`
+                });
+                scannedArcs.push(bestArc);
+            } else {
+                const dimArc = { from: i, to: clampedReach, type: 'dim', label: `${reach}` };
+                arcs = [...contextArcs, dimArc];
+                record(6, `farthest = max(${oldFarthest}, ${reachDisplay}) = ${farthest}. No change.`, { i }, {
+                    reachExpanded: false,
+                    prevFarthest: oldFarthest,
+                    iReach: reach,
+                    iReachDisplay: reachDisplay,
+                    humanMsg: `Index ${i} only reaches ${reach}, which doesn't beat our current best of ${oldFarthest}. Moving on.`
+                });
+                scannedArcs.push(dimArc);
+            }
+        }
+
+        // ── Window done → show ALL arcs together (the "comparison" moment) ──
+        const bestReach = farthest;
+        const bestFrom = scannedArcs.reduce((best, a) => {
+            const r2 = a.from + nums[a.from];
+            const bR = best.from + nums[best.from];
+            return r2 > bR ? a : best;
+        }, scannedArcs[0]);
+
+        arcs = scannedArcs.map(a => ({
+            ...a,
+            type: a.from === bestFrom.from ? 'winner' : 'loser'
+        }));
+
+        const prevL = l, prevR = r;
+        jumps++;
+        windows.push({ l: prevL, r: prevR, jumpNum: jumps });
+        l = prevR + 1;
+        r = farthest;
+
+        record(7, `Zone [${prevL}, ${prevR}] fully explored! Best reach = ${bestReach} (from index ${bestFrom.from}). Jump #${jumps}! New zone → [${l}, ${r}].`, {}, {
+            isJump: true,
+            prevL, prevR,
+            prevJumps: jumps - 1,
+            bestIdx: bestFrom.from,
+            lines: [7, 8, 9],
+            humanMsg: `We've checked every cell in this zone. The best launch pad was index ${bestFrom.from} (reaching index ${bestReach}). That completes jump #${jumps}. Our new reachable zone is indices ${l} through ${Math.min(farthest, nums.length - 1)}.`
         });
 
-        if (i === curEnd) {
-            const prevCurEnd = curEnd;
-            jumps++;
-            curEnd = farthest;
-            levels.push({ start: prevCurEnd + 1, end: curEnd });
-            record(6, `i == curEnd (${prevCurEnd}) — end of level ${jumps - 1}. Jump! jumps = ${jumps}. curEnd moves to ${curEnd}.`, { i }, {
-                isComparison: true,
-                isJump: true,
-                prevCurEnd,
-                prevJumps: jumps - 1
-            });
-        }
+        arcs = [];
+        scannedArcs = [];
     }
 
-    record(9, `Done! Minimum jumps to reach end = ${jumps}.`, {}, { isComplete: true });
+    // Add the final window that we arrived at (but didn't jump from)
+    windows.push({ l, r: Math.min(r, nums.length - 1), jumpNum: jumps + 1, arrived: true });
+    record(10, `Done! The last index is inside our reach. Minimum jumps = ${jumps}.`, {}, {
+        isComplete: true,
+        humanMsg: `The last index (${nums.length - 1}) falls within our current reachable zone. We made it in ${jumps} jump${jumps === 1 ? '' : 's'}!`
+    });
     return h;
 }
 
@@ -6332,7 +6459,7 @@ function render() {
     // Highlight code lines
     document.querySelectorAll('.line').forEach((lineEl, index) => {
         lineEl.classList.remove('active', 'base-hit');
-        if (state.line === index) {
+        if (state.line === index || (state.lines && state.lines.includes(index))) {
             lineEl.classList.add(state.isBase ? 'base-hit' : 'active');
         }
     });
@@ -8003,227 +8130,387 @@ function render() {
             }
         }
         
-        // Problem 12: Fewest Jumps to End (Jump Game II) — "BFS Level" stepping stones
+        // Problem 12: Fewest Jumps to End (Jump Game II) — Window / BFS visual
         if (currentProbId === '12' && state.nums1) {
             const iPtr = state.pointers?.i ?? -1;
             const meta = state.arrayMeta || {};
             const jumps = meta.jumps ?? 0;
-            const curEnd = meta.curEnd ?? 0;
+            const wL = meta.l ?? 0;
+            const wR = meta.r ?? 0;
             const farthest = meta.farthest ?? 0;
-            const levels = meta.levels || [{ start: 0, end: 0 }];
+            const farthestIdx = meta.farthestIdx ?? 0;
+            const completedWindows = meta.windows || [];
+            const arcs = meta.arcs || [];
+            const activeWindow = meta.activeWindow || { l: 0, r: 0 };
             const isComplete = state.isComplete || false;
-            const isComparison = state.isComparison || false;
             const isJump = state.isJump || false;
-            const prevCurEnd = state.prevCurEnd ?? curEnd;
+            const prevL = state.prevL ?? wL;
+            const prevR = state.prevR ?? wR;
             const prevJumps = state.prevJumps ?? jumps;
+            const reachExpanded = state.reachExpanded || false;
             const prevFarthest = state.prevFarthest ?? farthest;
-            const iReach = state.iReach ?? 0;
+            const showWindow = state.showWindow || false;
+            const bestIdx = state.bestIdx ?? -1;
+            const humanMsg = state.humanMsg || '';
             const nums = state.nums1;
             const lastIdx = nums.length - 1;
 
-            // Level color palette
-            const lvlColors = [
-                'rgba(59, 130, 246, 0.15)',   // blue
-                'rgba(16, 185, 129, 0.15)',   // green
-                'rgba(139, 92, 246, 0.15)',   // purple
-                'rgba(249, 115, 22, 0.15)',   // orange
-                'rgba(236, 72, 153, 0.15)'    // pink
+            // Window color palette (each jump level gets a color)
+            const winColors = [
+                { bg: 'rgba(59, 130, 246, 0.15)', border: 'var(--accent-blue)', text: '#60a5fa', zoneBg: 'rgba(59, 130, 246, 0.08)' },
+                { bg: 'rgba(16, 185, 129, 0.15)', border: 'var(--accent-green)', text: '#34d399', zoneBg: 'rgba(16, 185, 129, 0.08)' },
+                { bg: 'rgba(139, 92, 246, 0.15)', border: 'var(--accent-purple)', text: '#a78bfa', zoneBg: 'rgba(139, 92, 246, 0.08)' },
+                { bg: 'rgba(249, 115, 22, 0.15)', border: 'var(--accent-orange)', text: '#fb923c', zoneBg: 'rgba(249, 115, 22, 0.08)' },
+                { bg: 'rgba(236, 72, 153, 0.15)', border: 'rgba(236, 72, 153, 0.8)', text: '#f472b6', zoneBg: 'rgba(236, 72, 153, 0.08)' }
             ];
-            const lvlBorders = [
-                'var(--accent-blue)',
-                'var(--accent-green)',
-                'var(--accent-purple)',
-                'var(--accent-orange)',
-                'rgba(236, 72, 153, 0.8)'
-            ];
+
+            // Build map: which window does each index belong to?
+            const allWindows = [...completedWindows];
+            const currentWinIdx = allWindows.length;
             
-            // Build level map: which level does each index belong to?
-            const idxLevel = new Array(nums.length).fill(-1);
-            levels.forEach((lv, lvIdx) => {
-                for (let k = lv.start; k <= Math.min(lv.end, lastIdx); k++) {
-                    idxLevel[k] = lvIdx;
+            const idxWin = new Array(nums.length).fill(-1);
+            allWindows.forEach((w, wi) => {
+                for (let k = w.l; k <= Math.min(w.r, lastIdx); k++) {
+                    idxWin[k] = wi;
                 }
             });
+            for (let k = activeWindow.l; k <= Math.min(activeWindow.r, lastIdx); k++) {
+                if (idxWin[k] < 0) idxWin[k] = currentWinIdx;
+            }
 
             const sItemCount = nums.length;
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             let html = `<div class="array-inner${sDenseClass} jg2-inner">`;
-            html += `<div class="array-label">nums — minimum jumps to last index (BFS: each "level" = one jump)</div>`;
+
+            // ── Concept header ──
+            html += `<div class="jg2-concept">`;
+            html += `<span class="jg2-concept-icon">i</span>`;
+            html += `<span>Greedy BFS — each <b>shaded zone</b> = all indices reachable in that many jumps. The outer loop expands zones; the inner loop finds the farthest reach.</span>`;
+            html += `<button class="cy-insight-btn jg2-insight-btn" onclick="openInsightModal('insightModal12')" title="Why does this work?">i</button>`;
+            html += `</div>`;
+
+            html += `<div class="array-label">nums — each value = max jump distance from that index</div>`;
             html += `<div class="array-visualization jump-viz jg2-viz" id="jg2-chart">`;
-            
+
+            // ── Farthest marker (flag above cells) ──
+            // We'll position this with JS after render, but add the element now
+            if (farthest > 0 || isComplete) {
+                const fMarkerIdx = Math.min(farthest, lastIdx);
+                html += `<div class="jg2-farthest-flag" data-target="${fMarkerIdx}">`;
+                html += `<div class="jg2-ff-line"></div>`;
+                html += `<div class="jg2-ff-label">farthest=${farthest}</div>`;
+                html += `</div>`;
+            }
+
             nums.forEach((val, idx) => {
                 let classes = 'array-item jg2-cell';
-                let pointerLabels = '';
-                const lvl = idxLevel[idx];
-                const lvlColor = lvl >= 0 ? lvlColors[lvl % lvlColors.length] : 'transparent';
-                const lvlBorder = lvl >= 0 ? lvlBorders[lvl % lvlBorders.length] : 'var(--border-subtle)';
-                let extraStyle = `background:${lvlColor};border-color:${lvlBorder}`;
+                const wIdx = idxWin[idx];
+                const wc = wIdx >= 0 ? winColors[wIdx % winColors.length] : null;
+                let extraStyle = wc 
+                    ? `background:${wc.bg};border-color:${wc.border}` 
+                    : '';
 
-                // Goal cell
                 if (idx === lastIdx) classes += ' jg2-goal';
-
-                // Completed
                 if (isComplete) classes += ' jg2-done';
 
-                // curEnd boundary — solid wall
-                if (!isComplete && idx === curEnd) {
-                    classes += ' jg2-wall';
+                // Best index pulse on jump step
+                if (isJump && idx === bestIdx) {
+                    classes += ' jg2-best-launch';
                 }
 
-                // Scanner
-                if (idx === iPtr && !isComplete) {
-                    classes += ' pointer-1';
-                    pointerLabels = `<div class="pointer-label p1">i</div>`;
+                // L / R / i pointer labels
+                const isL = !isComplete && idx === activeWindow.l;
+                const isR = !isComplete && idx === activeWindow.r;
+                const isI = !isComplete && idx === iPtr;
+
+                const jumpNewL = isJump ? wL : -1;
+                const jumpNewR = isJump ? Math.min(wR, lastIdx) : -1;
+                const isJumpL = isJump && idx === jumpNewL;
+                const isJumpR = isJump && idx === jumpNewR;
+
+                if (isI) classes += ' pointer-1';
+                if (isL || isR || isJumpL || isJumpR) classes += ' jg2-window-edge';
+
+                // Pointer label stack
+                let bottomLabels = [];
+                if (isL && isR && isI) {
+                    bottomLabels.push(`<span class="jg2-ptr jg2-ptr-l">L</span><span class="jg2-ptr jg2-ptr-r">R</span><span class="jg2-ptr jg2-ptr-i">i</span>`);
+                } else if (isL && isR) {
+                    bottomLabels.push(`<span class="jg2-ptr jg2-ptr-l">L</span><span class="jg2-ptr jg2-ptr-r">R</span>`);
+                } else {
+                    if (isL || isJumpL) bottomLabels.push(`<span class="jg2-ptr jg2-ptr-l">L</span>`);
+                    if (isR || isJumpR) bottomLabels.push(`<span class="jg2-ptr jg2-ptr-r">R</span>`);
+                    if (isI) bottomLabels.push(`<span class="jg2-ptr jg2-ptr-i">i</span>`);
                 }
 
-                // Level badge
-                let lvlBadge = '';
-                if (lvl >= 0) {
-                    lvlBadge = `<div class="jg2-lvl-badge" style="color:${lvlBorders[lvl % lvlBorders.length]}">L${lvl}</div>`;
-                }
+                const ptrRow = bottomLabels.length > 0 
+                    ? `<div class="jg2-ptr-row">${bottomLabels.join('')}</div>` 
+                    : '';
 
-                html += `<div class="${classes}" style="${extraStyle}" data-idx="${idx}">${val}${lvlBadge}${pointerLabels}<div class="array-index">${idx}</div></div>`;
+                html += `<div class="${classes}" style="${extraStyle}" data-idx="${idx}">${val}${ptrRow}<div class="array-index">${idx}</div></div>`;
             });
             
             html += `</div>`;
 
-            // Boundary indicators
-            if (!isComplete) {
-                html += `<div class="jg2-boundaries">`;
-                html += `<div class="jg2-boundary-item"><span class="jg2-wall-icon"></span><span>curEnd = ${curEnd}</span><span style="color:var(--text-muted);margin-left:4px">(solid wall — end of level ${jumps})</span></div>`;
-                html += `<div class="jg2-boundary-item"><span class="jg2-ghost-icon"></span><span>farthest = ${farthest}</span><span style="color:var(--text-muted);margin-left:4px">(ghost wall — next level reaches here)</span></div>`;
-                html += `</div>`;
+            // ── Zone labels row (below cells) — show completed + active zones ──
+            const showZones = [...completedWindows.map((w, i) => {
+                const label = w.arrived ? 'Arrived' : `Jump ${w.jumpNum}`;
+                return { ...w, label, idx: i, active: false };
+            })];
+            if (!isComplete && !isJump) {
+                showZones.push({ l: activeWindow.l, r: activeWindow.r, label: jumps === 0 ? 'Start' : `Reach`, idx: currentWinIdx, active: true });
+            } else if (isJump) {
+                showZones.push({ l: wL, r: Math.min(wR, lastIdx), label: 'Next Reach →', idx: currentWinIdx, active: true });
             }
 
-            // Level brackets row
-            if (levels.length > 0) {
-                html += `<div class="jg2-levels-row">`;
-                levels.forEach((lv, lvIdx) => {
-                    const color = lvlBorders[lvIdx % lvlBorders.length];
-                    const bg = lvlColors[lvIdx % lvlColors.length];
-                    html += `<div class="jg2-level-bracket" style="border-color:${color};background:${bg}">`;
-                    html += `<span style="color:${color};font-weight:700;font-size:10px">Jump ${lvIdx}</span>`;
-                    html += `<span style="color:var(--text-muted);font-size:9px;margin-left:4px">[${lv.start}..${Math.min(lv.end, lastIdx)}]</span>`;
+            if (showZones.length > 0) {
+                html += `<div class="jg2-zones-row">`;
+                showZones.forEach(w => {
+                    const wc = winColors[w.idx % winColors.length];
+                    const rangeEnd = Math.min(w.r, lastIdx);
+                    const isSingle = w.l === rangeEnd;
+                    const jumpClass = isJump && w.active ? ' jg2-zone-new' : '';
+                    const completedClass = !w.active && !w.arrived ? ' jg2-zone-done' : '';
+                    html += `<div class="jg2-zone-pill${jumpClass}${completedClass}" style="border-color:${wc.border};background:${wc.bg}">`;
+                    html += `<span class="jg2-zone-label" style="color:${wc.text}">${w.label}</span>`;
+                    html += `<span class="jg2-zone-range">`;
+                    if (isSingle) {
+                        html += `[${w.l}]`;
+                    } else {
+                        html += `[${w.l}…${rangeEnd}]`;
+                    }
+                    html += `</span>`;
+                    if (w.active && !isJump) html += `<span class="jg2-zone-scanning">scanning</span>`;
                     html += `</div>`;
                 });
                 html += `</div>`;
             }
 
-            // Bridge
-            if (iPtr >= 0 && iPtr < nums.length && !isComplete && isComparison) {
-                const val = nums[iPtr];
-                const reach = iPtr + val;
+            // ── Bridge text ──
+            if (isJump && !isComplete) {
+                const prevWinColor = winColors[(completedWindows.length - 1) % winColors.length];
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                if (isJump) {
-                    html += `<span style="color:var(--accent-orange);font-weight:700">i == curEnd (${prevCurEnd})</span>`;
-                    html += `<span style="color:var(--text-muted);margin:0 6px">— end of level ${prevJumps}. Forced jump!</span>`;
-                    html += `<span style="color:var(--accent-green);font-weight:700">jumps = ${jumps}, curEnd moves to ${curEnd}</span>`;
-                } else {
+                html += `<span style="color:${prevWinColor.text};font-weight:700">Zone [${prevL}, ${prevR}] fully explored</span>`;
+                html += `<span style="color:var(--text-muted);margin:0 6px">→</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">Jump #${jumps}!</span>`;
+                html += `<span style="color:var(--text-muted);margin-left:6px">New reach → [${wL}, ${Math.min(wR, lastIdx)}]</span>`;
+                html += `</div></div>`;
+            } else if (!isComplete && iPtr >= 0) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                if (reachExpanded || state.reachExpanded === false) {
+                    const reach = state.iReach ?? (iPtr + nums[iPtr]);
+                    const reachDisplay = state.iReachDisplay ?? `${iPtr}+${nums[iPtr]}=${reach}`;
+                    const result = Math.max(prevFarthest, reach);
+
                     html += `<span style="color:var(--text-muted)">farthest = max(</span>`;
                     html += `<span style="color:var(--accent-purple);font-weight:600">${prevFarthest}</span>`;
                     html += `<span style="color:var(--text-muted)">, </span>`;
-                    html += `<span style="color:var(--accent-blue);font-weight:600">${iPtr} + ${val} = ${reach}</span>`;
+                    html += `<span style="color:var(--accent-blue);font-weight:600">${reachDisplay}</span>`;
                     html += `<span style="color:var(--text-muted)">) = </span>`;
-                    html += `<span style="color:var(--accent-purple);font-weight:700">${Math.max(prevFarthest, reach)}</span>`;
-                    html += `<span style="color:var(--text-muted);margin-left:6px">exploring level ${jumps}...</span>`;
+                    html += `<span style="color:var(--accent-green);font-weight:700">${result}</span>`;
+
+                    if (reachExpanded) {
+                        html += `<span style="color:var(--accent-green);margin-left:8px;font-weight:700">new best!</span>`;
+                    } else {
+                        html += `<span style="color:var(--text-muted);margin-left:8px;font-style:italic">no change</span>`;
+                    }
+                } else {
+                    const reach = iPtr + nums[iPtr];
+                    html += `<span style="color:var(--accent-blue)">Index ${iPtr}: value <b>${nums[iPtr]}</b> → reach = ${iPtr} + ${nums[iPtr]} = <b>${reach}</b></span>`;
                 }
                 html += `</div></div>`;
             } else if (isComplete) {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
-                html += `<span style="color:var(--accent-green);font-weight:700">Minimum jumps = ${jumps} (${levels.length} BFS levels to reach end)</span>`;
+                html += `<span style="color:var(--accent-green);font-weight:700">Done! Minimum jumps = ${jumps}</span>`;
+                html += `</div></div>`;
+            } else if (showWindow && !isComplete) {
+                html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
+                html += `<span style="color:var(--accent-blue)">Starting zone [0, 0] — we begin at index 0. Let's find the farthest we can reach.</span>`;
                 html += `</div></div>`;
             }
 
-            // Jump counter with flash
-            const jFlash = isJump ? ' stock-mp-flash' : '';
-            let jContent;
-            if (isJump) {
-                jContent = `<span class="stock-mp-old">${prevJumps}</span><span class="stock-mp-new">${jumps}</span>`;
-            } else {
-                jContent = `${jumps}`;
+            // ── Human-mode explanation ──
+            if (humanMsg) {
+                html += `<div class="jg2-human">`;
+                html += `<span class="jg2-human-icon"></span>`;
+                html += `<span class="jg2-human-text">${humanMsg}</span>`;
+                html += `</div>`;
             }
+
+            // ── Pointer info boxes ──
+            const jFlash = isJump ? ' stock-mp-flash' : '';
+            let jContent = isJump
+                ? `<span class="stock-mp-old">${prevJumps}</span><span class="stock-mp-new">${jumps}</span>`
+                : `${jumps}`;
+
+            const fFlash = reachExpanded ? ' stock-mp-flash' : '';
+            let fContent = reachExpanded
+                ? `<span class="stock-mp-old">${prevFarthest}</span><span class="stock-mp-new">${farthest}</span>`
+                : `${farthest}`;
 
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">i (scanner)</div>
+                        <div class="pointer-detail-label">current reach [<span style="color:#fb923c">L</span>, <span style="color:#f472b6">R</span>]</div>
+                        <div class="pointer-detail-value p2">[${wL}, ${Math.min(wR, lastIdx)}]</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label"><span style="color:#60a5fa">i</span> (inner loop)</div>
                         <div class="pointer-detail-value p1">${iPtr >= 0 ? `idx ${iPtr}` : '—'}</div>
+                    </div>
+                    <div class="pointer-detail stock-mp-box${fFlash}">
+                        <div class="pointer-detail-label">farthest</div>
+                        <div class="pointer-detail-value p-purple">${fContent}</div>
                     </div>
                     <div class="pointer-detail stock-mp-box${jFlash}">
                         <div class="pointer-detail-label">jumps</div>
                         <div class="pointer-detail-value p-merge">${jContent}</div>
-                    </div>
-                    <div class="pointer-detail">
-                        <div class="pointer-detail-label">curEnd</div>
-                        <div class="pointer-detail-value p2">idx ${curEnd}</div>
-                    </div>
-                    <div class="pointer-detail">
-                        <div class="pointer-detail-label">farthest</div>
-                        <div class="pointer-detail-value p-purple">idx ${farthest}</div>
                     </div>
                 </div>
             `;
             html += `</div>`;
             arrayContainer.innerHTML = html;
 
-            // Draw solid wall line at curEnd and dashed ghost at farthest
-            if (!isComplete) {
-                const chartEl = arrayContainer.querySelector('#jg2-chart');
-                if (chartEl) {
-                    requestAnimationFrame(() => {
+            // ── Position the farthest flag via JS ──
+            const chartEl = arrayContainer.querySelector('#jg2-chart');
+            const fFlag = arrayContainer.querySelector('.jg2-farthest-flag');
+            if (chartEl && fFlag) {
+                requestAnimationFrame(() => {
+                    const targetIdx = parseInt(fFlag.dataset.target);
+                    const targetCell = chartEl.querySelector(`[data-idx="${targetIdx}"]`);
+                    if (targetCell) {
                         const chartRect = chartEl.getBoundingClientRect();
-                        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                        svg.classList.add('jg2-wall-svg');
-                        svg.setAttribute('width', chartRect.width);
-                        svg.setAttribute('height', chartRect.height);
-                        svg.setAttribute('viewBox', `0 0 ${chartRect.width} ${chartRect.height}`);
+                        const cellRect = targetCell.getBoundingClientRect();
+                        const cx = cellRect.left + cellRect.width / 2 - chartRect.left;
+                        fFlag.style.left = cx + 'px';
+                    }
+                });
+            }
 
-                        // Solid wall at curEnd
-                        const curEndCell = chartEl.querySelector(`[data-idx="${curEnd}"]`);
-                        if (curEndCell) {
-                            const cellRect = curEndCell.getBoundingClientRect();
-                            const wallX = cellRect.right - chartRect.left + 2;
-                            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                            line.setAttribute('x1', wallX);
-                            line.setAttribute('y1', 0);
-                            line.setAttribute('x2', wallX);
-                            line.setAttribute('y2', chartRect.height);
-                            line.classList.add('jg2-solid-wall');
-                            svg.appendChild(line);
-                            // Label
-                            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                            text.setAttribute('x', wallX + 3);
-                            text.setAttribute('y', 10);
-                            text.classList.add('jg2-wall-label');
-                            text.textContent = 'curEnd';
-                            svg.appendChild(text);
-                        }
+            // ── SVG overlay: arcs ──
+            if (chartEl && arcs.length > 0) {
+                requestAnimationFrame(() => {
+                    const chartRect = chartEl.getBoundingClientRect();
+                    const svgW = chartRect.width;
+                    const svgH = chartRect.height;
 
-                        // Dashed ghost wall at farthest (if different from curEnd)
-                        if (farthest > curEnd) {
-                            const farCell = chartEl.querySelector(`[data-idx="${Math.min(farthest, lastIdx)}"]`);
-                            if (farCell) {
-                                const fRect = farCell.getBoundingClientRect();
-                                const ghostX = fRect.right - chartRect.left + 2;
-                                const ghostLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                                ghostLine.setAttribute('x1', ghostX);
-                                ghostLine.setAttribute('y1', 0);
-                                ghostLine.setAttribute('x2', ghostX);
-                                ghostLine.setAttribute('y2', chartRect.height);
-                                ghostLine.classList.add('jg2-ghost-wall');
-                                svg.appendChild(ghostLine);
-                                const gText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                                gText.setAttribute('x', ghostX + 3);
-                                gText.setAttribute('y', 10);
-                                gText.classList.add('jg2-ghost-label');
-                                gText.textContent = 'farthest';
-                                svg.appendChild(gText);
-                            }
-                        }
+                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.classList.add('jg2-wall-svg');
+                    svg.setAttribute('width', svgW);
+                    svg.setAttribute('height', svgH);
+                    svg.setAttribute('viewBox', `0 0 ${svgW} ${svgH}`);
 
-                        chartEl.appendChild(svg);
+                    // Arrow marker defs
+                    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                    [
+                        { id: 'jg2-arr-scan', fill: 'rgba(96, 165, 250, 0.8)', size: 6 },
+                        { id: 'jg2-arr-best', fill: 'rgba(16, 185, 129, 0.9)', size: 6 },
+                        { id: 'jg2-arr-dim', fill: 'rgba(255,255,255,0.2)', size: 4 },
+                        { id: 'jg2-arr-win', fill: 'rgba(16, 185, 129, 0.9)', size: 7 },
+                        { id: 'jg2-arr-lose', fill: 'rgba(255,255,255,0.12)', size: 4 },
+                        { id: 'jg2-arr-ctx', fill: 'rgba(255,255,255,0.15)', size: 4 }
+                    ].forEach(m => {
+                        const mk = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                        mk.setAttribute('id', m.id);
+                        mk.setAttribute('viewBox', '0 0 10 10');
+                        mk.setAttribute('refX', '10'); mk.setAttribute('refY', '5');
+                        mk.setAttribute('markerWidth', String(m.size)); mk.setAttribute('markerHeight', String(m.size));
+                        mk.setAttribute('orient', 'auto-start-reverse');
+                        const ap = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        ap.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+                        ap.setAttribute('fill', m.fill);
+                        mk.appendChild(ap); defs.appendChild(mk);
                     });
-                }
+                    svg.appendChild(defs);
+
+                    // Helpers
+                    const cellCX = (idx) => {
+                        const c = chartEl.querySelector(`[data-idx="${Math.min(idx, lastIdx)}"]`);
+                        if (!c) return 0;
+                        const rect = c.getBoundingClientRect();
+                        return rect.left + rect.width / 2 - chartRect.left;
+                    };
+                    const baseY = (() => {
+                        const c = chartEl.querySelector('[data-idx="0"]');
+                        return c ? c.getBoundingClientRect().top - chartRect.top - 2 : 0;
+                    })();
+
+                    // Sort so context arcs render first (behind)
+                    const sortedArcs = [...arcs].sort((a, b) => {
+                        const order = { context: 0, loser: 1, dim: 2, scan: 3, best: 4, winner: 5 };
+                        return (order[a.type] || 0) - (order[b.type] || 0);
+                    });
+
+                    sortedArcs.forEach((arc, arcIdx) => {
+                        const fromX = cellCX(arc.from);
+                        const toX = cellCX(arc.to);
+                        if (Math.abs(toX - fromX) < 2) return;
+                        const midX = (fromX + toX) / 2;
+                        const baseArcH = Math.min(Math.abs(toX - fromX) * 0.25, 30) + 12;
+                        const stagger = arc.type === 'context' ? -4 : (arc.type === 'winner' ? 6 : 0);
+                        const arcH = baseArcH + stagger;
+                        const midY = baseY - arcH;
+
+                        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        p.setAttribute('d', `M ${fromX} ${baseY} Q ${midX} ${midY} ${toX} ${baseY}`);
+
+                        let markerEnd, className;
+                        switch (arc.type) {
+                            case 'scan':
+                                className = 'jg2-arc-scan';
+                                markerEnd = 'url(#jg2-arr-scan)';
+                                break;
+                            case 'best':
+                                className = 'jg2-arc-best';
+                                markerEnd = 'url(#jg2-arr-best)';
+                                break;
+                            case 'dim':
+                                className = 'jg2-arc-dim';
+                                markerEnd = 'url(#jg2-arr-dim)';
+                                break;
+                            case 'winner':
+                                className = 'jg2-arc-winner';
+                                markerEnd = 'url(#jg2-arr-win)';
+                                break;
+                            case 'loser':
+                                className = 'jg2-arc-loser';
+                                markerEnd = 'url(#jg2-arr-lose)';
+                                break;
+                            case 'context':
+                                className = 'jg2-arc-context';
+                                markerEnd = 'url(#jg2-arr-ctx)';
+                                break;
+                            default:
+                                className = 'jg2-arc-scan';
+                                markerEnd = 'url(#jg2-arr-scan)';
+                        }
+
+                        p.setAttribute('class', className);
+                        p.setAttribute('marker-end', markerEnd);
+                        svg.appendChild(p);
+
+                        // Labels — only on prominent arcs
+                        if (arc.label && (arc.type === 'scan' || arc.type === 'best' || arc.type === 'winner')) {
+                            const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                            t.setAttribute('x', midX); t.setAttribute('y', midY - 4);
+                            t.setAttribute('text-anchor', 'middle');
+                            t.setAttribute('class', arc.type === 'scan' ? 'jg2-arc-label-scan' : 'jg2-arc-label-best');
+                            t.textContent = arc.label;
+                            svg.appendChild(t);
+                        }
+                        // Dim / loser labels (smaller, subtle)
+                        if (arc.label && (arc.type === 'dim' || arc.type === 'loser')) {
+                            const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                            t.setAttribute('x', midX); t.setAttribute('y', midY - 4);
+                            t.setAttribute('text-anchor', 'middle');
+                            t.setAttribute('class', 'jg2-arc-label-dim');
+                            t.textContent = arc.label;
+                            svg.appendChild(t);
+                        }
+                    });
+
+                    chartEl.appendChild(svg);
+                });
             }
         }
         

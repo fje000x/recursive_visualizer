@@ -2,6 +2,7 @@
   "name": "recursive-visualizer-api",
   "version": "1.0.0",
   "description": "Backend API for bug reports and user signups",
+  "license": "MIT",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
