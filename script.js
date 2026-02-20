@@ -12945,6 +12945,13 @@ function updateAuthUI() {
         if (drawerAvatar) drawerAvatar.textContent = initial;
         if (drawerName) drawerName.textContent = displayName;
         if (drawerEmail) drawerEmail.textContent = auth.user.email || '';
+        // Landing page auth button
+        const landingAuthBtn = document.getElementById('landingAuthBtn');
+        const landingAuthLabel = document.getElementById('landingAuthLabel');
+        if (landingAuthBtn) {
+            landingAuthBtn.classList.add('logged-in');
+            if (landingAuthLabel) landingAuthLabel.textContent = displayName;
+        }
     } else {
         // Desktop nav button
         if (navBtn) {
@@ -12957,6 +12964,13 @@ function updateAuthUI() {
         // Drawer
         if (drawerLoggedOut) drawerLoggedOut.style.display = 'block';
         if (drawerLoggedIn) drawerLoggedIn.style.display = 'none';
+        // Landing page auth button
+        const landingAuthBtn = document.getElementById('landingAuthBtn');
+        const landingAuthLabel = document.getElementById('landingAuthLabel');
+        if (landingAuthBtn) {
+            landingAuthBtn.classList.remove('logged-in');
+            if (landingAuthLabel) landingAuthLabel.textContent = 'Log in';
+        }
     }
 }
 
@@ -13240,12 +13254,12 @@ function setupMobileMorePopover() {
         });
     }
 
-    // Popover Notes button
+    // Popover Notes button — opens editor for current problem directly (mobile shortcut)
     const popNotesBtn = document.getElementById('popNotesBtn');
     if (popNotesBtn) {
         popNotesBtn.addEventListener('click', () => {
             closeMobileMorePopover();
-            openNotebook();
+            openNotebookForCurrentProblem();
         });
     }
 }
@@ -13294,9 +13308,15 @@ function openNotebook() {
     const panel = document.getElementById('notebookPanel');
     if (!panel) return;
     panel.classList.add('open');
-    loadNotebookForCurrentProblem();
-    // Init canvas after transition completes
-    setTimeout(() => initNotebookCanvas(), 300);
+    showNotebookListView();
+}
+
+// Open notebook and jump straight to the editor for the current problem
+function openNotebookForCurrentProblem() {
+    const panel = document.getElementById('notebookPanel');
+    if (!panel) return;
+    panel.classList.add('open');
+    openNoteEditor(currentProbId);
 }
 
 function closeNotebook() {
@@ -13305,34 +13325,172 @@ function closeNotebook() {
     saveNotebookNote(); // save on close
 }
 
-// ---- Load note for current problem ----
-async function loadNotebookForCurrentProblem() {
-    const prob = problemDB[currentProbId];
+// ---- Notes List View ----
+function showNotebookListView() {
+    const listView = document.getElementById('notebookListView');
+    const editorView = document.getElementById('notebookEditorView');
+    if (listView) listView.style.display = 'flex';
+    if (editorView) editorView.style.display = 'none';
+    // Show login prompt if not logged in
+    const loginPrompt = document.getElementById('notebookLoginPrompt');
+    const auth = getStoredAuth();
+    if (loginPrompt) loginPrompt.style.display = auth ? 'none' : 'flex';
+    renderNotesList();
+}
+
+function renderNotesList() {
+    const container = document.getElementById('notebookNotesList');
+    if (!container) return;
+
+    const localNotes = getLocalNotes();
+    const allIds = Object.keys(problemDB);
+
+    // Separate: problems with notes first, then problems without notes
+    const withNotes = [];
+    const withoutNotes = [];
+    for (const id of allIds) {
+        const note = localNotes[id];
+        const hasContent = note && (
+            (note.text_content && note.text_content.replace(/<[^>]*>/g, '').trim().length > 0) ||
+            (note.drawing_data && note.drawing_data !== '[]')
+        );
+        if (hasContent) {
+            withNotes.push({ id, note });
+        } else {
+            withoutNotes.push({ id });
+        }
+    }
+
+    // Sort notes by updated_at (newest first)
+    withNotes.sort((a, b) => {
+        const ta = a.note.updated_at ? new Date(a.note.updated_at).getTime() : 0;
+        const tb = b.note.updated_at ? new Date(b.note.updated_at).getTime() : 0;
+        return tb - ta;
+    });
+
+    let html = '';
+
+    if (withNotes.length === 0) {
+        html += `
+            <div class="nb-list-empty">
+                <i class="fas fa-book-open"></i>
+                <p>No notes yet.<br>Open a problem below to start writing.</p>
+                <span class="nb-list-empty-hint">Your notes are saved automatically</span>
+            </div>`;
+    } else {
+        html += '<div class="nb-list-section-label" style="padding:10px 14px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);opacity:0.5;">Your Notes</div>';
+        for (const { id, note } of withNotes) {
+            html += buildNoteCard(id, note, true);
+        }
+    }
+
+    // Show all problems (without notes) as available to open
+    html += '<div class="nb-list-section-label" style="padding:14px 14px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);opacity:0.5;">All Problems</div>';
+    for (const { id } of withoutNotes) {
+        html += buildNoteCard(id, null, false);
+    }
+
+    container.innerHTML = html;
+
+    // Wire click events
+    container.querySelectorAll('.nb-note-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const pid = card.dataset.problemId;
+            openNoteEditor(pid);
+        });
+    });
+}
+
+function buildNoteCard(problemId, note, hasContent) {
+    const prob = problemDB[problemId];
+    if (!prob) return '';
+    const diffClass = prob.difficulty === 'easy' ? 'diff-easy' : prob.difficulty === 'medium' ? 'diff-medium' : 'diff-hard';
+    const num = prob.leetcodeNum || problemId;
+
+    let preview = '';
+    if (hasContent && note && note.text_content) {
+        // Strip HTML to get plain text preview
+        const tmp = document.createElement('div');
+        tmp.innerHTML = note.text_content;
+        preview = tmp.textContent.trim().slice(0, 100);
+        if (preview.length === 100) preview += '…';
+    } else if (hasContent) {
+        preview = '🎨 Drawing';
+    } else {
+        preview = 'No notes yet — tap to start';
+    }
+
+    let meta = '';
+    if (hasContent && note && note.updated_at) {
+        const d = new Date(note.updated_at);
+        const now = new Date();
+        const diffMs = now - d;
+        const mins = Math.floor(diffMs / 60000);
+        const hrs = Math.floor(diffMs / 3600000);
+        const days = Math.floor(diffMs / 86400000);
+        if (mins < 1) meta = 'Just now';
+        else if (mins < 60) meta = `${mins}m ago`;
+        else if (hrs < 24) meta = `${hrs}h ago`;
+        else if (days < 7) meta = `${days}d ago`;
+        else meta = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    return `
+        <div class="nb-note-card" data-problem-id="${problemId}">
+            <div class="nb-note-num ${diffClass}">${num}</div>
+            <div class="nb-note-info">
+                <div class="nb-note-name">${prob.name}</div>
+                <div class="nb-note-preview">${preview}</div>
+                ${meta ? `<div class="nb-note-meta"><i class="fas fa-clock"></i> ${meta}</div>` : ''}
+            </div>
+            <div class="nb-note-arrow"><i class="fas fa-chevron-right"></i></div>
+        </div>`;
+}
+
+// ---- Open Editor for a specific problem ----
+function openNoteEditor(problemId) {
+    const listView = document.getElementById('notebookListView');
+    const editorView = document.getElementById('notebookEditorView');
+    if (listView) listView.style.display = 'none';
+    if (editorView) editorView.style.display = 'flex';
+    // Set the active problem for notes
+    notebookActiveProblemId = problemId;
+    loadNotebookForProblem(problemId);
+    setTimeout(() => initNotebookCanvas(), 100);
+}
+
+function backToNotesList() {
+    saveNotebookNote(); // save current before going back
+    showNotebookListView();
+}
+
+// Track which problem the notebook editor is showing (separate from viz currentProbId)
+let notebookActiveProblemId = null;
+
+// ---- Load note for a specific problem ----
+async function loadNotebookForProblem(problemId) {
+    const prob = problemDB[problemId];
     const nameEl = document.getElementById('notebookProblemName');
     const pageInfo = document.getElementById('notebookPageInfo');
     const editor = document.getElementById('notebookEditor');
-    const loginPrompt = document.getElementById('notebookLoginPrompt');
 
     if (nameEl) nameEl.textContent = prob ? prob.name : 'Notes';
 
     // Page info
     const ids = Object.keys(problemDB);
-    const idx = ids.indexOf(currentProbId);
+    const idx = ids.indexOf(problemId);
     if (pageInfo) pageInfo.textContent = `Problem ${idx + 1} of ${ids.length}`;
 
-    // Show login prompt if not logged in
-    const auth = getStoredAuth();
-    if (loginPrompt) loginPrompt.style.display = auth ? 'none' : 'flex';
-
     // Load from local first (instant)
-    const local = getLocalNote(currentProbId);
+    const local = getLocalNote(problemId);
     if (editor) editor.innerHTML = local.text_content || '';
     loadDrawingData(local.drawing_data);
 
     // If logged in, try to fetch from server (merge: server wins if newer)
+    const auth = getStoredAuth();
     if (auth) {
         try {
-            const res = await fetch(`${AUTH_API}/api/notes/${currentProbId}`, {
+            const res = await fetch(`${AUTH_API}/api/notes/${problemId}`, {
                 headers: { 'Authorization': `Bearer ${auth.token}` }
             });
             if (res.ok) {
@@ -13346,7 +13504,7 @@ async function loadNotebookForCurrentProblem() {
                         if (editor && serverNote.text_content) editor.innerHTML = serverNote.text_content;
                         if (serverNote.drawing_data) loadDrawingData(serverNote.drawing_data);
                         // Update local cache
-                        setLocalNote(currentProbId, {
+                        setLocalNote(problemId, {
                             text_content: serverNote.text_content,
                             drawing_data: serverNote.drawing_data,
                             updated_at: serverNote.updated_at
@@ -13376,18 +13534,19 @@ async function saveNotebookNote() {
     if (!notebookDirty) return;
     notebookDirty = false;
 
+    const pid = notebookActiveProblemId || currentProbId;
     const editor = document.getElementById('notebookEditor');
     const textContent = editor ? editor.innerHTML : '';
     const drawingData = getDrawingData();
 
     // Always save locally
-    setLocalNote(currentProbId, { text_content: textContent, drawing_data: drawingData });
+    setLocalNote(pid, { text_content: textContent, drawing_data: drawingData });
 
     // If logged in, sync to server
     const auth = getStoredAuth();
     if (auth) {
         try {
-            const res = await fetch(`${AUTH_API}/api/notes/${currentProbId}`, {
+            const res = await fetch(`${AUTH_API}/api/notes/${pid}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -13582,13 +13741,17 @@ function clearNotebookCanvas() {
 
 // ---- Setup notebook ----
 function setupNotebook() {
-    // Open button (nav)
+    // Open button (nav) — opens list view
     const navBtn = document.getElementById('navNotesBtn');
     if (navBtn) navBtn.addEventListener('click', openNotebook);
 
-    // Close button
+    // Close button (list view)
     const closeBtn = document.getElementById('notebookClose');
     if (closeBtn) closeBtn.addEventListener('click', closeNotebook);
+
+    // Back button (editor view → list view)
+    const backBtn = document.getElementById('notebookBack');
+    if (backBtn) backBtn.addEventListener('click', backToNotesList);
 
     // Login prompt button
     const nbLoginBtn = document.getElementById('nbLoginBtn');
@@ -13596,6 +13759,20 @@ function setupNotebook() {
         nbLoginBtn.addEventListener('click', () => {
             closeNotebook();
             openAuthModal('login');
+        });
+    }
+
+    // Landing page auth button
+    const landingAuthBtn = document.getElementById('landingAuthBtn');
+    if (landingAuthBtn) {
+        landingAuthBtn.addEventListener('click', () => {
+            const auth = getStoredAuth();
+            if (auth) {
+                // Logged in — open notes
+                openNotebook();
+            } else {
+                openAuthModal('login');
+            }
         });
     }
 

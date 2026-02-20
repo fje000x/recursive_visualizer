@@ -71,6 +71,9 @@
                     <button class="landing-nav-cta" id="landingNavCTA">
                         Start Exploring <i class="fas fa-arrow-right"></i>
                     </button>
+                    <button class="landing-nav-auth" id="landingAuthBtn" type="button">
+                        <i class="fas fa-user"></i> <span id="landingAuthLabel">Log in</span>
+                    </button>
                     <button class="theme-toggle" id="themeToggle3" title="Toggle light/dark mode">
                         <i class="fas fa-sun"></i>
                     </button>
@@ -711,69 +714,89 @@
         <div class="notebook-chrome">
             <!-- Resize handle (desktop only) -->
             <div class="notebook-resize-handle" id="notebookResizeHandle"></div>
-            <!-- Header -->
-            <div class="notebook-header">
-                <div class="notebook-header-left">
-                    <button id="notebookClose" class="notebook-close-btn" type="button" aria-label="Close notes">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    </button>
-                    <span class="notebook-title">
-                        <i class="fas fa-book"></i>
-                        <span id="notebookProblemName">Notes</span>
-                    </span>
+
+            <!-- ══ VIEW 1: Notes List ══ -->
+            <div id="notebookListView" class="notebook-view notebook-list-view">
+                <div class="notebook-header">
+                    <div class="notebook-header-left">
+                        <button id="notebookClose" class="notebook-close-btn" type="button" aria-label="Close notes">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                        <span class="notebook-title">
+                            <i class="fas fa-book"></i>
+                            <span>My Notes</span>
+                        </span>
+                    </div>
                 </div>
-                <div class="notebook-header-right">
-                    <span id="notebookSaveStatus" class="notebook-save-status">
-                        <i class="fas fa-check-circle"></i> Saved
-                    </span>
+                <!-- Login prompt (shown to logged-out users) -->
+                <div id="notebookLoginPrompt" class="notebook-login-prompt" style="display:none;">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Notes are saved locally. <button type="button" id="nbLoginBtn" class="nb-login-link">Log in</button> to sync across devices.</span>
+                </div>
+                <div id="notebookNotesList" class="notebook-notes-list">
+                    <!-- Filled dynamically -->
                 </div>
             </div>
 
-            <!-- Toolbar -->
-            <div class="notebook-toolbar">
-                <div class="notebook-toolbar-group">
-                    <button class="nb-tool-btn" data-cmd="bold" title="Bold (⌘B)"><b>B</b></button>
-                    <button class="nb-tool-btn" data-cmd="italic" title="Italic (⌘I)"><i>I</i></button>
-                    <button class="nb-tool-btn" data-cmd="underline" title="Underline (⌘U)"><u>U</u></button>
-                    <button class="nb-tool-btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+            <!-- ══ VIEW 2: Note Editor ══ -->
+            <div id="notebookEditorView" class="notebook-view notebook-editor-view" style="display:none;">
+                <div class="notebook-header">
+                    <div class="notebook-header-left">
+                        <button id="notebookBack" class="notebook-close-btn" type="button" aria-label="Back to list" title="Back to notes list">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <span class="notebook-title">
+                            <i class="fas fa-file-alt"></i>
+                            <span id="notebookProblemName">Notes</span>
+                        </span>
+                    </div>
+                    <div class="notebook-header-right">
+                        <span id="notebookSaveStatus" class="notebook-save-status">
+                            <i class="fas fa-check-circle"></i> Saved
+                        </span>
+                    </div>
                 </div>
-                <div class="nb-tool-divider"></div>
-                <div class="notebook-toolbar-group">
-                    <button class="nb-tool-btn" data-cmd="formatBlock" data-value="H2" title="Heading"><span style="font-weight:800;font-size:13px;">H</span></button>
-                    <button class="nb-tool-btn" data-cmd="insertUnorderedList" title="Bullet list"><i class="fas fa-list-ul"></i></button>
-                    <button class="nb-tool-btn" data-cmd="insertOrderedList" title="Numbered list"><i class="fas fa-list-ol"></i></button>
+
+                <!-- Toolbar -->
+                <div class="notebook-toolbar">
+                    <div class="notebook-toolbar-group">
+                        <button class="nb-tool-btn" data-cmd="bold" title="Bold (⌘B)"><b>B</b></button>
+                        <button class="nb-tool-btn" data-cmd="italic" title="Italic (⌘I)"><i>I</i></button>
+                        <button class="nb-tool-btn" data-cmd="underline" title="Underline (⌘U)"><u>U</u></button>
+                        <button class="nb-tool-btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+                    </div>
+                    <div class="nb-tool-divider"></div>
+                    <div class="notebook-toolbar-group">
+                        <button class="nb-tool-btn" data-cmd="formatBlock" data-value="H2" title="Heading"><span style="font-weight:800;font-size:13px;">H</span></button>
+                        <button class="nb-tool-btn" data-cmd="insertUnorderedList" title="Bullet list"><i class="fas fa-list-ul"></i></button>
+                        <button class="nb-tool-btn" data-cmd="insertOrderedList" title="Numbered list"><i class="fas fa-list-ol"></i></button>
+                    </div>
+                    <div class="nb-tool-divider"></div>
+                    <div class="notebook-toolbar-group">
+                        <button class="nb-tool-btn nb-draw-toggle" id="nbDrawToggle" title="Draw mode">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <input type="color" id="nbPenColor" class="nb-color-picker" value="#3b82f6" title="Pen color">
+                        <button class="nb-tool-btn" id="nbEraserBtn" title="Eraser"><i class="fas fa-eraser"></i></button>
+                        <select id="nbPenSize" class="nb-pen-size" title="Pen size">
+                            <option value="2">Thin</option>
+                            <option value="4" selected>Medium</option>
+                            <option value="8">Thick</option>
+                        </select>
+                        <button class="nb-tool-btn nb-danger" id="nbClearCanvas" title="Clear drawing"><i class="fas fa-trash-alt"></i></button>
+                    </div>
                 </div>
-                <div class="nb-tool-divider"></div>
-                <div class="notebook-toolbar-group">
-                    <button class="nb-tool-btn nb-draw-toggle" id="nbDrawToggle" title="Draw mode">
-                        <i class="fas fa-pen"></i>
-                    </button>
-                    <input type="color" id="nbPenColor" class="nb-color-picker" value="#3b82f6" title="Pen color">
-                    <button class="nb-tool-btn" id="nbEraserBtn" title="Eraser"><i class="fas fa-eraser"></i></button>
-                    <select id="nbPenSize" class="nb-pen-size" title="Pen size">
-                        <option value="2">Thin</option>
-                        <option value="4" selected>Medium</option>
-                        <option value="8">Thick</option>
-                    </select>
-                    <button class="nb-tool-btn nb-danger" id="nbClearCanvas" title="Clear drawing"><i class="fas fa-trash-alt"></i></button>
+
+                <!-- Editor area -->
+                <div class="notebook-body">
+                    <div id="notebookEditor" class="notebook-editor" contenteditable="true" spellcheck="true" data-placeholder="Start typing your notes..."></div>
+                    <canvas id="notebookCanvas" class="notebook-canvas"></canvas>
                 </div>
-            </div>
 
-            <!-- Login prompt (shown to logged-out users) -->
-            <div id="notebookLoginPrompt" class="notebook-login-prompt" style="display:none;">
-                <i class="fas fa-info-circle"></i>
-                <span>Notes are saved locally. <button type="button" id="nbLoginBtn" class="nb-login-link">Log in</button> to sync across devices.</span>
-            </div>
-
-            <!-- Editor area -->
-            <div class="notebook-body">
-                <div id="notebookEditor" class="notebook-editor" contenteditable="true" spellcheck="true" data-placeholder="Start typing your notes..."></div>
-                <canvas id="notebookCanvas" class="notebook-canvas"></canvas>
-            </div>
-
-            <!-- Page indicator -->
-            <div class="notebook-footer">
-                <span id="notebookPageInfo" class="notebook-page-info">Problem 1 of 16</span>
+                <!-- Page indicator -->
+                <div class="notebook-footer">
+                    <span id="notebookPageInfo" class="notebook-page-info">Problem 1 of 16</span>
+                </div>
             </div>
         </div>
     </div>
