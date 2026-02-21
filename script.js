@@ -6787,10 +6787,11 @@ function render() {
     
     // Update console
     const consoleEl = document.getElementById('console');
+    const cleanMsg = state.msg.replace(/[\u2713\u2714\u2715\u2716\u2717\u2718\u274C\u274E\u2705\u2611\u2612\u{1F389}\u{1F3C1}✓✗✅❌🎉]\s*/gu, '');
     if (state.isComplete) {
-        consoleEl.innerHTML = `<div class="console-line console-answer">${state.msg}</div>`;
+        consoleEl.innerHTML = `<div class="console-line console-answer">${cleanMsg}</div>`;
     } else {
-        consoleEl.innerHTML = `<div class="console-line">${state.msg}</div>`;
+        consoleEl.innerHTML = `<div class="console-line">${cleanMsg}</div>`;
     }
     
     // Draw return arrows for recursive
@@ -7018,7 +7019,7 @@ function render() {
             `;
             
             // Merge info bridge — explanation between the two arrays
-            const mergeInfo = state.mergeInfo || '';
+            const mergeInfo = (state.mergeInfo || '').replace(/[\u2713\u2714\u2715\u2716\u2717\u2718\u274C\u274E\u2705\u2611\u2612\u{1F389}\u{1F3C1}✓✗✅❌🎉]\s*/gu, '');
             if (mergeInfo) {
                 const bridgeClass = isBattle ? ' merge-info-battle' : (state.isComplete ? ' merge-info-done' : '');
                 html += `

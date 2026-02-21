@@ -8125,9 +8125,26 @@ body > main > section.module.viz-module > div.module-header:empty {
         font-weight: 700;
         color: #242424;
     }
+    .mobile-bottom-nav .control-btn.primary,
+    .mobile-bottom-nav .control-btn.primary span,
+    .mobile-bottom-nav .control-btn.secondary,
+    .mobile-bottom-nav .control-btn.secondary span {
+        color: #242424;
+    }
     .mobile-bottom-nav .control-btn:active {
         transform: scale(0.92);
         background: rgba(0, 0, 0, 0.07);
+        color: #242424;
+    }
+    .mobile-bottom-nav .control-btn:active span {
+        color: #242424;
+    }
+    .mobile-bottom-nav .control-btn:hover:not(:disabled) {
+        background: rgba(0, 0, 0, 0.05);
+        color: #242424;
+    }
+    .mobile-bottom-nav .control-btn:hover:not(:disabled) span {
+        color: #242424;
     }
     .mobile-bottom-nav .control-btn:disabled {
         opacity: 0.3;
