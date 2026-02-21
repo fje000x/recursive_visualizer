@@ -12189,7 +12189,7 @@ function init() {
         history = [];
         currentStep = 0;
         const treeCanvas = document.getElementById('treeCanvas');
-        if (treeCanvas) { treeCanvas.style.display = 'none'; treeCanvas.innerHTML = ''; }
+        if (treeCanvas) treeCanvas.style.display = 'none';
         const nodesContainer = document.getElementById('nodesContainer');
         if (nodesContainer) nodesContainer.innerHTML = '';
         const svgLines = document.getElementById('svgLines');
