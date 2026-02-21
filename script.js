@@ -3741,7 +3741,7 @@ function generateHIndexHistory(inputCitations) {
     // Phase: sort — show unsorted first, then sorted
     record(0, `Call hIndex(citations=[${citations}]). Goal: find h such that h papers have ≥ h citations each.`, {}, { phase: 'unsorted', _useArr: unsorted });
     record(1, `Sort descending → [${arr}]. Tallest bars on the left — now we can scan left to right and grow the square.`, {}, { phase: 'sort' });
-    record(2, `Initialize h = 0. The Durfee square starts at 0×0 — can we grow it?`, {}, { phase: 'sort' });
+    record(2, `Initialize h = 0. The square starts at 0×0 — can we grow it?`, {}, { phase: 'sort' });
 
     for (let i = 0; i < arr.length; i++) {
         const tryH = i + 1;
@@ -3793,7 +3793,7 @@ function generateHIndexHistory(inputCitations) {
         else finalFail.push(b);
     }
 
-    record(8, `✅ H-Index = ${hIdx}. The ${hIdx}×${hIdx} Durfee square is the largest that fits under the curve. ${hIdx} papers each have ≥ ${hIdx} citations.`, {}, {
+    record(8, `✅ H-Index = ${hIdx}. The largest square that fits is ${hIdx}×${hIdx}. ${hIdx} papers each have ≥ ${hIdx} citations.`, {}, {
         isComplete: true,
         phase: 'done',
         thresholdH: hIdx,
@@ -8469,7 +8469,6 @@ function render() {
 
             // ── Concept header ──
             html += `<div class="jg2-concept">`;
-            html += `<span class="jg2-concept-icon">i</span>`;
             html += `<span>Greedy BFS — each <b>shaded zone</b> = all indices reachable in that many jumps. The outer loop expands zones; the inner loop finds the farthest reach.</span>`;
             html += `<button class="cy-insight-btn jg2-insight-btn" onclick="openInsightModal('insightModal12')" title="Why does this work?">i</button>`;
             html += `</div>`;
@@ -8636,8 +8635,12 @@ function render() {
             html += `
                 <div class="pointer-info">
                     <div class="pointer-detail">
-                        <div class="pointer-detail-label">current reach [<span style="color:#fb923c">L</span>, <span style="color:#f472b6">R</span>]</div>
-                        <div class="pointer-detail-value p2">[${wL}, ${Math.min(wR, lastIdx)}]</div>
+                        <div class="pointer-detail-label"><span style="color:#fb923c">L</span> (start)</div>
+                        <div class="pointer-detail-value p2">${wL}</div>
+                    </div>
+                    <div class="pointer-detail">
+                        <div class="pointer-detail-label"><span style="color:#f472b6">R</span> (end)</div>
+                        <div class="pointer-detail-value p-pink">${Math.min(wR, lastIdx)}</div>
                     </div>
                     <div class="pointer-detail">
                         <div class="pointer-detail-label"><span style="color:#60a5fa">i</span> (inner loop)</div>
@@ -8817,8 +8820,8 @@ function render() {
             const squareSize = meta.squareSize ?? 0;
 
             // SVG geometry constants
-            const svgW = 520, svgH = 280;
-            const pad = { top: 24, right: 20, bottom: 32, left: 44 };
+            const svgW = 480, svgH = 230;
+            const pad = { top: 20, right: 18, bottom: 28, left: 40 };
             const plotW = svgW - pad.left - pad.right;
             const plotH = svgH - pad.top - pad.bottom;
             const barGap = Math.max(2, Math.min(6, Math.floor(plotW / n * 0.12)));
@@ -8830,7 +8833,7 @@ function render() {
             const sDenseClass = sItemCount >= 9 ? ' array-dense' : '';
             const isSorted = meta.sorted !== false;
             let html = `<div class="array-inner${sDenseClass}">`;
-            html += `<div class="array-label">${isSorted ? 'citations (sorted desc) — find largest h×h Durfee square that fits under the bars' : 'citations (unsorted) — must sort descending first'}</div>`;
+            html += `<div class="array-label">${isSorted ? 'citations (sorted desc) — find the largest h×h square under the bars' : 'citations (unsorted) — must sort descending first'}</div>`;
 
             // ─── SVG chart ───
             html += `<div class="hindex-svg-wrap">`;
@@ -8945,13 +8948,13 @@ function render() {
                     html += `<span style="color:var(--text-muted)"> — bars are in their original order. We need to sort descending so the tallest bars land on the left.</span>`;
                 } else {
                     html += `<span style="color:var(--accent-green);font-weight:600">✓ Sorted descending</span>`;
-                    html += `<span style="color:var(--text-muted)"> — tallest bars on the left. Now we scan left-to-right and try to grow the Durfee square.</span>`;
+                    html += `<span style="color:var(--text-muted)"> — tallest bars on the left. Now we scan left-to-right and try to grow the square.</span>`;
                 }
                 html += `</div></div>`;
             } else if (isComplete) {
                 html += `<div class="sum-bridge"><div class="sum-bridge-label">`;
                 html += `<span style="color:var(--accent-green);font-weight:700">✓ H-Index = ${hVal}</span>`;
-                html += `<span style="color:var(--text-muted)"> — the ${hVal}×${hVal} Durfee square is the largest that fits. ${hVal} papers each have ≥ ${hVal} citations.</span>`;
+                html += `<span style="color:var(--text-muted)"> — the ${hVal}×${hVal} square is the largest that fits. ${hVal} papers each have ≥ ${hVal} citations.</span>`;
                 html += `</div></div>`;
             }
 
@@ -12161,6 +12164,177 @@ function init() {
     const algorithm = prob.algorithms[currentAlgorithm];
     const engine = document.querySelector('.render-engine');
     
+    // ---- Show "coming soon" message on canvas for problems 14+ ----
+    const comingSoonThreshold = 14;
+    let comingSoonOverlay = document.getElementById('comingSoonOverlay');
+    const actionBar = document.querySelector('.action-bar');
+
+    if (parseInt(currentProbId) >= comingSoonThreshold) {
+        // Create overlay if it doesn't exist
+        if (!comingSoonOverlay) {
+            comingSoonOverlay = document.createElement('div');
+            comingSoonOverlay.id = 'comingSoonOverlay';
+            comingSoonOverlay.className = 'coming-soon-overlay';
+            comingSoonOverlay.innerHTML = `
+                <div class="coming-soon-inner">
+                    <h3 class="coming-soon-title">Visual coming soon</h3>
+                    <p class="coming-soon-text">Working on making this the best animation for you.</p>
+                </div>
+            `;
+            engine.appendChild(comingSoonOverlay);
+        }
+        comingSoonOverlay.style.display = 'flex';
+
+        // Nuke all visual data so nothing can be revealed via DevTools
+        history = [];
+        currentStep = 0;
+        const treeCanvas = document.getElementById('treeCanvas');
+        if (treeCanvas) { treeCanvas.style.display = 'none'; treeCanvas.innerHTML = ''; }
+        const nodesContainer = document.getElementById('nodesContainer');
+        if (nodesContainer) nodesContainer.innerHTML = '';
+        const svgLines = document.getElementById('svgLines');
+        if (svgLines) svgLines.innerHTML = '';
+        const arrayContainer = document.getElementById('arrayContainer');
+        if (arrayContainer) arrayContainer.remove();
+        const queueContainer = document.getElementById('queueContainer');
+        if (queueContainer) queueContainer.style.display = 'none';
+
+        // Disable play controls (greyed out)
+        if (actionBar) actionBar.classList.add('controls-disabled');
+
+        // Stop any autoplay
+        if (autoPlayInterval) {
+            clearInterval(autoPlayInterval);
+            autoPlayInterval = null;
+            updatePlayButtons(false);
+        }
+
+        // --- Populate all controls so they reflect the problem ---
+
+        // Reset code & stack panel states
+        const codeModule = document.querySelector('.code-module');
+        const codeToggleBtn = document.getElementById('codeToggleBtn');
+        if (codeModule) codeModule.classList.remove('mobile-visible');
+        const appLayout = document.querySelector('.app-layout');
+        if (appLayout) appLayout.classList.add('hide-code-panel');
+        if (codeToggleBtn) codeToggleBtn.classList.add('collapsed');
+
+        const stackModule = document.querySelector('.stack-module');
+        const stackToggleBtn = document.getElementById('stackToggleBtn');
+        if (stackModule) stackModule.classList.remove('mobile-visible');
+        if (stackToggleBtn) stackToggleBtn.classList.remove('collapsed');
+
+        // Layout: show/hide right panel based on algo type
+        const isArrayProb = prob.topics && prob.topics.includes('array');
+        const isBFS = currentAlgorithm === 'bfs';
+        if (isArrayProb || isBFS) {
+            if (appLayout) appLayout.classList.add('hide-right-panel');
+            if (stackModule) stackModule.style.display = 'none';
+            if (stackToggleBtn) stackToggleBtn.style.display = 'none';
+        } else {
+            if (appLayout) appLayout.classList.remove('hide-right-panel');
+            if (stackModule) stackModule.style.display = '';
+            if (stackToggleBtn) stackToggleBtn.style.display = '';
+        }
+
+        // Problem title in nav
+        const problemListBtn = document.getElementById('problemListBtn');
+        if (problemListBtn) {
+            problemListBtn.innerHTML = `<i class="fas fa-list"></i> #${currentProbId} ${prob.name}`;
+        }
+
+        // Inspired by attribution
+        const inspiredByEl = document.getElementById('inspiredBy');
+        const inspiredByLink = document.getElementById('inspiredByLink');
+        if (inspiredByEl && inspiredByLink && prob.inspiredBy) {
+            inspiredByLink.textContent = prob.inspiredBy;
+            inspiredByLink.href = prob.sourceUrl || '#';
+            inspiredByEl.style.display = '';
+        } else if (inspiredByEl) {
+            inspiredByEl.style.display = 'none';
+        }
+
+        // Prereq banner
+        if (typeof renderPrereqBanner === 'function') renderPrereqBanner(currentProbId);
+
+        // Algorithm selectors (all variants: desktop, action bar, mobile, popover)
+        const algorithmSelect = document.getElementById('algorithmSelect');
+        const actionBarAlgoSelect = document.getElementById('actionBarAlgoSelect');
+        const mobileAlgorithmSelect = document.getElementById('mobileAlgorithmSelect');
+        const popAlgoSelect = document.getElementById('popAlgoSelect');
+        if (algorithmSelect) algorithmSelect.innerHTML = '';
+        if (actionBarAlgoSelect) actionBarAlgoSelect.innerHTML = '';
+        if (mobileAlgorithmSelect) mobileAlgorithmSelect.innerHTML = '';
+        if (popAlgoSelect) popAlgoSelect.innerHTML = '';
+        Object.keys(prob.algorithms).forEach(algoKey => {
+            const option = document.createElement('option');
+            option.value = algoKey;
+            option.textContent = prob.algorithms[algoKey].name;
+            if (algoKey === currentAlgorithm) option.selected = true;
+            if (algorithmSelect) algorithmSelect.appendChild(option);
+            if (actionBarAlgoSelect) actionBarAlgoSelect.appendChild(option.cloneNode(true));
+            if (mobileAlgorithmSelect) mobileAlgorithmSelect.appendChild(option.cloneNode(true));
+            if (popAlgoSelect) popAlgoSelect.appendChild(option.cloneNode(true));
+        });
+        if (algorithmSelect) algorithmSelect.value = currentAlgorithm;
+        if (actionBarAlgoSelect) actionBarAlgoSelect.value = currentAlgorithm;
+        if (mobileAlgorithmSelect) mobileAlgorithmSelect.value = currentAlgorithm;
+        if (popAlgoSelect) popAlgoSelect.value = currentAlgorithm;
+
+        // Testcase selectors
+        const testcaseSelector = document.getElementById('testcaseSelector');
+        const testcaseSelect = document.getElementById('testcaseSelect');
+        const mobileTestcaseSelector = document.getElementById('mobileTestcaseSelector');
+        const mobileTestcaseSelect = document.getElementById('mobileTestcaseSelect');
+        const popTestcaseRow = document.getElementById('popTestcaseRow');
+        const popTestcaseSelect = document.getElementById('popTestcaseSelect');
+        const hasEdgeCase = algorithm.generateEdgeCaseHistory || prob.edgeCaseTree;
+        if (testcaseSelector) testcaseSelector.style.display = hasEdgeCase ? '' : 'none';
+        if (mobileTestcaseSelector) mobileTestcaseSelector.style.display = hasEdgeCase ? '' : 'none';
+        if (popTestcaseRow) popTestcaseRow.style.display = hasEdgeCase ? '' : 'none';
+        if (hasEdgeCase) {
+            const labels = prob.testCaseLabels || { normal: 'Example', edge: 'Edge Case' };
+            [testcaseSelect, mobileTestcaseSelect, popTestcaseSelect].forEach(sel => {
+                if (!sel) return;
+                sel.innerHTML = '';
+                Object.keys(labels).forEach(key => {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.textContent = labels[key];
+                    sel.appendChild(opt);
+                });
+                sel.value = currentTestCase;
+            });
+        }
+
+        // Code panel
+        const codeEditor = document.getElementById('codeEditor');
+        if (codeEditor) {
+            codeEditor.innerHTML = '';
+            algorithm.code.forEach((line, index) => {
+                const lineEl = document.createElement('div');
+                lineEl.className = 'line';
+                lineEl.innerHTML = highlightPython(line);
+                lineEl.setAttribute('data-line', index);
+                if (algorithm.indentation && algorithm.indentation[index] !== undefined) {
+                    lineEl.setAttribute('data-indent', algorithm.indentation[index]);
+                }
+                codeEditor.appendChild(lineEl);
+            });
+        }
+        document.getElementById('timeComplexity').textContent = algorithm.timeComplexity;
+        document.getElementById('spaceComplexity').textContent = algorithm.spaceComplexity;
+
+        return; // Don't generate history or render anything
+    } else {
+        // Remove overlay and re-enable controls for problems < 14
+        if (comingSoonOverlay) comingSoonOverlay.style.display = 'none';
+        if (actionBar) actionBar.classList.remove('controls-disabled');
+    }
+
+    const codeModule = document.querySelector('.code-module');
+    const stackModule = document.querySelector('.stack-module');
+
     baseCasesCount = 0;
     prevArraySnapshot = null; // reset change-detection on re-init
 
@@ -12172,7 +12346,6 @@ function init() {
     }
 
     // Reset code & stack panels to hidden on mobile
-    const codeModule = document.querySelector('.code-module');
     const codeToggleBtn = document.getElementById('codeToggleBtn');
     if (codeModule) codeModule.classList.remove('mobile-visible');
 
@@ -12188,7 +12361,6 @@ function init() {
     }
     
     // RESET LAYOUT - Remove inline styles and use CSS classes
-    const stackModule = document.querySelector('.stack-module');
     const stackToggleBtn = document.getElementById('stackToggleBtn');
     
     if (appLayout) {
@@ -12808,7 +12980,12 @@ function setupEventListeners() {
     });
 }
 
+function isVisualsDisabled() {
+    return parseInt(currentProbId) >= 14;
+}
+
 function changeStep(delta) {
+    if (isVisualsDisabled()) return;
     const problemModal = document.getElementById('problemModal');
     if (problemModal && problemModal.classList.contains('show')) return;
     const ytModal = document.getElementById('youtubeModal');
@@ -12869,6 +13046,7 @@ function cycleSpeed() {
 }
 
 function toggleAutoPlay() {
+    if (isVisualsDisabled()) return;
     const problemModal = document.getElementById('problemModal');
     if (problemModal && problemModal.classList.contains('show')) {
         closeProblemModal();
@@ -13424,9 +13602,20 @@ function renderNotesList() {
     const withoutNotes = [];
     for (const id of allIds) {
         const note = localNotes[id];
+        let hasDrawingContent = false;
+        if (note && note.drawing_data) {
+            try {
+                const dd = JSON.parse(note.drawing_data);
+                if (Array.isArray(dd)) {
+                    hasDrawingContent = dd.length > 0;
+                } else {
+                    hasDrawingContent = (dd.paths && dd.paths.length > 0) || (dd.structures && dd.structures.length > 0);
+                }
+            } catch { hasDrawingContent = false; }
+        }
         const hasContent = note && (
             (note.text_content && note.text_content.replace(/<[^>]*>/g, '').trim().length > 0) ||
-            (note.drawing_data && note.drawing_data !== '[]')
+            hasDrawingContent
         );
         if (hasContent) {
             withNotes.push({ id, note });
@@ -13447,9 +13636,8 @@ function renderNotesList() {
     if (withNotes.length === 0) {
         html += `
             <div class="nb-list-empty">
-                <i class="fas fa-book-open"></i>
-                <p>No notes yet.<br>Open a problem below to start writing.</p>
-                <span class="nb-list-empty-hint">Your notes are saved automatically</span>
+                <p>No notes yet.</p>
+                <p>Visit a problem to start writing.</p>
             </div>`;
     } else {
         html += '<div class="nb-list-section-label" style="padding:12px 16px 4px;font-size:11px;font-weight:500;color:var(--text-muted);opacity:0.5;">Notes</div>';
@@ -13648,30 +13836,92 @@ async function saveNotebookNote() {
     }
 }
 
+// Track the canvas dimensions content was drawn at (for responsive scaling)
+let notebookCanvasBaseWidth = 0;
+let notebookCanvasBaseHeight = 0;
+
 // ---- Drawing canvas ----
 function initNotebookCanvas() {
     const canvas = document.getElementById('notebookCanvas');
     if (!canvas) return;
     const body = document.querySelector('.notebook-body');
-    if (body) {
-        canvas.width = body.clientWidth;
-        canvas.height = body.clientHeight;
+    if (!body) return;
+
+    const newW = body.clientWidth;
+    const newH = body.clientHeight;
+
+    // If we have a previous base size and content, scale to fit
+    if (notebookCanvasBaseWidth > 0 && notebookCanvasBaseHeight > 0 &&
+        (notebookPaths.length > 0 || notebookStructures.length > 0)) {
+        const scaleX = newW / notebookCanvasBaseWidth;
+        const scaleY = newH / notebookCanvasBaseHeight;
+
+        // Scale freehand paths
+        for (const path of notebookPaths) {
+            for (const pt of path.points) {
+                pt.x *= scaleX;
+                pt.y *= scaleY;
+            }
+            // Scale stroke width proportionally (use average scale)
+            path.size = Math.max(1, path.size * ((scaleX + scaleY) / 2));
+        }
+
+        // Scale structure node positions
+        for (const struct of notebookStructures) {
+            for (const node of struct.nodes) {
+                node.x *= scaleX;
+                node.y *= scaleY;
+            }
+        }
     }
+
+    notebookCanvasBaseWidth = newW;
+    notebookCanvasBaseHeight = newH;
+    canvas.width = newW;
+    canvas.height = newH;
     notebookCtx = canvas.getContext('2d');
     redrawCanvas();
+    renderStructures();
 }
 
 function getDrawingData() {
-    return JSON.stringify(notebookPaths);
+    return JSON.stringify({
+        paths: notebookPaths,
+        structures: notebookStructures,
+        baseW: notebookCanvasBaseWidth,
+        baseH: notebookCanvasBaseHeight
+    });
 }
 
 function loadDrawingData(data) {
     try {
-        notebookPaths = data ? JSON.parse(data) : [];
+        if (!data) {
+            notebookPaths = [];
+            notebookStructures = [];
+        } else {
+            const parsed = JSON.parse(data);
+            // Support legacy format (just an array of paths)
+            if (Array.isArray(parsed)) {
+                notebookPaths = parsed;
+                notebookStructures = [];
+            } else {
+                notebookPaths = parsed.paths || [];
+                // Restore base dimensions from saved data
+                if (parsed.baseW && parsed.baseH) {
+                    notebookCanvasBaseWidth = parsed.baseW;
+                    notebookCanvasBaseHeight = parsed.baseH;
+                }
+                loadStructuresData(JSON.stringify(parsed.structures || []));
+                redrawCanvas();
+                return;
+            }
+        }
     } catch {
         notebookPaths = [];
+        notebookStructures = [];
     }
     redrawCanvas();
+    renderStructures();
 }
 
 function redrawCanvas() {
@@ -13715,8 +13965,11 @@ function startStroke(e) {
         return;
     }
 
-    const color = document.getElementById('nbPenColor')?.value || '#3b82f6';
-    const size = parseInt(document.getElementById('nbPenSize')?.value || '4');
+    // Read color from selected pen swatch, size from selected stroke button
+    const selectedSwatch = document.querySelector('.nb-pen-swatch.selected');
+    const color = selectedSwatch?.getAttribute('data-color') || '#e2e8f0';
+    const selectedStroke = document.querySelector('.nb-stroke-btn.selected');
+    const size = parseInt(selectedStroke?.getAttribute('data-size') || '4');
     notebookCurrentPath = { points: [pt], color, size };
 }
 
@@ -13777,6 +14030,9 @@ function toggleDrawMode() {
     const btn = document.getElementById('nbDrawToggle');
     const eraserBtn = document.getElementById('nbEraserBtn');
 
+    // Exit placement mode
+    if (structPlacementMode) { structPlacementMode = null; updateStructPlacementCursor(); }
+
     if (notebookErasing) {
         // Turn off eraser first
         notebookErasing = false;
@@ -13797,6 +14053,9 @@ function toggleEraserMode() {
     const btn = document.getElementById('nbEraserBtn');
     const drawBtn = document.getElementById('nbDrawToggle');
 
+    // Exit placement mode
+    if (structPlacementMode) { structPlacementMode = null; updateStructPlacementCursor(); }
+
     if (notebookDrawing) {
         // Turn off draw first
         notebookDrawing = false;
@@ -13815,8 +14074,915 @@ function toggleEraserMode() {
 function clearNotebookCanvas() {
     if (!confirm('Clear all drawings on this page?')) return;
     notebookPaths = [];
+    notebookStructures = [];
+    selectedStructNode = null;
+    hideNodeActions();
     redrawCanvas();
+    renderStructures();
     scheduleNotebookSave();
+}
+
+// ═══════════════════════════════════════════
+// Data Structures System (Tree, Array, LinkedList)
+// ═══════════════════════════════════════════
+let notebookStructures = []; // array of structure objects
+let selectedStructNode = null; // { structId, nodeId }
+let structDragging = null; // { structId, nodeId, offsetX, offsetY } for drag
+let structPlacementMode = null; // 'tree-node' | 'array' | 'linked-list' | null
+let structIdCounter = 0;
+let structNodeIdCounter = 0;
+
+// Generate unique IDs
+function nextStructId() { return 's' + (++structIdCounter); }
+function nextNodeId() { return 'n' + (++structNodeIdCounter); }
+
+// ---- Structure Data Model ----
+// Each structure: { id, type:'tree'|'array'|'linked-list', nodes:[], edges:[] }
+// Tree node: { id, value, x, y, parentId, children:{ left, right } }
+// Array node: { id, value, x, y, index }
+// LL node: { id, value, x, y, nextId }
+
+function createTreeNode(x, y, value = '?', color = '#3b82f6') {
+    return {
+        id: nextNodeId(),
+        value,
+        x, y,
+        color,
+        parentId: null,
+        children: { left: null, right: null }
+    };
+}
+
+function createArrayNode(x, y, index, value = '0', color = '#3b82f6') {
+    return {
+        id: nextNodeId(),
+        value,
+        x, y,
+        color,
+        index
+    };
+}
+
+function createLLNode(x, y, value = '?', color = '#22c55e') {
+    return {
+        id: nextNodeId(),
+        value,
+        x, y,
+        color,
+        nextId: null
+    };
+}
+
+// ---- Get current pen color from toolbar ----
+function getSelectedPenColor() {
+    const swatch = document.querySelector('.nb-pen-swatch.selected');
+    return swatch?.getAttribute('data-color') || '#3b82f6';
+}
+
+// ---- Insert Structures ----
+function insertTreeNode(cx, cy) {
+    const color = getSelectedPenColor();
+    const node = createTreeNode(cx, cy, '?', color);
+    const struct = {
+        id: nextStructId(),
+        type: 'tree',
+        nodes: [node],
+        edges: []
+    };
+    notebookStructures.push(struct);
+    renderStructures();
+    selectStructNode(struct.id, node.id);
+    scheduleNotebookSave();
+}
+
+function insertArray(cx, cy, size) {
+    const color = getSelectedPenColor();
+    const cellW = 42;
+    const totalW = size * cellW;
+    const startX = cx - totalW / 2;
+    const nodes = [];
+    for (let i = 0; i < size; i++) {
+        nodes.push(createArrayNode(startX + i * cellW + cellW / 2, cy, i, '0', color));
+    }
+    const struct = {
+        id: nextStructId(),
+        type: 'array',
+        nodes,
+        edges: []
+    };
+    notebookStructures.push(struct);
+    renderStructures();
+    scheduleNotebookSave();
+}
+
+function insertLinkedList(cx, cy) {
+    const color = getSelectedPenColor();
+    const node = createLLNode(cx, cy, '?', color);
+    const struct = {
+        id: nextStructId(),
+        type: 'linked-list',
+        nodes: [node],
+        edges: []
+    };
+    notebookStructures.push(struct);
+    renderStructures();
+    selectStructNode(struct.id, node.id);
+    scheduleNotebookSave();
+}
+
+// ---- Add children / next ----
+function addTreeChild(structId, parentNodeId, side) {
+    const struct = notebookStructures.find(s => s.id === structId);
+    if (!struct || struct.type !== 'tree') return;
+    const parent = struct.nodes.find(n => n.id === parentNodeId);
+    if (!parent) return;
+    if (parent.children[side]) return; // already has child
+
+    const offsetX = side === 'left' ? -60 : 60;
+    const child = createTreeNode(parent.x + offsetX, parent.y + 70, '?', parent.color || '#3b82f6');
+    child.parentId = parent.id;
+    parent.children[side] = child.id;
+    struct.nodes.push(child);
+    struct.edges.push({ from: parent.id, to: child.id });
+    renderStructures();
+    selectStructNode(structId, child.id);
+    scheduleNotebookSave();
+}
+
+function addLLNodeAfter(structId, nodeId) {
+    const struct = notebookStructures.find(s => s.id === structId);
+    if (!struct || struct.type !== 'linked-list') return;
+    const node = struct.nodes.find(n => n.id === nodeId);
+    if (!node) return;
+
+    const newNode = createLLNode(node.x + 80, node.y, '?', node.color || '#22c55e');
+    // Insert between current and its next
+    newNode.nextId = node.nextId;
+    node.nextId = newNode.id;
+    struct.nodes.push(newNode);
+    renderStructures();
+    selectStructNode(structId, newNode.id);
+    scheduleNotebookSave();
+}
+
+// ---- Delete ----
+function deleteStructNode(structId, nodeId) {
+    const struct = notebookStructures.find(s => s.id === structId);
+    if (!struct) return;
+
+    if (struct.type === 'tree') {
+        // Collect node and all descendants
+        const toRemove = new Set();
+        function collectDescendants(nid) {
+            toRemove.add(nid);
+            const n = struct.nodes.find(x => x.id === nid);
+            if (n && n.children) {
+                if (n.children.left) collectDescendants(n.children.left);
+                if (n.children.right) collectDescendants(n.children.right);
+            }
+        }
+        collectDescendants(nodeId);
+
+        // Remove parent's reference to this node
+        const node = struct.nodes.find(n => n.id === nodeId);
+        if (node && node.parentId) {
+            const parent = struct.nodes.find(n => n.id === node.parentId);
+            if (parent) {
+                if (parent.children.left === nodeId) parent.children.left = null;
+                if (parent.children.right === nodeId) parent.children.right = null;
+            }
+        }
+
+        struct.nodes = struct.nodes.filter(n => !toRemove.has(n.id));
+        struct.edges = struct.edges.filter(e => !toRemove.has(e.from) && !toRemove.has(e.to));
+
+    } else if (struct.type === 'linked-list') {
+        // Relink: find who points to this node
+        const prev = struct.nodes.find(n => n.nextId === nodeId);
+        const node = struct.nodes.find(n => n.id === nodeId);
+        if (prev) {
+            prev.nextId = node ? node.nextId : null;
+        }
+        struct.nodes = struct.nodes.filter(n => n.id !== nodeId);
+
+    } else if (struct.type === 'array') {
+        // Delete entire array structure
+        notebookStructures = notebookStructures.filter(s => s.id !== structId);
+        selectedStructNode = null;
+        hideNodeActions();
+        renderStructures();
+        scheduleNotebookSave();
+        return;
+    }
+
+    // If no nodes left, remove the structure entirely
+    if (struct.nodes.length === 0) {
+        notebookStructures = notebookStructures.filter(s => s.id !== structId);
+    }
+
+    selectedStructNode = null;
+    hideNodeActions();
+    renderStructures();
+    scheduleNotebookSave();
+}
+
+// ---- Selection ----
+function selectStructNode(structId, nodeId) {
+    selectedStructNode = { structId, nodeId, wholeStructure: false };
+    renderStructures();
+    showNodeActions(structId, nodeId);
+}
+
+function deselectStructNode() {
+    selectedStructNode = null;
+    hideNodeActions();
+    renderStructures();
+}
+
+// ---- Action bar positioning ----
+function showNodeActions(structId, nodeId) {
+    const struct = notebookStructures.find(s => s.id === structId);
+    if (!struct) return;
+    const node = struct.nodes.find(n => n.id === nodeId);
+    if (!node) return;
+
+    const bar = document.getElementById('nbNodeActions');
+    if (!bar) return;
+
+    const body = document.querySelector('.notebook-body');
+    if (!body) return;
+    const rect = body.getBoundingClientRect();
+
+    // Get SVG coordinate mapping
+    const svg = document.getElementById('nbStructuresSvg');
+    const svgRect = svg.getBoundingClientRect();
+
+    const scaleX = svgRect.width / (svg.viewBox.baseVal.width || svgRect.width);
+    const scaleY = svgRect.height / (svg.viewBox.baseVal.height || svgRect.height);
+
+    const screenX = node.x * scaleX + svgRect.left - rect.left;
+    const screenY = node.y * scaleY + svgRect.top - rect.top;
+
+    // Show/hide appropriate buttons
+    const addLeftBtn = document.getElementById('nbAddLeftChild');
+    const addRightBtn = document.getElementById('nbAddRightChild');
+    const addLLBtn = document.getElementById('nbAddLLNode');
+    const delBtn = document.getElementById('nbDeleteStruct');
+    const moveAllBtn = document.getElementById('nbMoveAll');
+
+    addLeftBtn.style.display = 'none';
+    addRightBtn.style.display = 'none';
+    addLLBtn.style.display = 'none';
+
+    // Update Move All button active state
+    if (moveAllBtn) {
+        moveAllBtn.classList.toggle('active', !!(selectedStructNode && selectedStructNode.wholeStructure));
+    }
+
+    if (struct.type === 'tree') {
+        const tNode = node;
+        if (!tNode.children.left) addLeftBtn.style.display = '';
+        if (!tNode.children.right) addRightBtn.style.display = '';
+    } else if (struct.type === 'linked-list') {
+        addLLBtn.style.display = '';
+    }
+    // Array: only delete
+
+    bar.style.display = 'flex';
+    // Defer positioning so offsetWidth is accurate
+    requestAnimationFrame(() => {
+        bar.style.left = Math.max(0, screenX - bar.offsetWidth / 2) + 'px';
+        bar.style.top = Math.max(0, screenY - 46) + 'px';
+    });
+}
+
+function hideNodeActions() {
+    const bar = document.getElementById('nbNodeActions');
+    if (bar) bar.style.display = 'none';
+}
+
+// ---- Rendering ----
+function renderStructures() {
+    const svg = document.getElementById('nbStructuresSvg');
+    if (!svg) return;
+
+    // Set viewBox to match body size
+    const body = document.querySelector('.notebook-body');
+    if (body) {
+        svg.setAttribute('viewBox', `0 0 ${body.clientWidth} ${body.clientHeight}`);
+    }
+
+    svg.innerHTML = '';
+
+    // Render edges first (behind nodes)
+    for (const struct of notebookStructures) {
+        if (struct.type === 'tree') {
+            for (const edge of struct.edges) {
+                const from = struct.nodes.find(n => n.id === edge.from);
+                const to = struct.nodes.find(n => n.id === edge.to);
+                if (!from || !to) continue;
+                const edgeColor = from.color || '#3b82f6';
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', from.x);
+                line.setAttribute('y1', from.y + 20);
+                line.setAttribute('x2', to.x);
+                line.setAttribute('y2', to.y - 20);
+                line.setAttribute('stroke', edgeColor);
+                line.setAttribute('stroke-width', '2');
+                line.setAttribute('stroke-linecap', 'round');
+                line.classList.add('nb-struct-edge');
+                svg.appendChild(line);
+            }
+        } else if (struct.type === 'linked-list') {
+            for (const node of struct.nodes) {
+                if (!node.nextId) continue;
+                const next = struct.nodes.find(n => n.id === node.nextId);
+                if (!next) continue;
+                const edgeColor = node.color || '#22c55e';
+                const x1 = node.x + 20;
+                const y1 = node.y;
+                const x2 = next.x - 20;
+                const y2 = next.y;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x1);
+                line.setAttribute('y1', y1);
+                line.setAttribute('x2', x2);
+                line.setAttribute('y2', y2);
+                line.setAttribute('stroke', edgeColor);
+                line.setAttribute('stroke-width', '2');
+                line.setAttribute('stroke-linecap', 'round');
+                line.classList.add('nb-struct-edge');
+                svg.appendChild(line);
+
+                // Arrowhead
+                const angle = Math.atan2(y2 - y1, x2 - x1);
+                const headLen = 8;
+                const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                const ax = x2;
+                const ay = y2;
+                const p1x = ax - headLen * Math.cos(angle - Math.PI / 6);
+                const p1y = ay - headLen * Math.sin(angle - Math.PI / 6);
+                const p2x = ax - headLen * Math.cos(angle + Math.PI / 6);
+                const p2y = ay - headLen * Math.sin(angle + Math.PI / 6);
+                arrow.setAttribute('points', `${ax},${ay} ${p1x},${p1y} ${p2x},${p2y}`);
+                arrow.setAttribute('fill', edgeColor);
+                arrow.classList.add('nb-struct-arrow-ptr');
+                svg.appendChild(arrow);
+            }
+        }
+    }
+
+    // Render nodes
+    for (const struct of notebookStructures) {
+        if (struct.type === 'tree') {
+            for (const node of struct.nodes) {
+                const color = node.color || '#3b82f6';
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.classList.add('nb-struct-node');
+                g.setAttribute('data-struct-id', struct.id);
+                g.setAttribute('data-node-id', node.id);
+                const isSelected = selectedStructNode && selectedStructNode.structId === struct.id &&
+                    (selectedStructNode.wholeStructure || selectedStructNode.nodeId === node.id);
+                if (isSelected) g.classList.add('selected');
+
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', node.x);
+                circle.setAttribute('cy', node.y);
+                circle.setAttribute('r', '20');
+                circle.setAttribute('stroke', color);
+                circle.setAttribute('stroke-width', isSelected ? '3' : '2');
+                circle.setAttribute('fill', '#1a1a2e');
+                g.appendChild(circle);
+
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', node.x);
+                text.setAttribute('y', node.y);
+                text.classList.add('nb-struct-value');
+                text.style.fill = '#fff';
+                text.setAttribute('font-weight', '700');
+                text.textContent = node.value;
+                g.appendChild(text);
+                svg.appendChild(g);
+            }
+
+        } else if (struct.type === 'array') {
+            const cellW = 42;
+            const cellH = 36;
+            for (const node of struct.nodes) {
+                const color = node.color || '#3b82f6';
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.classList.add('nb-struct-node');
+                g.setAttribute('data-struct-id', struct.id);
+                g.setAttribute('data-node-id', node.id);
+                const isSelected = selectedStructNode && selectedStructNode.structId === struct.id &&
+                    (selectedStructNode.wholeStructure || selectedStructNode.nodeId === node.id);
+                if (isSelected) g.classList.add('selected');
+
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', node.x - cellW / 2);
+                rect.setAttribute('y', node.y - cellH / 2);
+                rect.setAttribute('width', cellW);
+                rect.setAttribute('height', cellH);
+                rect.setAttribute('rx', '4');
+                rect.setAttribute('stroke', color);
+                rect.setAttribute('stroke-width', isSelected ? '2.5' : '1.5');
+                rect.setAttribute('fill', '#1a1a2e');
+                g.appendChild(rect);
+
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', node.x);
+                text.setAttribute('y', node.y);
+                text.classList.add('nb-struct-value');
+                text.style.fill = '#fff';
+                text.setAttribute('font-weight', '700');
+                text.textContent = node.value;
+                g.appendChild(text);
+
+                // Index label below
+                const idx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                idx.setAttribute('x', node.x);
+                idx.setAttribute('y', node.y + cellH / 2 + 13);
+                idx.classList.add('nb-struct-index');
+                idx.textContent = node.index;
+                g.appendChild(idx);
+
+                svg.appendChild(g);
+            }
+
+        } else if (struct.type === 'linked-list') {
+            for (const node of struct.nodes) {
+                const color = node.color || '#22c55e';
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.classList.add('nb-struct-node');
+                g.setAttribute('data-struct-id', struct.id);
+                g.setAttribute('data-node-id', node.id);
+                const isSelected = selectedStructNode && selectedStructNode.structId === struct.id &&
+                    (selectedStructNode.wholeStructure || selectedStructNode.nodeId === node.id);
+                if (isSelected) g.classList.add('selected');
+
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', node.x);
+                circle.setAttribute('cy', node.y);
+                circle.setAttribute('r', '20');
+                circle.setAttribute('stroke', color);
+                circle.setAttribute('stroke-width', isSelected ? '3' : '2');
+                circle.setAttribute('fill', '#1a1a2e');
+                g.appendChild(circle);
+
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', node.x);
+                text.setAttribute('y', node.y);
+                text.classList.add('nb-struct-value');
+                text.style.fill = '#fff';
+                text.setAttribute('font-weight', '700');
+                text.textContent = node.value;
+                g.appendChild(text);
+                svg.appendChild(g);
+            }
+            // NULL terminator
+            const tail = struct.nodes.find(n => !n.nextId);
+            if (tail) {
+                const tailColor = tail.color || '#22c55e';
+                const nx = tail.x + 60;
+                const ny = tail.y;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', tail.x + 20);
+                line.setAttribute('y1', tail.y);
+                line.setAttribute('x2', nx - 8);
+                line.setAttribute('y2', ny);
+                line.setAttribute('stroke', tailColor);
+                line.setAttribute('stroke-width', '2');
+                line.classList.add('nb-struct-edge');
+                svg.appendChild(line);
+
+                const nullText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                nullText.setAttribute('x', nx);
+                nullText.setAttribute('y', ny);
+                nullText.classList.add('nb-struct-value');
+                nullText.setAttribute('fill', '#525252');
+                nullText.setAttribute('font-size', '11');
+                nullText.textContent = 'null';
+                svg.appendChild(nullText);
+            }
+        }
+    }
+
+    // Re-attach events to rendered nodes
+    svg.querySelectorAll('.nb-struct-node').forEach(g => {
+        g.addEventListener('mousedown', onStructNodeMouseDown);
+        g.addEventListener('touchstart', onStructNodeTouchStart, { passive: false });
+    });
+}
+
+// ---- Interaction: click, drag, double-click ----
+function getSvgPoint(e) {
+    const svg = document.getElementById('nbStructuresSvg');
+    const body = document.querySelector('.notebook-body');
+    if (!svg || !body) return { x: 0, y: 0 };
+    const rect = svg.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const vb = svg.viewBox.baseVal;
+    const scaleX = vb.width / rect.width;
+    const scaleY = vb.height / rect.height;
+    return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+    };
+}
+
+function onStructNodeMouseDown(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    const g = e.currentTarget;
+    const structId = g.getAttribute('data-struct-id');
+    const nodeId = g.getAttribute('data-node-id');
+    const pt = getSvgPoint(e);
+    const struct = notebookStructures.find(s => s.id === structId);
+    if (!struct) return;
+    const node = struct.nodes.find(n => n.id === nodeId);
+    if (!node) return;
+
+    // Check for double-click (edit value)
+    if (checkStructDoubleClick(structId, nodeId)) return;
+
+    // Determine if we're already in whole-structure mode for this struct
+    const wasWholeStruct = selectedStructNode &&
+        selectedStructNode.structId === structId &&
+        selectedStructNode.wholeStructure;
+
+    // If whole-structure mode is active for THIS structure, keep it; otherwise select single node
+    if (wasWholeStruct) {
+        selectedStructNode = { structId, nodeId, wholeStructure: true };
+    } else {
+        selectedStructNode = { structId, nodeId, wholeStructure: false };
+        // Visually mark only this node selected without full re-render
+        document.querySelectorAll('.nb-struct-node.selected').forEach(el => el.classList.remove('selected'));
+        g.classList.add('selected');
+    }
+    showNodeActions(structId, nodeId);
+
+    // Start drag — move whole structure if wholeStructure mode, otherwise just this node
+    const moveAll = selectedStructNode.wholeStructure;
+    structDragging = {
+        structId, nodeId,
+        offsetX: pt.x - node.x,
+        offsetY: pt.y - node.y,
+        startX: pt.x,
+        startY: pt.y,
+        moved: false,
+        moveAll: moveAll
+    };
+
+    const onMove = (ev) => {
+        if (!structDragging) return;
+        const p = getSvgPoint(ev);
+        const dx = p.x - structDragging.startX;
+        const dy = p.y - structDragging.startY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) structDragging.moved = true;
+
+        const s = notebookStructures.find(x => x.id === structDragging.structId);
+        if (!s) return;
+        const n = s.nodes.find(x => x.id === structDragging.nodeId);
+        if (!n) return;
+
+        const moveX = p.x - structDragging.offsetX - n.x;
+        const moveY = p.y - structDragging.offsetY - n.y;
+
+        if (structDragging.moveAll) {
+            // Move ALL nodes in the structure together
+            for (const sNode of s.nodes) {
+                sNode.x += moveX;
+                sNode.y += moveY;
+            }
+        } else {
+            // Move only the dragged node
+            n.x += moveX;
+            n.y += moveY;
+        }
+
+        renderStructures();
+        showNodeActions(structDragging.structId, structDragging.nodeId);
+    };
+
+    const onUp = () => {
+        if (structDragging && structDragging.moved) {
+            scheduleNotebookSave();
+        }
+        structDragging = null;
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        // Now do a full render to ensure selection styling is correct
+        renderStructures();
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+}
+
+function onStructNodeTouchStart(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const g = e.currentTarget;
+    const structId = g.getAttribute('data-struct-id');
+    const nodeId = g.getAttribute('data-node-id');
+    const pt = getSvgPoint(e);
+    const struct = notebookStructures.find(s => s.id === structId);
+    if (!struct) return;
+    const node = struct.nodes.find(n => n.id === nodeId);
+    if (!node) return;
+
+    // Check for double-tap (edit value)
+    if (checkStructDoubleClick(structId, nodeId)) return;
+
+    // Determine if we're already in whole-structure mode for this struct
+    const wasWholeStruct = selectedStructNode &&
+        selectedStructNode.structId === structId &&
+        selectedStructNode.wholeStructure;
+
+    if (wasWholeStruct) {
+        selectedStructNode = { structId, nodeId, wholeStructure: true };
+    } else {
+        selectedStructNode = { structId, nodeId, wholeStructure: false };
+        document.querySelectorAll('.nb-struct-node.selected').forEach(el => el.classList.remove('selected'));
+        g.classList.add('selected');
+    }
+    showNodeActions(structId, nodeId);
+
+    const moveAll = selectedStructNode.wholeStructure;
+    structDragging = {
+        structId, nodeId,
+        offsetX: pt.x - node.x,
+        offsetY: pt.y - node.y,
+        startX: pt.x,
+        startY: pt.y,
+        moved: false,
+        moveAll: moveAll
+    };
+
+    const onMove = (ev) => {
+        ev.preventDefault();
+        if (!structDragging) return;
+        const p = getSvgPoint(ev);
+        const dx = p.x - structDragging.startX;
+        const dy = p.y - structDragging.startY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) structDragging.moved = true;
+
+        const s = notebookStructures.find(x => x.id === structDragging.structId);
+        if (!s) return;
+        const n = s.nodes.find(x => x.id === structDragging.nodeId);
+        if (!n) return;
+
+        const moveX = p.x - structDragging.offsetX - n.x;
+        const moveY = p.y - structDragging.offsetY - n.y;
+
+        if (structDragging.moveAll) {
+            for (const sNode of s.nodes) {
+                sNode.x += moveX;
+                sNode.y += moveY;
+            }
+        } else {
+            n.x += moveX;
+            n.y += moveY;
+        }
+        renderStructures();
+        showNodeActions(structDragging.structId, structDragging.nodeId);
+    };
+
+    const onEnd = () => {
+        if (structDragging && structDragging.moved) {
+            scheduleNotebookSave();
+        }
+        structDragging = null;
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+        document.removeEventListener('touchcancel', onEnd);
+        renderStructures();
+    };
+
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onEnd);
+    document.addEventListener('touchcancel', onEnd);
+}
+
+// ---- Double-click detection (manual, since SVG re-renders kill native dblclick) ----
+let lastStructClickNodeId = null;
+let lastStructClickTime = 0;
+
+function checkStructDoubleClick(structId, nodeId) {
+    const now = Date.now();
+    if (lastStructClickNodeId === nodeId && (now - lastStructClickTime) < 400) {
+        lastStructClickNodeId = null;
+        lastStructClickTime = 0;
+        openStructValueEditor(structId, nodeId);
+        return true;
+    }
+    lastStructClickNodeId = nodeId;
+    lastStructClickTime = now;
+    return false;
+}
+
+function openStructValueEditor(structId, nodeId) {
+    const struct = notebookStructures.find(s => s.id === structId);
+    if (!struct) return;
+    const node = struct.nodes.find(n => n.id === nodeId);
+    if (!node) return;
+
+    hideNodeActions();
+
+    const svg = document.getElementById('nbStructuresSvg');
+    const body = document.querySelector('.notebook-body');
+    if (!svg || !body) return;
+    const svgRect = svg.getBoundingClientRect();
+    const bodyRect = body.getBoundingClientRect();
+    const vb = svg.viewBox.baseVal;
+    const scaleX = svgRect.width / vb.width;
+    const scaleY = svgRect.height / vb.height;
+    const screenX = node.x * scaleX + svgRect.left - bodyRect.left;
+    const screenY = node.y * scaleY + svgRect.top - bodyRect.top;
+
+    const input = document.createElement('input');
+    input.className = 'nb-struct-edit-input';
+    input.type = 'text';
+    input.value = node.value;
+    input.style.left = (screenX - 24) + 'px';
+    input.style.top = (screenY - 14) + 'px';
+    input.style.width = '48px';
+    input.style.height = '28px';
+    body.appendChild(input);
+    input.focus();
+    input.select();
+
+    const commit = () => {
+        const val = input.value.trim() || '?';
+        node.value = val;
+        if (input.parentNode) input.remove();
+        renderStructures();
+        selectStructNode(structId, nodeId);
+        scheduleNotebookSave();
+    };
+
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
+        if (ev.key === 'Escape') { input.value = node.value; input.blur(); }
+    });
+}
+
+// ---- Array size prompt ----
+function showArrayPrompt(cx, cy) {
+    const body = document.querySelector('.notebook-body');
+    if (!body) return;
+
+    // Remove existing prompt if any
+    const existing = body.querySelector('.nb-array-prompt');
+    if (existing) existing.remove();
+
+    const prompt = document.createElement('div');
+    prompt.className = 'nb-array-prompt';
+    prompt.innerHTML = `
+        <label>Array size (1–20)</label>
+        <input type="number" min="1" max="20" value="5" class="nb-ap-input" />
+        <div class="nb-array-prompt-btns">
+            <button class="nb-ap-ok" type="button">Insert</button>
+            <button class="nb-ap-cancel" type="button">Cancel</button>
+        </div>
+    `;
+    body.appendChild(prompt);
+
+    const inp = prompt.querySelector('.nb-ap-input');
+    inp.focus();
+    inp.select();
+
+    const close = () => { if (prompt.parentNode) prompt.remove(); structPlacementMode = null; updateStructPlacementCursor(); };
+
+    prompt.querySelector('.nb-ap-cancel').addEventListener('click', close);
+    prompt.querySelector('.nb-ap-ok').addEventListener('click', () => {
+        const size = Math.max(1, Math.min(20, parseInt(inp.value) || 5));
+        close();
+        insertArray(cx, cy, size);
+    });
+    inp.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') { ev.preventDefault(); prompt.querySelector('.nb-ap-ok').click(); }
+        if (ev.key === 'Escape') { close(); }
+    });
+}
+
+// ---- Placement mode ----
+function enterStructPlacementMode(type) {
+    // Turn off draw/eraser modes
+    if (notebookDrawing) toggleDrawMode();
+    if (notebookErasing) toggleEraserMode();
+    // Deselect any selected node
+    deselectStructNode();
+
+    structPlacementMode = type;
+    updateStructPlacementCursor();
+}
+
+function updateStructPlacementCursor() {
+    const svg = document.getElementById('nbStructuresSvg');
+    if (!svg) return;
+    if (structPlacementMode) {
+        svg.classList.add('struct-placing');
+    } else {
+        svg.classList.remove('struct-placing');
+    }
+}
+
+function onSvgClick(e) {
+    // If in placement mode, place the structure
+    if (structPlacementMode) {
+        const pt = getSvgPoint(e);
+        if (structPlacementMode === 'tree-node') {
+            insertTreeNode(pt.x, pt.y);
+        } else if (structPlacementMode === 'array') {
+            showArrayPrompt(pt.x, pt.y);
+            return; // don't exit placement mode yet, prompt handles it
+        } else if (structPlacementMode === 'linked-list') {
+            insertLinkedList(pt.x, pt.y);
+        }
+        structPlacementMode = null;
+        updateStructPlacementCursor();
+        return;
+    }
+
+    // If click was on empty space, deselect
+    if (e.target === e.currentTarget || e.target.tagName === 'svg') {
+        deselectStructNode();
+    }
+}
+
+// ---- Persistence ----
+function getStructuresData() {
+    return JSON.stringify(notebookStructures);
+}
+
+function loadStructuresData(data) {
+    try {
+        notebookStructures = data ? JSON.parse(data) : [];
+        // Rebuild ID counters to avoid collisions
+        for (const s of notebookStructures) {
+            const sNum = parseInt(s.id.replace('s', ''));
+            if (sNum >= structIdCounter) structIdCounter = sNum;
+            for (const n of s.nodes) {
+                const nNum = parseInt(n.id.replace('n', ''));
+                if (nNum >= structNodeIdCounter) structNodeIdCounter = nNum;
+            }
+        }
+    } catch {
+        notebookStructures = [];
+    }
+    renderStructures();
+}
+
+// ---- Toolbar state updater (Word-like active states) ----
+function updateNotebookToolbar() {
+    // Toggle commands: bold, italic, underline, strikeThrough
+    const toggleCmds = ['bold', 'italic', 'underline', 'strikeThrough'];
+    toggleCmds.forEach(cmd => {
+        const btn = document.querySelector(`.nb-tool-btn[data-cmd="${cmd}"]`);
+        if (!btn) return;
+        try {
+            if (document.queryCommandState(cmd)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        } catch (e) {
+            btn.classList.remove('active');
+        }
+    });
+
+    // List commands
+    ['insertUnorderedList', 'insertOrderedList'].forEach(cmd => {
+        const btn = document.querySelector(`.nb-tool-btn[data-cmd="${cmd}"]`);
+        if (!btn) return;
+        try {
+            if (document.queryCommandState(cmd)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        } catch (e) {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Heading toggle
+    const headingBtn = document.querySelector('.nb-tool-btn[data-cmd="formatBlock"]');
+    if (headingBtn) {
+        try {
+            const block = document.queryCommandValue('formatBlock');
+            if (block && block.toLowerCase() === 'h2') {
+                headingBtn.classList.add('active');
+            } else {
+                headingBtn.classList.remove('active');
+            }
+        } catch (e) {
+            headingBtn.classList.remove('active');
+        }
+    }
 }
 
 // ---- Setup notebook ----
@@ -13885,14 +15051,83 @@ function setupNotebook() {
         });
     }
 
-    // Toolbar: text formatting
-    document.querySelectorAll('.nb-tool-btn[data-cmd]').forEach(btn => {
-        btn.addEventListener('click', () => {
+    // Toolbar: text formatting (Word-like toggle behavior)
+    const formatBtns = document.querySelectorAll('.nb-tool-btn[data-cmd]');
+    formatBtns.forEach(btn => {
+        btn.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // prevent stealing focus/selection from editor
+        });
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
             const cmd = btn.getAttribute('data-cmd');
             const val = btn.getAttribute('data-value') || null;
-            document.execCommand(cmd, false, val);
-            document.getElementById('notebookEditor')?.focus();
+            const editorEl = document.getElementById('notebookEditor');
+            if (!editorEl) return;
+
+            // For heading toggle: if already H2, revert to paragraph
+            if (cmd === 'formatBlock') {
+                const block = document.queryCommandValue('formatBlock');
+                if (block.toLowerCase() === 'h2') {
+                    document.execCommand('formatBlock', false, 'P');
+                } else {
+                    document.execCommand('formatBlock', false, val);
+                }
+            } else if (cmd === 'foreColor') {
+                // Handled by dedicated color input, skip
+                return;
+            } else {
+                document.execCommand(cmd, false, val);
+            }
+            editorEl.focus();
+            updateNotebookToolbar();
+            scheduleNotebookSave();
         });
+    });
+
+    // ---- Whiteboard: pen color swatches ----
+    let nbPenColor = '#e2e8f0';
+    const penColorContainer = document.getElementById('nbPenColors');
+    if (penColorContainer) {
+        penColorContainer.querySelectorAll('.nb-pen-swatch').forEach(swatch => {
+            swatch.addEventListener('click', () => {
+                nbPenColor = swatch.getAttribute('data-color');
+                penColorContainer.querySelectorAll('.nb-pen-swatch').forEach(s => s.classList.remove('selected'));
+                swatch.classList.add('selected');
+            });
+        });
+    }
+
+    // ---- Whiteboard: stroke size buttons ----
+    let nbPenSize = 4;
+    const strokeContainer = document.getElementById('nbStrokeSizes');
+    if (strokeContainer) {
+        strokeContainer.querySelectorAll('.nb-stroke-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                nbPenSize = parseInt(btn.getAttribute('data-size'), 10);
+                strokeContainer.querySelectorAll('.nb-stroke-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+            });
+        });
+    }
+
+    // ---- Whiteboard: undo last stroke ----
+    const undoBtn = document.getElementById('nbUndoStroke');
+    if (undoBtn) {
+        undoBtn.addEventListener('click', () => {
+            if (notebookPaths.length > 0) {
+                notebookPaths.pop();
+                redrawCanvas();
+                scheduleNotebookSave();
+            }
+        });
+    }
+
+    // Update toolbar state on selection change
+    document.addEventListener('selectionchange', () => {
+        const editorEl = document.getElementById('notebookEditor');
+        if (editorEl && editorEl.contains(document.getSelection()?.anchorNode)) {
+            updateNotebookToolbar();
+        }
     });
 
     // Toolbar: draw toggle
@@ -13907,11 +15142,146 @@ function setupNotebook() {
     const clearBtn = document.getElementById('nbClearCanvas');
     if (clearBtn) clearBtn.addEventListener('click', clearNotebookCanvas);
 
-    // Editor: auto-save on input
+    // ---- Structures: dropdown menu ----
+    const structBtn = document.getElementById('nbStructuresBtn');
+    const structMenu = document.getElementById('nbStructuresMenu');
+    if (structBtn && structMenu) {
+        structBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = structMenu.classList.contains('open');
+            if (!isOpen) {
+                // Show offscreen first to measure, then position
+                structMenu.style.visibility = 'hidden';
+                structMenu.classList.add('open');
+                const rect = structBtn.getBoundingClientRect();
+                const menuW = structMenu.offsetWidth;
+                let left = rect.left + rect.width / 2 - menuW / 2;
+                // Clamp to viewport
+                if (left < 4) left = 4;
+                if (left + menuW > window.innerWidth - 4) left = window.innerWidth - 4 - menuW;
+                structMenu.style.top = (rect.bottom + 6) + 'px';
+                structMenu.style.left = left + 'px';
+                structMenu.style.visibility = '';
+                structBtn.classList.add('active');
+            } else {
+                structMenu.classList.remove('open');
+                structBtn.classList.remove('active');
+            }
+        });
+        // Close menu on outside click
+        document.addEventListener('click', () => {
+            structMenu.classList.remove('open');
+            structBtn.classList.remove('active');
+        });
+        structMenu.addEventListener('click', (e) => e.stopPropagation());
+
+        // Menu options
+        structMenu.querySelectorAll('.nb-struct-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                const type = opt.getAttribute('data-struct');
+                structMenu.classList.remove('open');
+                structBtn.classList.remove('active');
+                enterStructPlacementMode(type);
+            });
+        });
+    }
+
+    // ---- Structures: SVG events ----
+    const structSvg = document.getElementById('nbStructuresSvg');
+    if (structSvg) {
+        structSvg.addEventListener('click', onSvgClick);
+    }
+
+    // Click on notebook body (not on a struct node) → deselect
+    const notebookBody = document.querySelector('.notebook-body');
+    if (notebookBody) {
+        notebookBody.addEventListener('mousedown', (e) => {
+            // If click is not on a struct node or action bar, deselect
+            if (!e.target.closest('.nb-struct-node') && !e.target.closest('.nb-node-actions') && !e.target.closest('.nb-struct-edit-input') && !e.target.closest('.nb-array-prompt')) {
+                if (selectedStructNode) {
+                    deselectStructNode();
+                }
+            }
+        });
+    }
+
+    // ---- Structures: action bar buttons ----
+    const moveAllBtn = document.getElementById('nbMoveAll');
+    if (moveAllBtn) {
+        moveAllBtn.addEventListener('click', () => {
+            if (!selectedStructNode) return;
+            const sid = selectedStructNode.structId;
+            const nid = selectedStructNode.nodeId;
+            const isAlreadyWhole = selectedStructNode.wholeStructure;
+            // Toggle whole-structure mode
+            selectedStructNode = { structId: sid, nodeId: nid, wholeStructure: !isAlreadyWhole };
+            moveAllBtn.classList.toggle('active', !isAlreadyWhole);
+            renderStructures();
+            showNodeActions(sid, nid);
+        });
+    }
+    const addLeftBtn = document.getElementById('nbAddLeftChild');
+    if (addLeftBtn) {
+        addLeftBtn.addEventListener('click', () => {
+            if (selectedStructNode) addTreeChild(selectedStructNode.structId, selectedStructNode.nodeId, 'left');
+        });
+    }
+    const addRightBtn = document.getElementById('nbAddRightChild');
+    if (addRightBtn) {
+        addRightBtn.addEventListener('click', () => {
+            if (selectedStructNode) addTreeChild(selectedStructNode.structId, selectedStructNode.nodeId, 'right');
+        });
+    }
+    const addLLBtn = document.getElementById('nbAddLLNode');
+    if (addLLBtn) {
+        addLLBtn.addEventListener('click', () => {
+            if (selectedStructNode) addLLNodeAfter(selectedStructNode.structId, selectedStructNode.nodeId);
+        });
+    }
+    const delStructBtn = document.getElementById('nbDeleteStruct');
+    if (delStructBtn) {
+        delStructBtn.addEventListener('click', () => {
+            if (selectedStructNode) deleteStructNode(selectedStructNode.structId, selectedStructNode.nodeId);
+        });
+    }
+
+    // Delete key to remove selected node
+    document.addEventListener('keydown', (e) => {
+        if ((e.key === 'Delete' || e.key === 'Backspace') && selectedStructNode) {
+            // Don't intercept if typing in editor or input
+            const tag = document.activeElement?.tagName?.toLowerCase();
+            if (tag === 'input' || tag === 'textarea') return;
+            if (document.activeElement?.contentEditable === 'true') return;
+            e.preventDefault();
+            deleteStructNode(selectedStructNode.structId, selectedStructNode.nodeId);
+        }
+    });
+
+    // Editor: auto-save on input + keyboard shortcuts
     const editor = document.getElementById('notebookEditor');
     if (editor) {
         editor.addEventListener('input', () => {
             scheduleNotebookSave();
+        });
+
+        // Keyboard shortcuts for formatting (update toolbar state after browser applies format)
+        editor.addEventListener('keydown', (e) => {
+            const isMod = e.metaKey || e.ctrlKey;
+            if (isMod && !e.shiftKey) {
+                let handled = false;
+                switch (e.key.toLowerCase()) {
+                    case 'b': // Bold
+                    case 'i': // Italic
+                    case 'u': // Underline
+                        // Let the browser handle the default execCommand, just update toolbar after
+                        handled = true;
+                        break;
+                }
+                if (handled) {
+                    // Defer so the browser applies the format first
+                    setTimeout(updateNotebookToolbar, 0);
+                }
+            }
         });
     }
 
@@ -13932,13 +15302,34 @@ function setupNotebook() {
     window.addEventListener('resize', () => {
         if (document.getElementById('notebookPanel')?.classList.contains('open')) {
             initNotebookCanvas();
+            renderStructures();
         }
     });
 
-    // Escape to close
+    // Escape to close / cancel placement, ⌘Z to undo canvas stroke
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && document.getElementById('notebookPanel')?.classList.contains('open')) {
+            // Cancel placement mode first
+            if (structPlacementMode) {
+                structPlacementMode = null;
+                updateStructPlacementCursor();
+                return;
+            }
+            // Deselect struct node first
+            if (selectedStructNode) {
+                deselectStructNode();
+                return;
+            }
             closeNotebook();
+        }
+        // ⌘Z / Ctrl+Z when drawing mode is active → undo last stroke
+        if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey && (notebookDrawing || notebookErasing)) {
+            e.preventDefault();
+            if (notebookPaths.length > 0) {
+                notebookPaths.pop();
+                redrawCanvas();
+                scheduleNotebookSave();
+            }
         }
     });
 

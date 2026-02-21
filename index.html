@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AlgoFlowz — Algorithm Visualizer for Coding Interviews</title>
+    <title>AlgoFlowz — Watch Every Algorithm Unfold in Real Time</title>
 
     <!-- SEO -->
-    <meta name="description" content="Step through the top 150 coding interview problems frame by frame. Watch DFS, BFS, recursion, two pointers, sliding window, and more unfold in real time on trees, arrays, and stacks.">
+    <meta name="description" content="Pick a problem, hit play, and actually see what the code is doing. 150+ coding interview problems broken down step by step on real trees, arrays, graphs, and more.">
 
     <!-- Open Graph (LinkedIn, Discord, iMessage, etc.) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://algoflowz.com">
-    <meta property="og:title" content="AlgoFlowz — See the Algorithm. Understand the Logic.">
-    <meta property="og:description" content="A curated, step-by-step algorithm visualizer for the top 150 coding interview problems — trees, arrays, DFS, BFS, stacks, and more.">
+    <meta property="og:title" content="AlgoFlowz — Watch Every Algorithm Unfold in Real Time">
+    <meta property="og:description" content="Pick a problem, hit play, and actually see what the code is doing. 150+ coding interview problems broken down step by step on real data structures.">
     <meta property="og:image" content="https://algoflowz.com/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="AlgoFlowz — Algorithm Visualizer for Coding Interviews">
-    <meta name="twitter:description" content="Step through DFS, BFS, recursion, and more on real data structures. The tool I wish I had when learning algorithms.">
+    <meta name="twitter:title" content="AlgoFlowz — Watch Every Algorithm Unfold in Real Time">
+    <meta name="twitter:description" content="The algorithm visualizer I wish I had when learning. Step through 150+ coding interview problems on real data structures.">
     <meta name="twitter:image" content="https://algoflowz.com/og-image.png">
 
     <!-- Theme color (mobile browser bar) -->
@@ -108,10 +108,10 @@
             <section class="landing-hero">
                 <div class="landing-hero-content">
                     <h1 class="landing-title">Watch every algorithm<br><span class="landing-accent">unfold in real time.</span></h1>
-                    <p class="landing-subtitle">Step through 150+ of the most common coding interview problems frame by frame. Trees, arrays, graphs, two pointers, sliding window, BFS, DFS, stacks — every major pattern, visualized.</p>
+                    <p class="landing-subtitle">Pick a problem, hit play, and actually see what the code is doing — on real trees, arrays, and graphs. 150+ problems from the most common interview patterns, broken down step by step so nothing feels like magic.</p>
                     <div class="landing-search-wrapper" id="landingSearchWrapper">
                         <i class="fas fa-search landing-search-icon"></i>
-                        <input type="text" id="landingSearchInput" class="landing-search-input" placeholder="Search by name or LeetCode problem..." autocomplete="off" />
+                        <input type="text" id="landingSearchInput" class="landing-search-input" placeholder="Search by name or LeetCode number..." autocomplete="off" />
                         <div class="landing-search-dropdown" id="landingSearchDropdown"></div>
                     </div>
                     <div class="landing-hero-actions">
@@ -127,8 +127,8 @@
             <section class="landing-section landing-section-alt">
                 <div class="landing-feature">
                     <div class="landing-feature-text reveal-on-scroll">
-                        <h2 class="landing-section-title">See how algorithms move, step by step</h2>
-                        <p>Follow every node visit, every comparison, every pointer shift — on live, interactive data structures that update in real time as the algorithm executes.</p>
+                        <h2 class="landing-section-title">See how algorithms actually move</h2>
+                        <p>No more staring at code hoping it clicks. Watch every node visit, every comparison, every pointer shift play out on real data structures — right in front of you.</p>
                     </div>
                     <div class="landing-feature-visual reveal-on-scroll">
                         <svg class="feature-svg" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -167,7 +167,7 @@
                 <div class="landing-feature landing-feature-reverse">
                     <div class="landing-feature-text reveal-on-scroll">
                         <h2 class="landing-section-title">Follow the code, line by line</h2>
-                        <p>The solution highlights the exact line being executed at each step. Finally connect what you're reading to what's actually happening on the data structure.</p>
+                        <p>Each step highlights the exact line running. You see the code, you see what it does to the data structure — and suddenly the solution makes sense.</p>
                     </div>
                     <div class="landing-feature-visual reveal-on-scroll">
                         <div class="feature-code-block">
@@ -186,7 +186,7 @@
                 <div class="landing-feature">
                     <div class="landing-feature-text reveal-on-scroll">
                         <h2 class="landing-section-title">Watch the call stack push &amp; pop</h2>
-                        <p>See exactly how recursion works — the stack grows as calls go deeper, then unwinds as return values propagate back. No more guessing.</p>
+                        <p>Recursion finally makes sense when you can see it. The stack grows as calls go deeper, then unwinds as values come back up. No more hand-tracing on paper.</p>
                     </div>
                     <div class="landing-feature-visual reveal-on-scroll">
                         <div class="feature-stack">
@@ -213,39 +213,151 @@
                 </div>
             </section>
 
-            <!-- Workflow Section -->
+            <!-- Feature 4: Whiteboard & Notes -->
             <section class="landing-section">
+                <div class="landing-feature landing-feature-reverse">
+                    <div class="landing-feature-text reveal-on-scroll">
+                        <h2 class="landing-section-title">Whiteboard &amp; notes, built in</h2>
+                        <p>Drop in trees, linked lists, arrays — or just sketch your approach freehand. Drag nodes around, edit values, jot notes next to your diagrams. Everything saves on its own.</p>
+                    </div>
+                    <div class="landing-feature-visual reveal-on-scroll">
+                        <div class="feature-notes-mock">
+                            <!-- Header -->
+                            <div class="fnote-header">
+                                <div class="fnote-header-left">
+                                    <div class="fnote-back-btn">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                                    </div>
+                                    <span class="fnote-icon">📄</span>
+                                    <span class="fnote-title">Remove Linked List Elements</span>
+                                </div>
+                                <div class="fnote-header-right">
+                                    <span class="fnote-saved">✓ Saved</span>
+                                </div>
+                            </div>
+                            <!-- Toolbar -->
+                            <div class="fnote-toolbar">
+                                <div class="fnote-toolbar-group">
+                                    <button class="fnote-tool" type="button"><b>B</b></button>
+                                    <button class="fnote-tool" type="button"><i>I</i></button>
+                                    <button class="fnote-tool" type="button"><u>U</u></button>
+                                    <button class="fnote-tool" type="button"><s>S</s></button>
+                                </div>
+                                <div class="fnote-tool-divider"></div>
+                                <div class="fnote-toolbar-group">
+                                    <button class="fnote-tool fnote-tool-active" type="button"><i class="fas fa-pen"></i></button>
+                                    <button class="fnote-tool" type="button"><i class="fas fa-eraser"></i></button>
+                                    <button class="fnote-tool" type="button"><i class="fas fa-undo"></i></button>
+                                </div>
+                                <div class="fnote-tool-divider"></div>
+                                <div class="fnote-toolbar-group">
+                                    <button class="fnote-tool" type="button"><i class="fas fa-shapes"></i></button>
+                                </div>
+                                <div class="fnote-tool-divider"></div>
+                                <div class="fnote-toolbar-group">
+                                    <div class="fnote-color-dot fnote-color-selected" style="background:#e2e8f0;"></div>
+                                    <div class="fnote-color-dot" style="background:#3b82f6;"></div>
+                                    <div class="fnote-color-dot" style="background:#ef4444;"></div>
+                                    <div class="fnote-color-dot" style="background:#22c55e;"></div>
+                                </div>
+                                <div class="fnote-tool-divider"></div>
+                                <div class="fnote-toolbar-group">
+                                    <span class="fnote-stroke-dot" style="width:4px;height:4px;"></span>
+                                    <span class="fnote-stroke-dot fnote-stroke-active" style="width:7px;height:7px;"></span>
+                                    <span class="fnote-stroke-dot" style="width:11px;height:11px;"></span>
+                                </div>
+                            </div>
+                            <!-- Whiteboard body -->
+                            <div class="fnote-editor-body fnote-wb-body">
+                                <!-- SVG whiteboard drawing — hand-drawn linked list -->
+                                <svg class="fnote-wb-canvas" viewBox="0 0 380 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+                                    <!-- Hand-drawn arrow: 1 → 2 -->
+                                    <path d="M84 79 C92 78 104 77 118 79" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                                    <path d="M115 74 L122 79 L115 84" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                    <!-- Hand-drawn arrow: 2 → 6 -->
+                                    <path d="M174 81 C183 79 196 78 209 80" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                                    <path d="M206 75 L213 80 L206 85" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                    <!-- Hand-drawn arrow: 6 → 3 -->
+                                    <path d="M264 80 C273 78 287 79 299 81" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                                    <path d="M296 76 L303 81 L296 86" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                    <!-- Hand-drawn arrow: 3 → null -->
+                                    <path d="M339 80 C346 79 353 80 360 80" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                                    <text x="374" y="84" fill="#525252" font-size="10" font-family="Inter,sans-serif" font-style="italic">null</text>
+
+                                    <!-- Hand-drawn circle: node 1 -->
+                                    <path d="M65 62 C78 60 84 67 84 80 C84 92 77 98 65 98 C53 98 46 92 46 80 C46 67 53 61 65 62 Z" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                                    <text x="65" y="84" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="600" font-family="Inter,sans-serif">1</text>
+
+                                    <!-- Hand-drawn circle: node 2 -->
+                                    <path d="M155 61 C169 60 176 68 175 80 C175 93 168 99 155 99 C142 99 135 92 136 80 C136 67 143 61 155 61 Z" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                                    <text x="155" y="84" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="600" font-family="Inter,sans-serif">2</text>
+
+                                    <!-- Hand-drawn circle: node 6 (red — to remove) -->
+                                    <path d="M245 61 C259 59 267 67 266 80 C266 93 258 100 245 100 C232 100 224 93 225 80 C225 67 233 61 245 61 Z" stroke="#ef4444" stroke-width="2" stroke-linecap="round" fill="none"/>
+                                    <text x="245" y="84" text-anchor="middle" fill="#ef4444" font-size="15" font-weight="600" font-family="Inter,sans-serif">6</text>
+
+                                    <!-- Hand-drawn circle: node 3 -->
+                                    <path d="M320 62 C334 60 341 68 340 80 C340 93 333 99 320 99 C307 99 300 92 301 80 C301 67 308 61 320 62 Z" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                                    <text x="320" y="84" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="600" font-family="Inter,sans-serif">3</text>
+
+                                    <!-- Freehand scribble arrow curving down from node 6 -->
+                                    <path d="M238 102 C232 114 222 128 210 140" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" fill="none" stroke-dasharray="5 4"/>
+                                    <path d="M213 134 L210 141 L217 138" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+                                    <!-- Handwritten annotation -->
+                                    <text x="118" y="158" fill="#ef4444" font-size="10.5" font-weight="500" font-family="Inter,sans-serif" font-style="italic">remove this node →</text>
+
+                                    <!-- Handwritten "head" label -->
+                                    <text x="65" y="48" text-anchor="middle" fill="#525252" font-size="9.5" font-family="Inter,sans-serif" font-style="italic">head</text>
+                                </svg>
+                                <!-- Notes below the drawing -->
+                                <div class="fnote-wb-notes">
+                                    <p class="fnote-text">Relink node 2 → node 3, then <b>return head</b></p>
+                                </div>
+                            </div>
+                            <!-- Footer -->
+                            <div class="fnote-footer">
+                                <span>Problem 1 of 49</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Workflow Section -->
+            <section class="landing-section landing-section-alt">
                 <div class="landing-section-inner">
-                    <h2 class="landing-section-title" style="text-align: center;">Get the most out of it</h2>
-                    <p class="landing-section-desc" style="text-align: center; max-width: 520px; margin: 0 auto 56px;">The loop that actually makes algorithms stick.</p>
+                    <h2 class="landing-section-title" style="text-align: center;">How to get the most out of it</h2>
+                    <p class="landing-section-desc" style="text-align: center; max-width: 520px; margin: 0 auto 56px;">The study loop that actually makes algorithms stick.</p>
                     <div class="landing-timeline">
                         <div class="timeline-track"></div>
                         <div class="timeline-item reveal-on-scroll">
                             <div class="timeline-dot timeline-dot-blue"></div>
                             <div class="timeline-content">
-                                <h3>1. Attempt the problem</h3>
-                                <p>Spend 20–30 minutes attempting the problem. Even if you don't solve it, the struggle primes your brain for the solution.</p>
+                                <h3>1. Try the problem first</h3>
+                                <p>Give it a real shot — 20 to 30 minutes. Even if you don't crack it, the struggle is what makes the solution stick later.</p>
                             </div>
                         </div>
                         <div class="timeline-item reveal-on-scroll">
                             <div class="timeline-dot timeline-dot-orange"></div>
                             <div class="timeline-content">
-                                <h3>2. Step through on AlgoFlowz</h3>
-                                <p>Search for the problem, pick the algorithm, and step through frame by frame. Watch every operation on real data.</p>
+                                <h3>2. Walk through it on AlgoFlowz</h3>
+                                <p>Search for the problem, pick an algorithm, and step through it frame by frame. See every operation happen on the actual data.</p>
                             </div>
                         </div>
                         <div class="timeline-item reveal-on-scroll">
                             <div class="timeline-dot timeline-dot-blue"></div>
                             <div class="timeline-content">
-                                <h3>3. Go back and implement</h3>
-                                <p>Now that you've seen it, write the solution from understanding — not memorization. This is where it clicks.</p>
+                                <h3>3. Go back and write it yourself</h3>
+                                <p>Now that you've seen how it works, implement the solution from understanding — not memorization. That's where the real learning happens.</p>
                             </div>
                         </div>
                         <div class="timeline-item reveal-on-scroll">
                             <div class="timeline-dot timeline-dot-orange"></div>
                             <div class="timeline-content">
-                                <h3>4. Recognize the pattern</h3>
-                                <p>After a few problems, you start seeing the same patterns everywhere. That's when interviews get easy.</p>
+                                <h3>4. Start seeing the patterns</h3>
+                                <p>After a handful of problems, the same patterns keep showing up. Once you spot them, new problems stop feeling impossible.</p>
                             </div>
                         </div>
                     </div>
@@ -255,8 +367,8 @@
             <!-- Bottom CTA -->
             <section class="landing-section landing-section-cta">
                 <div class="landing-section-inner" style="text-align: center;">
-                    <h2 class="landing-cta-heading">Stop reading solutions<br>you don't understand.</h2>
-                    <p class="landing-section-desc" style="margin-bottom: 32px;">150+ problems. Every major pattern. Step-by-step, frame-by-frame.</p>
+                    <h2 class="landing-cta-heading">Stop re-reading solutions<br>that don't click.</h2>
+                    <p class="landing-section-desc" style="margin-bottom: 32px;">150+ problems. Every major pattern. One step at a time.</p>
                     <button class="landing-cta-btn landing-cta-bottom" id="landingCTABottom">
                         Launch AlgoFlowz <i class="fas fa-arrow-right"></i>
                     </button>
@@ -265,13 +377,8 @@
 
             <!-- Footer -->
             <footer class="landing-footer">
-                <blockquote class="landing-footer-quote">
-                    "The best way to learn is to do; the only way to learn programming is by writing programs."
-                </blockquote>
-                <cite class="landing-footer-cite">— Dennis Ritchie, creator of C</cite>
-                <div class="landing-footer-divider"></div>
                 <div class="landing-footer-row">
-                    <span class="landing-footer-text">Built by Fernando</span>
+                    <span class="landing-footer-text">© 2026 AlgoFlowz</span>
                     <span class="landing-footer-sep">·</span>
                     <a href="https://www.linkedin.com/in/fernando-erazo00" target="_blank" rel="noopener noreferrer" class="landing-footer-link">
                         <i class="fab fa-linkedin"></i> LinkedIn
@@ -841,18 +948,44 @@
                         <button class="nb-tool-btn" data-cmd="insertOrderedList" title="Numbered list"><i class="fas fa-list-ol"></i></button>
                     </div>
                     <div class="nb-tool-divider"></div>
-                    <div class="notebook-toolbar-group">
-                        <button class="nb-tool-btn nb-draw-toggle" id="nbDrawToggle" title="Draw mode">
+                    <div class="notebook-toolbar-group nb-draw-tools">
+                        <button class="nb-tool-btn nb-draw-toggle" id="nbDrawToggle" title="Draw">
                             <i class="fas fa-pen"></i>
                         </button>
-                        <input type="color" id="nbPenColor" class="nb-color-picker" value="#3b82f6" title="Pen color">
                         <button class="nb-tool-btn" id="nbEraserBtn" title="Eraser"><i class="fas fa-eraser"></i></button>
-                        <select id="nbPenSize" class="nb-pen-size" title="Pen size">
-                            <option value="2">Thin</option>
-                            <option value="4" selected>Medium</option>
-                            <option value="8">Thick</option>
-                        </select>
-                        <button class="nb-tool-btn nb-danger" id="nbClearCanvas" title="Clear drawing"><i class="fas fa-trash-alt"></i></button>
+                        <div class="nb-tool-divider"></div>
+                        <button class="nb-tool-btn nb-undo-btn" id="nbUndoStroke" title="Undo last stroke (⌘Z)">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <div class="nb-tool-divider"></div>
+                        <div class="notebook-toolbar-group nb-pen-colors" id="nbPenColors">
+                            <button class="nb-pen-swatch selected" data-color="#e2e8f0" style="background:#e2e8f0;" title="White"></button>
+                            <button class="nb-pen-swatch" data-color="#3b82f6" style="background:#3b82f6;" title="Blue"></button>
+                            <button class="nb-pen-swatch" data-color="#ef4444" style="background:#ef4444;" title="Red"></button>
+                            <button class="nb-pen-swatch" data-color="#22c55e" style="background:#22c55e;" title="Green"></button>
+                            <button class="nb-pen-swatch" data-color="#facc15" style="background:#facc15;" title="Yellow"></button>
+                            <button class="nb-pen-swatch" data-color="#c084fc" style="background:#c084fc;" title="Purple"></button>
+                        </div>
+                        <div class="nb-tool-divider"></div>
+                        <div class="nb-stroke-sizes" id="nbStrokeSizes">
+                            <button class="nb-stroke-btn" data-size="2" title="Thin"><span class="nb-stroke-dot" style="width:4px;height:4px;"></span></button>
+                            <button class="nb-stroke-btn selected" data-size="4" title="Medium"><span class="nb-stroke-dot" style="width:7px;height:7px;"></span></button>
+                            <button class="nb-stroke-btn" data-size="8" title="Thick"><span class="nb-stroke-dot" style="width:11px;height:11px;"></span></button>
+                        </div>
+                        <div class="nb-tool-divider"></div>
+                        <!-- Structures dropdown -->
+                        <div class="nb-structures-wrap">
+                            <button class="nb-tool-btn nb-structures-trigger" id="nbStructuresBtn" title="Insert data structure">
+                                <i class="fas fa-shapes"></i>
+                            </button>
+                            <div class="nb-structures-menu" id="nbStructuresMenu">
+                                <button class="nb-struct-option" data-struct="tree-node" type="button">Tree Node</button>
+                                <button class="nb-struct-option" data-struct="array" type="button">Array</button>
+                                <button class="nb-struct-option" data-struct="linked-list" type="button">Linked List</button>
+                            </div>
+                        </div>
+                        <div class="nb-tool-divider"></div>
+                        <button class="nb-tool-btn nb-danger" id="nbClearCanvas" title="Clear whiteboard"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
 
@@ -860,6 +993,16 @@
                 <div class="notebook-body">
                     <div id="notebookEditor" class="notebook-editor" contenteditable="true" spellcheck="true" data-placeholder="Start typing your notes..."></div>
                     <canvas id="notebookCanvas" class="notebook-canvas"></canvas>
+                    <!-- SVG overlay for data structures -->
+                    <svg id="nbStructuresSvg" class="nb-structures-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+                    <!-- Selected node action bar -->
+                    <div class="nb-node-actions" id="nbNodeActions" style="display:none;">
+                        <button class="nb-na-btn" id="nbMoveAll" type="button" title="Select whole structure to move"><i class="fas fa-arrows-alt"></i></button>
+                        <button class="nb-na-btn" id="nbAddLeftChild" type="button" title="Add left child"><i class="fas fa-arrow-down"></i> L</button>
+                        <button class="nb-na-btn" id="nbAddRightChild" type="button" title="Add right child"><i class="fas fa-arrow-down"></i> R</button>
+                        <button class="nb-na-btn" id="nbAddLLNode" type="button" title="Add next node" style="display:none;"><i class="fas fa-arrow-right"></i> Next</button>
+                        <button class="nb-na-btn nb-na-danger" id="nbDeleteStruct" type="button" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                    </div>
                 </div>
 
                 <!-- Page indicator -->
@@ -926,7 +1069,7 @@
                 </div>
 
                 <div class="insight-key">
-                    <strong>Why it works:</strong> Reversing the whole array puts each chunk in the right half of the array, just in the wrong internal order. The two sub-reverses fix each chunk's internal order without moving them out of position.
+                    <strong>Why it works:</strong> Reversing the whole array puts each chunk in the right half, just in the wrong internal order. The two sub-reverses fix each chunk without moving them out of place.
                 </div>
 
                 <div class="insight-complexity">
@@ -942,66 +1085,65 @@
     <div id="insightModal12" class="insight-modal">
         <div class="insight-modal-content">
             <div class="insight-modal-header">
-                <h3>Why Greedy BFS Works</h3>
+                <h3>How the Greedy Approach Works</h3>
                 <button class="insight-modal-close" type="button" onclick="closeInsightModal('insightModal12')">✕</button>
             </div>
             <div class="insight-modal-body">
-                <p class="insight-core-idea">This isn't a sliding window. It's a <strong>BFS layer expansion</strong> disguised as a greedy algorithm.</p>
-                <p class="insight-core-idea">Imagine you're standing on a number line. Each position tells you how far you can jump. You want to reach the end in the <strong>fewest jumps</strong>.</p>
+                <p class="insight-core-idea">Think of it like exploring a map. You start with a small area you can reach. You look around, figure out the farthest spot you can get to next, then "jump" — expanding your reach.</p>
+                <p class="insight-core-idea">Each jump opens up a new zone. You keep going until the end is inside your zone.</p>
 
                 <div class="insight-example-header">
-                    <span class="insight-example-label">The Key Insight</span>
-                    <span class="insight-example-array">Think of it like ripples in a pond — each "jump" expands your reachable zone</span>
+                    <span class="insight-example-label">The Core Idea</span>
+                    <span class="insight-example-array">Each jump opens the widest possible next zone — so you never waste a jump</span>
                 </div>
 
                 <div class="insight-step">
                     <div class="insight-step-num">1</div>
                     <div class="insight-step-body">
                         <strong>Two loops, two jobs</strong>
-                        <p>The <span style="color:var(--accent-blue)">outer loop</span> (<code style="color:var(--accent-blue)">while r &lt; len(nums) - 1</code>) handles <strong>jumps</strong> — each iteration = one jump.</p>
-                        <p>The <span style="color:var(--accent-green)">inner loop</span> (<code style="color:var(--accent-green)">for i in range(l, r+1)</code>) scans every cell in the current reachable zone to find the <strong>farthest</strong> any of them can reach.</p>
+                        <p>The <span style="color:var(--accent-blue)">outer loop</span> handles jumps — each time it runs, you're making one jump.</p>
+                        <p>The <span style="color:var(--accent-green)">inner loop</span> looks at every cell in your current zone and asks: "what's the farthest any of these can reach?"</p>
                     </div>
                 </div>
 
                 <div class="insight-step">
                     <div class="insight-step-num">2</div>
                     <div class="insight-step-body">
-                        <strong>What [L, R] actually means</strong>
-                        <p><span style="color:#fb923c"><strong>L</strong></span> and <span style="color:#f472b6"><strong>R</strong></span> define the <strong>current reachable zone</strong> — all indices you can land on using exactly the current number of jumps.</p>
-                        <p>This is identical to how BFS processes one "level" at a time. L is the start of the level, R is the end.</p>
+                        <strong>What L and R mean</strong>
+                        <p><span style="color:#fb923c"><strong>L</strong></span> and <span style="color:#f472b6"><strong>R</strong></span> mark the edges of your current zone — everything between them is reachable with the current number of jumps.</p>
+                        <p>Think of it like: "I can land on any of these spots right now."</p>
                     </div>
                 </div>
 
                 <div class="insight-step">
                     <div class="insight-step-num">3</div>
                     <div class="insight-step-body">
-                        <strong>Why we track <code style="color:var(--accent-purple)">farthest</code></strong>
-                        <p>Each cell in the zone offers a "launch pad." <code style="color:var(--accent-purple)">farthest = max(farthest, i + nums[i])</code> remembers the best one.</p>
-                        <p>We don't need to know <em>which</em> cell was best — only <em>how far</em> the best one reaches. That becomes the right edge of the next zone.</p>
+                        <strong>Finding the farthest reach</strong>
+                        <p>Each cell in the zone is a launch pad. We check every one and remember whichever can reach the farthest: <code style="color:var(--accent-purple)">farthest = max(farthest, i + nums[i])</code></p>
+                        <p>We don't care which cell was best — just how far the best one gets us. That becomes the right edge of our next zone.</p>
                     </div>
                 </div>
 
                 <div class="insight-step">
                     <div class="insight-step-num">4</div>
                     <div class="insight-step-body">
-                        <strong>The jump: expanding to the next zone</strong>
-                        <p>After scanning every cell in [L, R]:</p>
-                        <span class="insight-transform">L = R + 1 &nbsp;&nbsp;(start of new zone)<br>R = farthest &nbsp;(end of new zone)<br>jumps += 1</span>
-                        <p>The old zone fades out. The new zone lights up. Each jump = one BFS level deeper.</p>
+                        <strong>Making the jump</strong>
+                        <p>After checking every cell in [L, R]:</p>
+                        <span class="insight-transform">L = R + 1 &nbsp;&nbsp;(new zone starts)<br>R = farthest &nbsp;(new zone ends)<br>jumps += 1</span>
+                        <p>The old zone fades out. The new, bigger zone lights up.</p>
                     </div>
                 </div>
 
                 <div class="insight-step">
                     <div class="insight-step-num">5</div>
                     <div class="insight-step-body">
-                        <strong>Why this is optimal</strong>
-                        <p>BFS guarantees the shortest path. By always expanding to the farthest reachable index, we cover the maximum ground per jump — so we'll never use more jumps than necessary.</p>
-                        <p>Greedy works here because reaching farther is <em>always</em> better. There's no case where a shorter jump now leads to fewer total jumps later.</p>
+                        <strong>Why this gives the fewest jumps</strong>
+                        <p>By always expanding to the farthest reachable point, you cover the most ground per jump. There's no scenario where a shorter jump now would save you jumps later.</p>
                     </div>
                 </div>
 
                 <div class="insight-key">
-                    <strong>Mental model:</strong> Each zone = "everything reachable in exactly N jumps." The inner loop finds the frontier of the <em>next</em> zone. When you step forward, you're committing to one more jump and unlocking a bigger region. BFS guarantees this is optimal.
+                    <strong>Think of it this way:</strong> Each zone is "everywhere I can be in exactly N jumps." The inner loop finds the frontier of the next zone. When you step forward, you unlock a bigger region. Expanding as far as possible each time guarantees the fewest total jumps.
                 </div>
 
                 <div class="insight-complexity">
@@ -1170,6 +1312,7 @@
             });
         })();
     </script>
+
     <script src="script.js"></script>
 
     <!-- Bug Report / Feedback Modal -->
